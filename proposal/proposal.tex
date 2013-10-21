@@ -1,0 +1,103 @@
+% Use this template to write your solutions
+
+\documentclass[12pt]{article}
+
+\include{lecture}
+
+% Set the margins
+%
+\setlength{\textheight}{8.5in}
+\setlength{\headheight}{.25in}
+\setlength{\headsep}{.25in}
+\setlength{\topmargin}{0in}
+\setlength{\textwidth}{6.5in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+
+% Macros
+\newcommand{\myN}{\hbox{N\hspace*{-.9em}I\hspace*{.4em}}}
+\newcommand{\myZ}{\hbox{Z}^+}
+\newcommand{\myR}{\hbox{R}}
+
+\newcommand{\myfunction}[3]
+{${#1} : {#2} \rightarrow {#3}$ }
+
+\newcommand{\myzrfunction}[1]
+{\myfunction{#1}{{\myZ}}{{\myR}}}
+
+
+% Formating Macros
+
+\newcommand{\myheader}[4]
+{\vspace*{-0.5in}
+\noindent
+{#1} \hfill {#3}
+
+\noindent
+{#2} \hfill {#4}
+
+\noindent
+\rule[8pt]{\textwidth}{1pt}
+
+\vspace{1ex} 
+}  % end \myheader 
+
+%%%%%% Begin document with header and title %%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\pagestyle{plain}
+
+\begin{center}
+  \Large\textbf{Automated Data Configuration for NoSQL Systems}\\
+  \large\textit{Kevin Lee, Akshay Mittal, Sachin Ravi}
+\end{center}
+
+\bigskip
+
+\section{Introduction}
+NoSQL storage options such as \emph{Cassandra} and \emph{MongoDB} are gaining traction in industry because traditional
+RDBMS struggle with the scale associated with web services. By being distributed and decentralized, these new storage 
+services allow one to horizontally scale by adding more commodity machines as necessary. Though there exist many NOSQL
+options, all offering differing data models, we concentrate our efforts on column-oriented data stores, such as BigTable
+and Cassandra.
+
+Data modeling in these new systems differs from traditional RDBMS data modeling. In relational databases, where most queries
+are carried out through the use of joins, a fully normalized data model is conventional; however in the NoSQL storage systems, 
+we avoid using joins for scalability purposes and so it is necessary to denormalize one's data by storing repetitive information 
+to optimize the system's response to certain queries.
+
+The decision of how to denormalize one's data and to what level is dependent on the query workload one expects for his/her service.
+Not only does this require the developer to predict the workload ahead of time but it may involve a complicated cost-benefit analysis that
+is harder for larger, more complicated workloads. 
+Here, we believe it is possible to help the developer and have an automated way to do this modeling. Given a query workload and 
+the normalized definition of how tables are related, it should be possible to give an optimal (or close to optimal) configuration 
+for how the denormalized data should be stored. This sort of tool would help avoid extended analysis and allow one to automatically
+change the data configuration if the query workload has changed enough.
+
+\section{Related Work}
+We look to previous database literature on automatically enumerating materialized views for SQL databases to solve the above problem. 
+In many ways, a materialized view is similar to a table that is storing denormalized data since in both cases, data is being replicated so 
+that queries can be answered more efficiently. Specifically, in \cite{agrawal2000automated}, the authors discuss an entire end-to-end solution
+for automated selection of materialized views. The main contributions of this paper are algorithms for: (1) producing a candidate materialized
+view set that is much smaller than the set of all possible materialized views for a query workload; (2) adding to this set by merging views from 
+the original set.
+
+In \cite{agrawal2000automated}, however, the query optimizer is used extensively to evaluate the cost of materialized views for different queries.
+In Cassandra, for example, we don't have access to a query optimizer so it will be neccessary to build our own cost model to evaluate the cost
+of a certain data configuration for a specific query. 
+
+\section{Preliminary Plan}
+We plan on working with Cassandra, an open-source, column-oriented data-store created at Facebook, to evaluate our automated data configuration
+system. In the first iteration, we plan to work outside the system and create a prototype that accepts a list of Cassandra queries and a normalized
+view of the data, to produce an optimal denormalized data configuration. Building this system outside of Cassandra will allow us to concentrate on 
+the actual project rather than spend a lot of time familiarizing ourselves with Cassandra code. We can then evaluate the automated data configuration 
+produced against other manually planned options for various query workloads to see how well our system performs.
+
+For a later goal, we would like to incorporate our system into Cassandra itself so that it can read from the query logs and automatically shift 
+the existing data configuration to a more optimal one.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
