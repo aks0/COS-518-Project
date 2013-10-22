@@ -58,7 +58,7 @@
 \section{Introduction}
 NoSQL storage options such as \emph{Cassandra} and \emph{MongoDB} are gaining traction in industry because traditional
 RDBMS struggle with the scale associated with web services. By being distributed and decentralized, these new storage 
-services allow one to horizontally scale by adding more commodity machines as necessary. Though there exist many NOSQL
+services allow one to horizontally scale by adding more commodity machines as necessary. Though there exist many NoSQL
 options, all offering differing data models, we concentrate our efforts on column-oriented data stores, such as BigTable
 and Cassandra.
 
@@ -69,7 +69,8 @@ to optimize the system's response to certain queries.
 
 The decision of how to denormalize one's data and to what level is dependent on the query workload one expects for his/her service.
 Not only does this require the developer to predict the workload ahead of time but it may involve a complicated cost-benefit analysis that
-is harder for larger, more complicated workloads. 
+is harder for larger, more complicated workloads.
+
 Here, we believe it is possible to help the developer and have an automated way to do this modeling. Given a query workload and 
 the normalized definition of how tables are related, it should be possible to give an optimal (or close to optimal) configuration 
 for how the denormalized data should be stored. This sort of tool would help avoid extended analysis and allow one to automatically
@@ -84,8 +85,13 @@ view set that is much smaller than the set of all possible materialized views fo
 the original set.
 
 In \cite{agrawal2000automated}, however, the query optimizer is used extensively to evaluate the cost of materialized views for different queries.
-In Cassandra, for example, we don't have access to a query optimizer so it will be neccessary to build our own cost model to evaluate the cost
+In Cassandra, for example, we do not have access to a query optimizer so it will be necessary to build our own cost model to evaluate the cost
 of a certain data configuration for a specific query. 
+
+HBase~\cite{hbaseBook} is an open source, non-relational, distributed database modeled after Google's BigTable. To make best use of the features
+of HBase, application developers have the onus to denormalize the schemas. If the query load changes, the initial optimal denormalization may
+prove to be inefficient for the incoming queries. An automated denormalization of the schemas will incur initial processing cost but will relieve
+the developer of the denormalization task.
 
 \section{Preliminary Plan}
 We plan on working with Cassandra, an open-source, column-oriented data-store created at Facebook, to evaluate our automated data configuration
@@ -95,7 +101,8 @@ the actual project rather than spend a lot of time familiarizing ourselves with 
 produced against other manually planned options for various query workloads to see how well our system performs.
 
 For a later goal, we would like to incorporate our system into Cassandra itself so that it can read from the query logs and automatically shift 
-the existing data configuration to a more optimal one.
+the existing data configuration to a more optimal one. We plan to use the ``Yahoo! Cloud Serving Benchmark" (YCSB) framework~\cite{ycsb} for the
+purpose of query workloads.
 
 \bibliographystyle{plain}
 \bibliography{references}

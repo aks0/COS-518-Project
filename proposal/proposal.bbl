@@ -1,0 +1,21 @@
+\begin{thebibliography}{1}
+
+\bibitem{agrawal2000automated}
+Sanjay Agrawal, Surajit Chaudhuri, and Vivek~R Narasayya.
+\newblock Automated selection of materialized views and indexes in sql
+  databases.
+\newblock In {\em VLDB}, volume 2000, pages 496--505, 2000.
+
+\bibitem{ycsb}
+Brian~F. Cooper, Adam Silberstein, Erwin Tam, Raghu Ramakrishnan, and Russell
+  Sears.
+\newblock Benchmarking cloud serving systems with ycsb.
+\newblock In {\em Proceedings of the 1st ACM symposium on Cloud computing},
+  SoCC '10, pages 143--154, New York, NY, USA, 2010. ACM.
+
+\bibitem{hbaseBook}
+Lars George.
+\newblock {\em HBase: the definitive guide}.
+\newblock O'Reilly Media, Inc., 2011.
+
+\end{thebibliography}
