@@ -81,11 +81,16 @@ change the data configuration if the query workload has changed enough.
 We look to previous database literature on automatically enumerating materialized views for SQL databases to solve the above problem. 
 In many ways, a materialized view is similar to a table that is storing denormalized data since in both cases, data is being replicated so 
 that queries can be answered more efficiently. Specifically, in \cite{agrawal2000automated}, the authors discuss an entire end-to-end solution
-for automated selection of materialized views. The main contributions of this paper are algorithms for: (1) producing a candidate materialized
-view set that is much smaller than the set of all possible materialized views for a query workload; (2) adding to this set by merging views from 
-the original set.
+for automated selection of materialized views based on their relative importance to a set of queries. The main contributions of this paper are 
+algorithms for: (1) producing a candidate materialized view set that is much smaller than the set of all possible materialized views for a
+query workload; (2) adding to this set by merging views from the original set.
 
-In \cite{agrawal2000automated}, however, the query optimizer is used extensively to evaluate the cost of materialized views for different queries.
+In \cite{chan99design} an algorithm is presented for selecting materialized views greedily based on their storage effectiveness.  This
+storage effectiveness is defined to be the view's net benefit, dependent on query and maintenance costs, divided by its storage cost.  By
+adding the notion of storage size directly into the cost model, this work is thus related to the issue of denormalized representations of
+data in NoSQL systems where there is also a benefit vs storage tradeoff being examined.
+
+In both \cite{agrawal2000automated} and \cite{chan99design}, however, the query optimizer is used extensively to evaluate the cost of materialized views for different queries.
 In Cassandra, for example, we do not have access to a query optimizer so it will be necessary to build our own cost model to evaluate the cost
 of a certain data configuration for a specific query. 
 
