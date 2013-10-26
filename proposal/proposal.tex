@@ -3,14 +3,14 @@
 \documentclass[10pt]{article}
 % \documentclass[twocolumn]{sigplanconf}
 
-\include{lecture}
+%\include{lecture}
 
 % Set the margins
 %
-\setlength{\textheight}{8.5in}
-\setlength{\headheight}{.25in}
-\setlength{\headsep}{.25in}
-\setlength{\topmargin}{0in}
+\setlength{\textheight}{9.7in}
+%\setlength{\headheight}{.25in}
+%\setlength{\headsep}{.25in}
+\setlength{\topmargin}{-0.8in}
 \setlength{\textwidth}{6.5in}
 \setlength{\oddsidemargin}{0in}
 \setlength{\evensidemargin}{0in}
@@ -47,35 +47,29 @@
 
 \begin{document}
 
-\pagestyle{plain}
+\title{\bf Automated Data Configuration for NoSQL Systems}
+\author {Kevin Lee \and Akshay Mittal \and Sachin Ravi}
 
-\begin{center}
-  \Large\textbf{Automated Data Configuration for NoSQL Systems}\\
-  \large\textit{Kevin Lee, Akshay Mittal, Sachin Ravi}
-\end{center}
+\date{}
+\maketitle
 
-\bigskip
-
-\section{Introduction}
+\section{Motivation}
 NoSQL storage options such as \emph{Cassandra} and \emph{MongoDB} are gaining traction in industry because traditional
 RDBMS struggle with the scale associated with web services. By being distributed and decentralized, these new storage 
 services allow one to horizontally scale by adding more commodity machines as necessary. Though there exist many NoSQL
 options, all offering differing data models, we concentrate our efforts on column-oriented data stores, such as BigTable
-and Cassandra.
+and Cassandra.\\
 
-Data modeling in these new systems differs from traditional RDBMS data modeling. In relational databases, where most queries
+\noindent Data modeling in these new systems differs from traditional RDBMS data modeling. In relational databases, where most queries
 are carried out through the use of joins, a fully normalized data model is conventional; however in the NoSQL storage systems, 
 we avoid using joins for scalability purposes and so it is necessary to denormalize one's data by storing repetitive information 
-to optimize the system's response to certain queries.
+to optimize the system's response to certain queries.\\
 
-The decision of how to denormalize one's data and to what level is dependent on the query workload one expects for his/her service.
+\noindent The decision of how to denormalize one's data and to what level is dependent on the query workload one expects for his/her service.
 Not only does this require the developer to predict the workload ahead of time but it may involve a complicated cost-benefit analysis that
-is harder for larger, more complicated workloads.
+is harder for larger, more complicated workloads.\\
 
-Here, we believe it is possible to help the developer and have an automated way to do this modeling. Given a query workload and 
-the normalized definition of how tables are related, it should be possible to give an optimal (or close to optimal) configuration 
-for how the denormalized data should be stored. This sort of tool would help avoid extended analysis and allow one to automatically
-change the data configuration if the query workload has changed enough.
+\noindent Here, we believe that it is possible to help the developer and have an automated way to do this modeling. 
 
 \section{Related Work}
 We look to previous database literature on automatically enumerating materialized views for SQL databases to solve the above problem. 
@@ -83,35 +77,42 @@ In many ways, a materialized view is similar to a table that is storing denormal
 that queries can be answered more efficiently. Specifically, in \cite{agrawal2000automated}, the authors discuss an entire end-to-end solution
 for automated selection of materialized views based on their relative importance to a set of queries. The main contributions of this paper are 
 algorithms for: (1) producing a candidate materialized view set that is much smaller than the set of all possible materialized views for a
-query workload; (2) adding to this set by merging views from the original set.
+query workload; (2) adding to this set by merging views from the original set.\\
 
-In \cite{chan99design} an algorithm is presented for selecting materialized views greedily based on their storage effectiveness.  This
+\noindent In \cite{chan99design} an algorithm is presented for selecting materialized views greedily based on their storage effectiveness.  This
 storage effectiveness is defined to be the view's net benefit, dependent on query and maintenance costs, divided by its storage cost.  By
 adding the notion of storage size directly into the cost model, this work is thus related to the issue of denormalized representations of
-data in NoSQL systems where there is also a benefit vs storage tradeoff being examined.
+data in NoSQL systems where there is also a benefit vs storage tradeoff being examined.\\
 
-In both \cite{agrawal2000automated} and \cite{chan99design}, however, the query optimizer is used extensively to evaluate the cost of materialized views for different queries.
+\noindent In both \cite{agrawal2000automated} and \cite{chan99design}, however, the query optimizer is used extensively to evaluate the cost of materialized views for different queries.
 In Cassandra, for example, we do not have access to a query optimizer so it will be necessary to build our own cost model to evaluate the cost
-of a certain data configuration for a specific query. 
+of a certain data configuration for a specific query. \\
 
-Nectar~\cite{gunda2010nectar} system was designed to avoid manual management of data and computation; it automates and unifies the management of
+\noindent Nectar~\cite{gunda2010nectar} system was designed to avoid manual management of data and computation; it automates and unifies the management of
 data and computation within a datacenter. Derived datasets, which are the results of computations, are uniquely identified by the programs that produce them,
 and together with their programs, are automatically managed by a datacenter wide caching service. Any derived dataset can be transparently regenerated by re-executing
 its program, and any computation can be transparently avoided by using previously cached results. This trade-off between storage and computation can
-be leveraged to define an efficient view materialization scheme for NoSQL storage systems.
+be leveraged to define an efficient view materialization scheme for NoSQL storage systems.\\
 
-HBase~\cite{hbaseBook} is an open source, non-relational, distributed database modeled after Google's BigTable. To make best use of the features
+\noindent HBase~\cite{hbaseBook} is an open source, non-relational, distributed database modeled after Google's BigTable. To make best use of the features
 of HBase, application developers have the onus to denormalize the schemas. If the query load changes, the initial optimal denormalization may
 prove to be inefficient for the incoming queries. An automated denormalization of the schemas will incur initial processing cost but will relieve
 the developer of the denormalization task.
 
-\section{Preliminary Plan}
+\section{Hypothesis}
+Given a query workload and the normalized definition of how tables are related, it should be possible to give an optimal (or close to optimal) configuration 
+for how the denormalized data should be stored. This sort of tool would help avoid extended analysis and allow one to automatically
+change the data configuration if the query workload has changed enough.
+
+\section{Project Plan}
+\subsection*{version 0}
 We plan on working with Cassandra, an open-source, column-oriented data-store created at Facebook, to evaluate our automated data configuration
 system. In the first iteration, we plan to work outside the system and create a prototype that accepts a list of Cassandra queries and a normalized
 view of the data, to produce an optimal denormalized data configuration. Building this system outside of Cassandra will allow us to concentrate on 
 the actual project rather than spend a lot of time familiarizing ourselves with Cassandra code. We can then evaluate the automated data configuration 
 produced against other manually planned options for various query workloads to see how well our system performs.
 
+\subsection*{version 1}
 For a later goal, we would like to incorporate our system into Cassandra itself so that it can read from the query logs and automatically shift 
 the existing data configuration to a more optimal one. We plan to use the ``Yahoo! Cloud Serving Benchmark" (YCSB) framework~\cite{ycsb} for the
 purpose of query workloads.
