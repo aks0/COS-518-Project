@@ -1,0 +1,181 @@
+\documentclass[10pt]{article}
+
+\usepackage{amsmath, amsfonts, amsthm, fullpage, amssymb, algpseudocode, algorithm, graphicx}
+
+\setlength{\textheight}{9in}
+\setlength{\textwidth}{6.5in} 
+\setlength{\topmargin}{-.5in}
+\setlength{\evensidemargin}{0in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\headsep}{0.5in}
+\setlength{\parskip}{0ex}
+\setlength{\itemsep}{-.6ex}
+
+\newcommand{\comment}[1]{}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{invariant}[theorem]{Invariant}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{property}[theorem]{Property}
+\newtheorem{remark}[theorem]{Remark}
+
+\floatstyle{ruled}
+\newfloat{Program}{H}{lop}[section]
+\newfloat{Function}{H}{lop}[section]
+
+\floatstyle{boxed}
+\newfloat{Output}{H}{lop}[section]
+
+\floatstyle{plain}
+\newfloat{Demo}{H}{lop}[section]
+\newfloat{Figure}{H}{lop}[section]
+\newfloat{Myfig}{H}{lop}[section]
+
+% These are some useful macros
+
+\algnewcommand\algorithmicinput{\textbf{INPUT:}}
+\algnewcommand\INPUT{\item[\algorithmicinput]}
+\algnewcommand\algorithmicoutput{\textbf{OUTPUT:}}
+\algnewcommand\OUTPUT{\item[\algorithmicoutput]}
+
+\def\handout#1#2{
+      \centerline{\framebox{\framebox{ \parbox{5in}{ \bf COS 423 \hfill
+      Theory of Algorithms \hfill Spring 2013 \hfill \\
+      \hfill\mbox{ } \\[1mm] \mbox{ } \hfill{\Large \bf #2 #1}\hfill
+      \mbox{ }} }}}
+      \vspace{0.5in}
+}
+
+\title{Precept 1}
+
+\begin{document}
+
+\title{\bf Automated Data Configuration for NoSQL Systems}
+\author {Kevin Lee \and Akshay Mittal \and Sachin Ravi}
+
+\date{}
+\maketitle
+
+\section{High-level Design}
+\begin{enumerate}
+\item Will receive SQL query workload
+\item Finding Interesting Table-subsets with selection conditions imposed (based purely on table-subsets occurring in queries) 
+\footnote{Might be interesting to try without selection conditions imposed and no merging}
+\item Do merging to get more options (to get table-subsets that are not explicitly in any query)
+\item For each of these table-subsets, we calculate score across all queries. 
+Supose $Q$ is the set of queries we are considering and $m \in M$, the set of all table-subsets we are considering, is one possible table-subset,
+\\
+\\
+$$queryCost(m, Q) = \textrm{cost to answer query using table-subset $m$}$$
+$$updateCost(m,Q) = \beta \cdot \textrm{number of queries that update any table in $m$}$$
+$$storageCost(m) = \alpha \cdot \textrm{size of storing $m$}$$
+$$cost(m,Q) = queryCost(m,Q) + updateCost(m,Q) + storageCost(m)$$
+\\
+\\
+Add each cost to priority queue
+\item Get $k$ lowest costs out of priority queue and keep the table-subsets corresponding to these $k$ lowest costs (if having picked smaller subset, ingore larger subset if it is considered later)
+\end{enumerate}
+
+\subsection{Finding Interesting Table-Subsets}
+$$ Cost(T) = \textrm{cost of all queries where subset $T$ occurs} $$
+
+$$ WeightedCost(T) = \sum_{i} cost(Q_i) \cdot \frac{\textrm{sum of sizes of tables in T}}{\textrm{sum of sizes of all tables referenced in $Q_i$}} $$
+
+\begin{lemma}
+For $T_1 \subseteq T_2$, $Cost(T_1) \ge Cost(T_2)$.
+\end{lemma}
+
+\begin{lemma}
+$WeightedCost(T) \ge C \Rightarrow Cost(T) \ge C$ $\Leftrightarrow$ $Cost(T) \not \ge C \Rightarrow WeightedCost(T) \not \ge C$ 
+\end{lemma}
+
+\begin{algorithm}[H]
+  \caption{Algorithm for finding potential table-subsets in query workload}
+  \begin{algorithmic}
+  	\INPUT $C$ (baseline), $maxSize$ (max size for a table-subset) \\
+  	$S_1 \gets \{T \, | \, T \textrm{ is a table-subset of size $1$ with } Cost(T) \ge C\}$ \\
+  	$i \gets 1$ \\
+  	\While{$i < maxSize$ and $|S_i| > 0$} \\
+  		$i = i + 1$ \\
+  		$S_i = \{\}$ \\
+  		$G \gets \{T \, | \, T \textrm{ is a table subset of size $i$ and } \exists s \in S_{i-1} \textrm{such that } s \subset T\}$
+  		\For{$g \in G$}
+  			\If{$Cost(g) \ge C$}
+  				$S_i = S_i \cup \{g\}$ 
+  			\EndIf
+  		\EndFor
+  	\EndWhile
+  \end{algorithmic}
+  $S \gets S_1 \cup S_2 \cup \ldots \cup S_{maxSize}$ \\
+  $R \gets \{T \, | \, T \in S \textrm{ and } Weight(T) \ge C\}$ \\
+  return $R$
+\end{algorithm}
+
+When picking table-subsets, we want to pick subsets that are in expensive queries (because materializing these table-subsets will decrease a great cost).
+We pass in a threshold value of the minimum total cost we would like to satisfy when considerng a certain table-subset.
+We start with single table-subsets and continually work our way up to higher table-subsets, while ensuring that we still satisfy the threshold.
+
+\subsection{Merging Table-Subsets}
+The problem with only using the previous procedure is that we only consider table-subsets that exist in some query in the workload. Oftentimes, there are table-subsets
+that don't occur in any query but are useful to materialize anyway.
+
+[Insert Example]
+
+\begin{algorithm}[H]
+  \caption{Pairwise Merge}
+  \begin{algorithmic}
+    \INPUT $T_1$, table-subset, $T_2$ table-subset \\
+    \If{$T_1 \cap T_2 = \emptyset$}
+      return $\emptyset$
+    \EndIf
+    \\
+    \\
+    $newT \gets$ union of $T_1$ and $T_2$'s projection columns (only the ones on the insterseciton of $T_1$ and $T_2$'s intersecting table-subsets), intersection of $T_1$ and $T_2$'s selection conditions, and intersection of $T_1$ and $T_2$'s table-subsets
+    \\
+    \\
+    return $newT$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Algorithm for producing merged table-subsets}
+  \begin{algorithmic}
+    \INPUT $T$, set of table-subsets \\
+    $R \gets T$ \\
+    \While{$|R| > 1$}
+      \State $M' = \emptyset$ 
+      \For{$R_1, R_2 \in R$} 
+        \State $newR \gets$ Pairwise Merge of $R_1$ and $R_2$
+        \State $M' \gets M' \cup newR$
+      \EndFor
+      \\
+      \If{$M' = \emptyset$}
+        \State return $R - T$ 
+      \EndIf
+      \\
+      \ForAll{$m \in M'$}
+        \State Remove both parents of $m$ from R
+      \EndFor   
+      \State $R \gets R \cup M'$
+      \\
+    \EndWhile 
+    \State return $R - T$
+  \end{algorithmic}
+\end{algorithm}
+
+\subsection{Pruning}
+
+\subsection{Cost Model}
+The basic thing we need to write is $cost(q, T)$ where $q$ is a normalized query and $T = \{T_1, \ldots, T_k\}$ is a subset of tables with possible selection conditions imposed (the possible denormalized option). 
+\\
+$cost(q,T)$
+\\
+\\
+
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
