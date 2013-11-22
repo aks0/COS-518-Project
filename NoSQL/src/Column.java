@@ -21,4 +21,9 @@ public class Column {
 		this.isPrimary = true;
 		return this;
 	}
+	
+	@Override
+	public String toString() {
+		return table.toString() + "#" + name;
+	}
 }
