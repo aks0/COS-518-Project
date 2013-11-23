@@ -2,21 +2,23 @@
 public class Column {
 	private Table table;
 	private String name;
-	private Column foreignKeyReferencing;
+	private Column foreignKeyReference;
 	private boolean isPrimary;
 	
 	Column(Table table, String name) {
 		this.table = table;
 		this.name = name;
-		foreignKeyReferencing = null;
+		foreignKeyReference = null;
 		isPrimary = false;
 	}
-
-	public void setPrimary(boolean isPrimary) {
-		this.isPrimary = isPrimary;
+	
+	public Column setForeignKeyReference(Column reference) {
+		this.foreignKeyReference = reference;
+		return this;
 	}
 
-	public void setForeignKeyReferencing(Column foreignKeyFor) {
-		this.foreignKeyReferencing = foreignKeyFor;
+	public Column primary() {
+		this.isPrimary = true;
+		return this;
 	}
 }
