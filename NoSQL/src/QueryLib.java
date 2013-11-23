@@ -1,20 +1,54 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
-
+/**
+ * Library for turning a queries log into a list
+ * of Query objects
+ */
 public class QueryLib {
-
-	private ArrayList<Query> queries;
-	
-	QueryLib() {
-		queries = new ArrayList<Query>();
-	}
-	
-	public QueryLib addQuery(Query query) {
-		this.queries.add(query);
-		return this;
-	}
-	
-	public Query getQuery(int index) {
-		return this.queries.get(index);
-	}
+    
+    /**
+     * Creates an ArrayList containing a Query object for every
+     * query in the file at filepath.
+     * @param filepath
+     * @return ArrayList of Query objects
+     */
+    public static ArrayList<Query> getQueryList(String filepath) {
+        StringBuilder builder = new StringBuilder();
+        ArrayList<Query> queryList = new ArrayList<Query>();
+        try {
+            Scanner scanner = new Scanner(new File(filepath));
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                // queries in the file are separated by empty lines
+                if (line.isEmpty()) {
+                    String query = builder.toString();
+                    builder = new StringBuilder();
+                    queryList.add(new Query(query));
+                } else {
+                    builder.append(line);
+                    builder.append("\n");
+                }
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return queryList;
+    }
+   
+    /**
+     * test main
+     * @param args
+     */
+    public static void main(String[] args) {
+        ArrayList<Query> queries = getQueryList("query_logs/queries.sql");
+        for (Query query : queries) {
+            for (Column column : query.getSelectColumns()) {
+                System.out.println(column);
+            }
+        }
+    }
 }
