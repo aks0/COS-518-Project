@@ -1,6 +1,10 @@
 
 public class Column {
 	private Table table;
+	public Table getTable() {
+		return table;
+	}
+
 	private String name;
 	private Column foreignKeyReference;
 	private boolean isPrimary;

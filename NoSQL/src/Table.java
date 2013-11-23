@@ -18,7 +18,13 @@ public class Table {
 
 	private String name;
 	private ArrayList<Column> columns;
+	// TODO: need to set this parameter
+	private int size;
 	
+	public int getSize() {
+		return size;
+	}
+
 	Table(String name) {
 		this.name = name;
 		columns = new ArrayList<Column>();

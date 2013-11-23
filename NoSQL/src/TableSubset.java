@@ -8,6 +8,10 @@ public class TableSubset {
 		tableset = new ArrayList<Column>();
 	}
 	
+	TableSubset(ArrayList<Column> columns) {
+		tableset = new ArrayList<Column>(columns);
+	}
+	
 	public TableSubset addColumn(Column column) {
 		this.tableset.add(column);
 		return this;
@@ -15,5 +19,9 @@ public class TableSubset {
 	
 	public Column getColumn(int index) {
 		return this.tableset.get(index);
+	}
+	
+	public ArrayList<Column> getColumns() {
+		return this.tableset;
 	}
 }
