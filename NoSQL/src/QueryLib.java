@@ -16,7 +16,7 @@ public class QueryLib {
      * @return ArrayList of Query objects
      */
     public static ArrayList<Query> getQueryList(String filepath) {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder query = new StringBuilder();
         ArrayList<Query> queryList = new ArrayList<Query>();
         try {
             Scanner scanner = new Scanner(new File(filepath));
@@ -24,12 +24,14 @@ public class QueryLib {
                 String line = scanner.nextLine();
                 // queries in the file are separated by empty lines
                 if (line.isEmpty()) {
-                    String query = builder.toString();
-                    builder = new StringBuilder();
-                    queryList.add(new Query(query));
+                    queryList.add(new Query(query.toString()));
+                    query = new StringBuilder();
                 } else {
-                    builder.append(line);
-                    builder.append("\n");
+                    query.append(line + "\n");
+                    // append if EOF is reached
+                    if (!scanner.hasNextLine()) {
+                        queryList.add(new Query(query.toString()));
+                    }
                 }
             }
             scanner.close();
