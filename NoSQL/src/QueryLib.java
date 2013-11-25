@@ -51,6 +51,7 @@ public class QueryLib {
             for (Column column : query.getSelectColumns()) {
                 System.out.println(column);
             }
+            System.out.println();
         }
     }
 }

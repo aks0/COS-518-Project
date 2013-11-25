@@ -2,7 +2,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,6 +18,7 @@ import org.xml.sax.SAXException;
 
 public class Table {
 
+	private static Map<String, Table> tables = new HashMap<String, Table>();
 	private String name;
 	private ArrayList<Column> columns;
 	// TODO: need to set this parameter
@@ -25,9 +28,19 @@ public class Table {
 		return size;
 	}
 
-	Table(String name) {
+	/**
+	 * Use the factory method {@link Table#getInstance} to get a Table
+	 * instance. Ensures uniqueness of Table instances.
+	 * @param name
+	 * @throws Exception
+	 */
+	private Table(String name) throws Exception {
+		if (tables.containsKey(name)) {
+			throw new Exception("A table with this name already exists");
+		}
 		this.name = name;
 		columns = new ArrayList<Column>();
+		tables.put(name, this);
 	}
 	
 	public String toString() {
@@ -43,6 +56,26 @@ public class Table {
 		return this.columns;
 	}
 
+	/**
+	 * Table factory for generating new tables or returning an already
+	 * existing instance. It ensures that only once instance of each table
+	 * exists.
+	 * @param table_name
+	 * @return Table instance
+	 */
+	public static Table getInstance(String table_name) {
+		if (!tables.containsKey(table_name)) {
+			try {
+				return new Table(table_name);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			return tables.get(table_name);
+		}
+		return null;
+	}
+	
 	/**
 	 * Assumes that the data model is in the following format
 	 * 
@@ -74,18 +107,23 @@ public class Table {
 		NodeList xml_tables = doc.getElementsByTagName("table");
 		ArrayList<Table> tables = new ArrayList<Table>();
 		for (int i = 0; i < xml_tables.getLength(); i++) {
-			Table table = getTableFromNode(xml_tables.item(i));
+			Table table = null;
+			try {
+				table = getTableFromNode(xml_tables.item(i));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			tables.add(table);
 		}
 		return tables;
 	}
 	
-	private static Table getTableFromNode(Node item) {
+	private static Table getTableFromNode(Node item) throws Exception {
 		if (item.getNodeType() == Node.ELEMENT_NODE) {
 			Element eElement = (Element) item;
 			String table_name =
 				eElement.getElementsByTagName("name").item(0).getTextContent();
-			Table table = new Table(table_name);
+			Table table = getInstance(table_name);
 			NodeList columns = eElement.getElementsByTagName("column");
 			for (int i = 0; i < columns.getLength(); i++) {
 				Column column = getColumnFromNode(table, columns.item(i));
