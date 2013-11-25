@@ -44,7 +44,8 @@ public class Query {
 	                if (split.length == 2 && columns != null) {
 	                    String tableName = split[0];
 	                    String columnName = split[1];
-                        columns.add(new Column(new Table(tableName), columnName));
+	                    Table table = Table.getInstance(tableName);
+                        columns.add(new Column(table, columnName));
 	                }
 	                break;
 	        }

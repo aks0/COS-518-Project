@@ -1,15 +1,15 @@
-SELECT a.name, b.title, b.desc 
+SELECT a.name, b.title, b.desc
 FROM user AS a, item AS b
 WHERE b.itemid = 111
 AND a.userid IN
-(SELECT userid 
+(SELECT userid
 FROM user_item_like
 WHERE itemid = 111)
 
-SELECT a.title, b.name, b.email 
+SELECT a.title, b.name, b.email
 FROM item AS a, user AS b
 WHERE a.userid = 123
 AND b.itemid IN
-(SELECT itemid 
+(SELECT itemid
 FROM user_item_like
 WHERE userid = 123)
