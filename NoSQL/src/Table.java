@@ -123,7 +123,7 @@ public class Table {
 			Element eElement = (Element) item;
 			String table_name =
 				eElement.getElementsByTagName("name").item(0).getTextContent();
-			Table table = new Table(table_name);
+			Table table = getInstance(table_name);
 			NodeList columns = eElement.getElementsByTagName("column");
 			for (int i = 0; i < columns.getLength(); i++) {
 				Column column = getColumnFromNode(table, columns.item(i));
