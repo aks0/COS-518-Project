@@ -26,6 +26,10 @@ public class Column {
 		return this;
 	}
 	
+	public boolean isPrimary() {
+	    return this.isPrimary;
+	}
+	
 	@Override
 	public String toString() {
 		return table.toString() + "#" + name;

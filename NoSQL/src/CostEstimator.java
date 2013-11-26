@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 
 public class CostEstimator {
@@ -34,7 +35,7 @@ public class CostEstimator {
 	 * @return
 	 */
 	public static double normalizedCost(Query query) {
-		return 0.0;
+	    return 0.0;
 	}
 	
 	/**
@@ -54,18 +55,16 @@ public class CostEstimator {
 			}
 			
 			if (subsetRelevant) {
-				HashMap<Table, Boolean> tables = new HashMap<Table, Boolean>();
+				HashSet<Table> tables = new HashSet<Table>();
 				
 				// Get Common tables in query
 				for (Column column : query.getSelectColumns()) {
-					if (!tables.containsKey(column.getTable())) {
-						tables.put(column.getTable(), true);
-					}
+					tables.add(column.getTable());
 				}
 				
 				double totalTablesSize = 0.0;
 				// Add up size of tables
-				for (Table table : tables.keySet()) {
+				for (Table table : tables) {
 					totalTablesSize += table.getSize();
 				}
 				
@@ -73,14 +72,12 @@ public class CostEstimator {
 				
 				// Get Common tables in table subset
 				for (Column column : subset.getColumns()) {
-					if (!tables.containsKey(column.getTable())) {
-						tables.put(column.getTable(), true);
-					}
+					tables.add(column.getTable());
 				}
 				
 				double subsetTablesSize = 0.0;
 				// Add up size of tables
-				for (Table table : tables.keySet()) {
+				for (Table table : tables) {
 					subsetTablesSize += table.getSize();
 				}
 				
