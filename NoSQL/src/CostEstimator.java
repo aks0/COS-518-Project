@@ -17,7 +17,7 @@ public class CostEstimator {
 		for (Query query : queries) {
 			boolean subsetRelevant = true;
 			for (Column column : subset.getColumns()) {
-				subsetRelevant = subsetRelevant && query.getSelectColumns().contains(column);
+				subsetRelevant = subsetRelevant && query.getReferencedColumns().contains(column);
 			}
 			
 			if (subsetRelevant) {
@@ -51,14 +51,14 @@ public class CostEstimator {
 		for (Query query : queries) {
 			boolean subsetRelevant = true;
 			for (Column column : subset.getColumns()) {
-				subsetRelevant = subsetRelevant && query.getSelectColumns().contains(column);
+				subsetRelevant = subsetRelevant && query.getReferencedColumns().contains(column);
 			}
 			
 			if (subsetRelevant) {
 				HashSet<Table> tables = new HashSet<Table>();
 				
 				// Get Common tables in query
-				for (Column column : query.getSelectColumns()) {
+				for (Column column : query.getReferencedColumns()) {
 					tables.add(column.getTable());
 				}
 				

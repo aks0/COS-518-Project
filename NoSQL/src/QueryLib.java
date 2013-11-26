@@ -48,7 +48,7 @@ public class QueryLib {
     public static void main(String[] args) {
         ArrayList<Query> queries = getQueryList("query_logs/queries.sql");
         for (Query query : queries) {
-            for (Column column : query.getSelectColumns()) {
+            for (Column column : query.getReferencedColumns()) {
                 System.out.println(column);
             }
             System.out.println();

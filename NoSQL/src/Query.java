@@ -5,15 +5,14 @@ import java.util.Scanner;
  *  Class for representing queries
  */
 public class Query {
-	private ArrayList<Column> selectColumns;
-	private ArrayList<Column> insertColumns;
+    private String type; // type of query this represents (select, update, delete, insert)
+	private ArrayList<Column> referencedColumns;  // list of columns referenced by this query
 	
 	/**
 	 * Default constructor
 	 */
 	Query() {
-		selectColumns = new ArrayList<Column>();
-		insertColumns = new ArrayList<Column>();
+		referencedColumns = new ArrayList<Column>();
 	}
 	
 	/**
@@ -22,10 +21,8 @@ public class Query {
 	 * @param query
 	 */
 	Query(String query) {
-		selectColumns = new ArrayList<Column>();
-		insertColumns = new ArrayList<Column>();
+		referencedColumns = new ArrayList<Column>();
 		
-		ArrayList<Column> columns = null;
 		// use CrudAnalyzer to analyze what columns are accessed in the query
 	    String analysis = (new CrudAnalyzer()).analyze(query);
 	    Scanner scanner = new Scanner(analysis);
@@ -33,19 +30,19 @@ public class Query {
 	        String line = scanner.nextLine();
 	        switch(line) {
 	            case CrudAnalyzer.SELECT_LABEL:
-	                columns = selectColumns;
-	                break;
 	            case CrudAnalyzer.INSERT_LABEL:
-	                columns = insertColumns;
+	            case CrudAnalyzer.DELETE_LABEL:
+	            case CrudAnalyzer.UPDATE_LABEL:
+	                type = line;
 	                break;
 	            default:
 	                // split line = <tableName>.<columnName> into its components
 	                String[] split = line.split("\\.");
-	                if (split.length == 2 && columns != null) {
+	                if (split.length == 2) {
 	                    String tableName = split[0];
 	                    String columnName = split[1];
 	                    Table table = Table.getInstance(tableName);
-                        columns.add(new Column(table, columnName));
+                        referencedColumns.add(new Column(table, columnName));
 	                }
 	                break;
 	        }
@@ -53,20 +50,16 @@ public class Query {
 	    scanner.close();
 	}
 
-	public ArrayList<Column> getSelectColumns() {
-	    return selectColumns;
+	public ArrayList<Column> getReferencedColumns() {
+	    return referencedColumns;
 	}
 	
-	public ArrayList<Column> getInsertColumns() {
-	    return insertColumns;
-	}
-	
-	public Query addSelectColumn(Column column) {
-		this.selectColumns.add(column);
+	public Query addReferencedColumn(Column column) {
+		this.referencedColumns.add(column);
 		return this;
 	}
 	
-	public Column getSelectColumn(int index) {
-		return this.selectColumns.get(index);
+	public Column getReferencedColumn(int index) {
+		return this.referencedColumns.get(index);
 	}
 }

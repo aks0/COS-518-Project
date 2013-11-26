@@ -22,7 +22,7 @@ public class TableSubsetProducer {
 		HashMap<TableSubset, Integer> singleton = candidateSets.get(0);
 		
 		for (Query query : queries) {
-			for (Column column : query.getSelectColumns()) {
+			for (Column column : query.getReferencedColumns()) {
 				TableSubset subset = new TableSubset();
 				subset.addColumn(column);
 				if (!singleton.containsKey(subset))
@@ -37,7 +37,7 @@ public class TableSubsetProducer {
 			HashMap<TableSubset, Integer> newCandidateSet = new HashMap<TableSubset, Integer>();
 			
 			for (Query query : queries) {
-				ArrayList<TableSubset> sizedCombos = combos(new TableSubset(query.getSelectColumns()), 0, i);
+				ArrayList<TableSubset> sizedCombos = combos(new TableSubset(query.getReferencedColumns()), 0, i);
 				for (TableSubset subset : sizedCombos) {
 					if (!newCandidateSet.containsKey(subset)) {
 						ArrayList<TableSubset> smallerSubsets = subsetOneSizeSmaller(subset);
