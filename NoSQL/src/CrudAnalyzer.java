@@ -5,10 +5,6 @@ import gudusoft.gsqlparser.*;
  * from provided SQL queries 
  */
 public class CrudAnalyzer {
-    public static final String SELECT_LABEL = "select";
-    public static final String DELETE_LABEL = "delete";
-    public static final String INSERT_LABEL = "insert";
-    public static final String UPDATE_LABEL = "update";
     private static final EDbVendor dbVendor = EDbVendor.dbvmssql;
 
     /**
@@ -61,10 +57,16 @@ public class CrudAnalyzer {
                 // determine statement type and append to result
                 switch(stmt.sqlstatementtype) {
                 case sstselect:
-                    result.append(SELECT_LABEL + "\n");
+                    result.append(Query.SELECT_LABEL + "\n");
                     break;
                 case sstinsert:
-                    result.append(INSERT_LABEL + "\n");
+                    result.append(Query.INSERT_LABEL + "\n");
+                    break;
+                case sstdelete:
+                    result.append(Query.DELETE_LABEL + "\n");
+                    break;
+                case sstupdate:
+                    result.append(Query.UPDATE_LABEL + "\n");
                     break;
                 default:
                     break;
