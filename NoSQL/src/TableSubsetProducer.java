@@ -2,6 +2,8 @@
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.NavigableSet;
 
 
 public class TableSubsetProducer {
@@ -37,7 +39,8 @@ public class TableSubsetProducer {
 			HashMap<TableSubset, Integer> newCandidateSet = new HashMap<TableSubset, Integer>();
 			
 			for (Query query : queries) {
-				ArrayList<TableSubset> sizedCombos = combos(new TableSubset(query.getReferencedColumns()), 0, i);
+				TableSubset tbset = new TableSubset(query.getReferencedColumns());
+				ArrayList<TableSubset> sizedCombos = combos(tbset.getColumns(), i);
 				for (TableSubset subset : sizedCombos) {
 					if (!newCandidateSet.containsKey(subset)) {
 						ArrayList<TableSubset> smallerSubsets = subsetOneSizeSmaller(subset);
@@ -68,11 +71,11 @@ public class TableSubsetProducer {
 		for (Column column1 : subset.getColumns()) {
 			TableSubset smallSubset = new TableSubset();
 			for (Column column2 : subset.getColumns()) {
-				if (column1 != column2) {
+				if (!column1.equals(column2)) {
 					smallSubset.addColumn(column2);
 				}
 			}
-			allSubsets.add(subset);
+			allSubsets.add(smallSubset);
 		}
 		
 		return allSubsets;
@@ -86,22 +89,28 @@ public class TableSubsetProducer {
 	 * @param size
 	 * @return
 	 */
-	private static ArrayList<TableSubset> combos(TableSubset subset, int offset, int size) {
-		if (size == 0) {
-			ArrayList<TableSubset> list = new ArrayList<TableSubset>();
-			list.add(subset);
-			return list;
-		}
-		
+	private static ArrayList<TableSubset> combos(
+			NavigableSet<Column> columns, int size) {
 		ArrayList<TableSubset> allSubsets = new ArrayList<TableSubset>();
-		for (int i = offset; i < subset.getColumns().size() - size; i++) {
-			ArrayList<TableSubset> subsets = combos(subset, offset + 1, size - 1);
-			for (TableSubset smallSubset : subsets) {
-				smallSubset.addColumn(subset.getColumn(i));
-				allSubsets.add(smallSubset);
-			}
+
+		// if size is 0 then return empty subset
+		if (size == 0) {
+			allSubsets.add(new TableSubset());
+			return allSubsets;
 		}
-		
+
+		int i = 0;
+		for (Iterator<Column> iter = columns.iterator();
+			i < (columns.size() - size + 1) && iter.hasNext();
+			i++) {
+			Column pivot_col = iter.next();
+			ArrayList<TableSubset> subsets =
+				combos(columns.tailSet(pivot_col, false), size-1);
+			for (TableSubset smallSubset: subsets) {
+				smallSubset.addColumn(pivot_col);
+			}
+			allSubsets.addAll(subsets);
+		}
 		return allSubsets;
 	}
 }
