@@ -43,6 +43,11 @@ public class Table {
 		tables.put(name, this);
 	}
 	
+	public String getName() {
+		return this.name;
+	}
+	
+	@Override
 	public String toString() {
 		return this.name;
 	}
@@ -146,7 +151,31 @@ public class Table {
 		}
 		return null;
 	}
+	
+	/**
+	 * To support equality among tables based on Table name only.
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof Table)) {
+			return false;
+		}
+		Table other_table = (Table) obj;
+		return this.name.equals(other_table.name);
+	}
 
+	/**
+	 * HashCode override follows with overriding the equals method.
+	 * 
+	 * If table1.equals(table2), then table1.hashCode() == table2.hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		int result = 17;
+		result = 31 * result + this.name.hashCode();
+		return result;
+	}
+	
 	/**
 	 * For testing
 	 * @param args

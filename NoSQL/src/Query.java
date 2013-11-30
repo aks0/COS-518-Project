@@ -26,8 +26,13 @@ public class Query {
      */
     Query(String query) {
         referencedColumns = new ArrayList<Column>();
-    	
-        // use CrudAnalyzer to analyze what columns are accessed in the query
+    	computeReferencedColumns(query);
+    }
+
+    /**
+     *  use CrudAnalyzer to analyze what columns are accessed in the query
+     */
+    private void computeReferencedColumns(String query) {
         String analysis = (new CrudAnalyzer()).analyze(query);
         Scanner scanner = new Scanner(analysis);
         while (scanner.hasNextLine()) {

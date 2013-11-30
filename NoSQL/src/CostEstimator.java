@@ -18,6 +18,9 @@ public class CostEstimator {
 			boolean subsetRelevant = true;
 			for (Column column : subset.getColumns()) {
 				subsetRelevant = subsetRelevant && query.getReferencedColumns().contains(column);
+				if (!subsetRelevant) {
+					break;
+				}
 			}
 			
 			if (subsetRelevant) {
@@ -52,6 +55,9 @@ public class CostEstimator {
 			boolean subsetRelevant = true;
 			for (Column column : subset.getColumns()) {
 				subsetRelevant = subsetRelevant && query.getReferencedColumns().contains(column);
+				if (!subsetRelevant) {
+					break;
+				}
 			}
 			
 			if (subsetRelevant) {
