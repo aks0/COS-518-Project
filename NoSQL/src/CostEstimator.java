@@ -44,51 +44,8 @@ public class CostEstimator {
      * @return cost
      */
     public static double normalizedCost(Query query) {
-        int columns = 0;
-        int rows = 0;
-        HashMap<Table, ArrayList<Column>> tablesToQueryColumns = new HashMap<Table, ArrayList<Column>>();
-        HashSet<Column> primaryColumns = new HashSet<Column>();
-        
-        // find all primary columns and tentative number of columns;
-        // also fill in tablesToQueryColumns mapping
-        for (Column column : query.getReferencedColumns()) {
-            if (column.isPrimary()) {
-                primaryColumns.add(column);
-            }
-            columns++;
-            
-            if (tablesToQueryColumns.containsKey(column.getTable())) {
-                tablesToQueryColumns.put(column.getTable(), new ArrayList<Column>());
-            }
-            tablesToQueryColumns.get(column.getTable()).add(column);
-        }
-        
-        // get number of cells in join of referenced tables with projections
-        for (Table table : tablesToQueryColumns.keySet()) {
-            boolean mustCrossJoin = true;
-            for (Column column : tablesToQueryColumns.get(table)) {
-                // find foreign columns that join with primary columns in query
-                if (column.isForeignReference() 
-                        && primaryColumns.contains(column.getForeignKeyReference())) {
-                    // don't have to cross join
-                    mustCrossJoin = false;
-                    columns--;
-                }
-            }
-            
-            // cross join worst case
-            if (mustCrossJoin) {
-                if (rows == 0) {
-                    // first table to fetch
-                    rows = table.getSize();
-                } else {
-                    // scan through table for joins
-                    rows *= table.getSize();
-                }
-            }
-        }
-        // one unit of cost per cell
-        return rows * columns;
+        // normalized cost is denormalized cost without table subset
+        return denormalizedCost(query, null);
     }
     
     /**
@@ -172,7 +129,7 @@ public class CostEstimator {
      * Find denormalized cost of query with respect to provided table subset
      * 
      * Cost model:
-     * Charges one unit of cost per cell in the cross join (worst case) of the
+     * Charges one unit of cost per cell in the join of the
      * tables referenced by a query where projected column are those that 
      * are not in the provided table subset.
      * 
@@ -181,31 +138,52 @@ public class CostEstimator {
      * @return cost
      */
     private static double denormalizedCost(Query query, TableSubset subset) {
-        HashSet<Table> seenTables = new HashSet<Table>();
-
-        // get number of cells in cross join of referenced tables with projections
-        // omit projection of columns that are in subset
         int columns = 0;
         int rows = 0;
+        HashMap<Table, ArrayList<Column>> tablesToQueryColumns = new HashMap<Table, ArrayList<Column>>();
+        HashSet<Column> primaryColumns = new HashSet<Column>();
+        
+        // find all primary columns and tentative number of columns;
+        // also fill in tablesToQueryColumns mapping
         for (Column column : query.getReferencedColumns()) {
-            // project column if it is not in subset
-            if (!subset.getColumns().contains(column)) {
+            if (subset == null || !subset.getColumns().contains(column)) {
+                if (column.isPrimary()) {
+                    primaryColumns.add(column);
+                }
                 columns++;
-                Table referencedTable = column.getTable();
-                if (!seenTables.contains(referencedTable)) {
-                    seenTables.add(referencedTable);
-                    if (rows == 0) {
-                        // first table to fetch
-                        rows = referencedTable.getSize();
-                    } else {
-                        // scan through next table for joins
-                        rows *= referencedTable.getSize();
-                    }
+                
+                if (!tablesToQueryColumns.containsKey(column.getTable())) {
+                    tablesToQueryColumns.put(column.getTable(), new ArrayList<Column>());
+                }
+                tablesToQueryColumns.get(column.getTable()).add(column);
+            }
+        }
+        
+        // get number of cells in join of referenced tables with projections
+        for (Table table : tablesToQueryColumns.keySet()) {
+            boolean mustCrossJoin = true;
+            for (Column column : tablesToQueryColumns.get(table)) {
+                // find foreign columns that join with primary columns in query
+                if (column.isForeignReference() 
+                        && primaryColumns.contains(column.getForeignKeyReference())) {
+                    // don't have to cross join
+                    mustCrossJoin = false;
+                    columns--;
+                }
+            }
+            
+            // cross join worst case
+            if (mustCrossJoin) {
+                if (rows == 0) {
+                    // first table to fetch
+                    rows = table.getSize();
+                } else {
+                    // scan through table for joins
+                    rows *= table.getSize();
                 }
             }
         }
         // one unit of cost per cell
-        // may also add a multiple of size of subset (as maintenance/storage cost) here
         return rows * columns;
     }
 }
