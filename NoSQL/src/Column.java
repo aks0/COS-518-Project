@@ -20,6 +20,14 @@ public class Column {
 		this.foreignKeyReference = reference;
 		return this;
 	}
+	
+	public Column getForeignKeyReference() {
+		return this.foreignKeyReference;
+	}
+	
+	public boolean isForeignReference() {
+	    return this.foreignKeyReference != null;
+	}
 
 	public Column primary() {
 		this.isPrimary = true;
