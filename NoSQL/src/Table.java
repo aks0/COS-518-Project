@@ -2,7 +2,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,10 @@ import org.xml.sax.SAXException;
 
 public class Table {
 
-	private static Map<String, Table> tables = new HashMap<String, Table>();
+    private static Map<String, Table> tables = Util518.newHashMap();
+    private static ArrayList<Pair<Column, Pair<String, String>>>
+        foreignReferences = Util518.newArrayList();
+
 	private String name;
 	private ArrayList<Column> columns;
 	// TODO: need to set this parameter
@@ -39,7 +41,7 @@ public class Table {
 			throw new Exception("A table with this name already exists");
 		}
 		this.name = name;
-		columns = new ArrayList<Column>();
+		columns = Util518.newArrayList();
 		tables.put(name, this);
 	}
 	
@@ -110,7 +112,7 @@ public class Table {
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document doc = dBuilder.parse(new File(model_path));
 		NodeList xml_tables = doc.getElementsByTagName("table");
-		ArrayList<Table> tables = new ArrayList<Table>();
+		ArrayList<Table> tables = Util518.newArrayList();
 		for (int i = 0; i < xml_tables.getLength(); i++) {
 			Table table = null;
 			try {
@@ -120,10 +122,23 @@ public class Table {
 			}
 			tables.add(table);
 		}
+		processForeignColumns();
 		return tables;
 	}
 	
-	private static Table getTableFromNode(Node item) throws Exception {
+	private static void processForeignColumns() {
+	    for (Pair<Column, Pair<String, String>> pair : foreignReferences) {
+	        Column column = pair.getFirst();
+	        String ftable_name = pair.getSecond().getFirst();
+	        String fcolumn_name = pair.getSecond().getSecond();
+	        Column fcolumn = Column.getInstance(ftable_name, fcolumn_name);
+	        column.setForeignKeyReference(fcolumn);
+	        System.out.println(String.format("Column: %s references Column %s.",
+	                column, fcolumn));
+	    }
+    }
+
+    private static Table getTableFromNode(Node item) throws Exception {
 		if (item.getNodeType() == Node.ELEMENT_NODE) {
 			Element eElement = (Element) item;
 			String table_name =
@@ -131,7 +146,7 @@ public class Table {
 			Table table = getInstance(table_name);
 			NodeList columns = eElement.getElementsByTagName("column");
 			for (int i = 0; i < columns.getLength(); i++) {
-				Column column = getColumnFromNode(table, columns.item(i));
+				Column column = getColumnFromNode(table_name, columns.item(i));
 				table.addColumn(column);
 			}
 			return table;
@@ -139,17 +154,40 @@ public class Table {
 		return null;
 	}
 
-	private static Column getColumnFromNode(Table table, Node item) {
+	private static Column getColumnFromNode(String table_name, Node item) {
 		if (item.getNodeType() == Node.ELEMENT_NODE) {
 			Element eElement = (Element) item;
-			String column_name = item.getTextContent();
-			Column column = Column.getInstance(table, column_name);
+			String column_name =
+			    eElement.getElementsByTagName("name").item(0).getTextContent();
+			Column column = Column.getInstance(table_name, column_name);
+			// if the column is defined as primary
 			if (eElement.getElementsByTagName("primary").getLength() == 1) {
 				column.primary();
+			}
+			// if the column is defined as a foreign key reference
+			if (eElement.getElementsByTagName("foreign").getLength() == 1) {
+			    processForeignNode(
+			        column,
+			        eElement.getElementsByTagName("foreign").item(0)
+			    );
 			}
 			return column;
 		}
 		return null;
+	}
+
+	private static void processForeignNode(Column column, Node foreign_node) {
+	    if (foreign_node.getNodeType() == Node.ELEMENT_NODE) {
+            Element eElement = (Element) foreign_node;
+            Node table_node = eElement.getElementsByTagName("ftable").item(0);
+            Node column_node = eElement.getElementsByTagName("fcolumn").item(0);
+            String table_name = table_node.getTextContent();
+            String column_name = column_node.getTextContent();
+            foreignReferences.add(new Pair<Column, Pair<String, String>>(
+                column,
+                new Pair<String, String>(table_name, column_name)
+            ));
+        }
 	}
 	
 	/**

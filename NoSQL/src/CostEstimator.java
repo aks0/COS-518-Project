@@ -129,8 +129,8 @@ public class CostEstimator {
     private static double denormalizedCost(Query query, TableSubset subset) {
         int columns = 0;
         int rows = 0;
-        HashMap<Table, ArrayList<Column>> tablesToQueryColumns = new HashMap<Table, ArrayList<Column>>();
-        HashSet<Column> primaryColumns = new HashSet<Column>();
+        HashMap<Table, ArrayList<Column>> tablesToQueryColumns = Util518.newHashMap();
+        HashSet<Column> primaryColumns = Util518.newHashSet();
         
         // find all primary columns and tentative number of columns;
         // also fill in tablesToQueryColumns mapping

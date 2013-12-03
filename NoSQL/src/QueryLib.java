@@ -17,7 +17,7 @@ public class QueryLib {
      */
     public static ArrayList<Query> getQueryList(String filepath) {
         StringBuilder query = new StringBuilder();
-        ArrayList<Query> queryList = new ArrayList<Query>();
+        ArrayList<Query> queryList = Util518.newArrayList();
         try {
             Scanner scanner = new Scanner(new File(filepath));
             while (scanner.hasNextLine()) {

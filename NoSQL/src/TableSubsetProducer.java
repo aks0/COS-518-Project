@@ -17,7 +17,7 @@ public class TableSubsetProducer {
 	 * @return
 	 */
 	public static ArrayList<TableSubset> produce(ArrayList<Query> queries, double baseline, int maxSize) {
-		ArrayList<HashSet<TableSubset>> candidateSets = new ArrayList<HashSet<TableSubset>>();
+		ArrayList<HashSet<TableSubset>> candidateSets = Util518.newArrayList();
 		
 		// Produce table subsets of size 1
 		candidateSets.add(new HashSet<TableSubset>());
@@ -36,7 +36,7 @@ public class TableSubsetProducer {
 		int i = 1;
 		while (i < maxSize && candidateSets.get(i-1).size() > 0) {
 			HashSet<TableSubset> candidateSet = candidateSets.get(i - 1);
-			HashSet<TableSubset> newCandidateSet = new HashSet<TableSubset>();
+			HashSet<TableSubset> newCandidateSet = Util518.newHashSet();
 			
 			for (Query query : queries) {
 				TableSubset tbset = new TableSubset(query.getReferencedColumns());
@@ -67,7 +67,7 @@ public class TableSubsetProducer {
 	 * @return
 	 */
 	private static ArrayList<TableSubset> subsetOneSizeSmaller(TableSubset subset) {
-		ArrayList<TableSubset> allSubsets = new ArrayList<TableSubset>();
+		ArrayList<TableSubset> allSubsets = Util518.newArrayList();
 		for (Column column1 : subset.getColumns()) {
 			TableSubset smallSubset = new TableSubset();
 			for (Column column2 : subset.getColumns()) {
@@ -91,7 +91,7 @@ public class TableSubsetProducer {
 	 */
 	private static ArrayList<TableSubset> combos(
 			NavigableSet<Column> columns, int size) {
-		ArrayList<TableSubset> allSubsets = new ArrayList<TableSubset>();
+		ArrayList<TableSubset> allSubsets = Util518.newArrayList();
 
 		// if size is 0 then return empty subset
 		if (size == 0) {

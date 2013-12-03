@@ -52,7 +52,8 @@ public class Query {
                         String tableName = split[0];
                         String columnName = split[1];
                         Table table = Table.getInstance(tableName);
-                        referencedColumns.add(Column.getInstance(table, columnName));
+                        referencedColumns.add(
+                            Column.getInstance(table.getName(), columnName));
                     }
                     break;
             }
