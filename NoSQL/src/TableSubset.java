@@ -1,6 +1,6 @@
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeSet;
 
 
@@ -11,7 +11,7 @@ public class TableSubset {
 		tableset = new TreeSet<Column>(new ColumnComparator());
 	}
 	
-	TableSubset(ArrayList<Column> columns) {
+	TableSubset(Set<Column> columns) {
 		tableset = new TreeSet<Column>(new ColumnComparator());
 		tableset.addAll(columns);
 	}

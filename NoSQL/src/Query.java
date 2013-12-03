@@ -1,5 +1,6 @@
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  *  Class for representing queries
@@ -10,13 +11,13 @@ public class Query {
     public static final String INSERT_LABEL = "insert";
     public static final String UPDATE_LABEL = "update";
     private String type; // type of query this represents (select, update, delete, insert)
-    private ArrayList<Column> referencedColumns;  // list of columns referenced by this query
+    private Set<Column> referencedColumns;  // list of columns referenced by this query
     
     /**
      * Default constructor
      */
     Query() {
-        referencedColumns = new ArrayList<Column>();
+        referencedColumns = new HashSet<Column>();
     }
     
     /**
@@ -25,7 +26,7 @@ public class Query {
      * @param query
      */
     Query(String query) {
-        referencedColumns = new ArrayList<Column>();
+        referencedColumns = new HashSet<Column>();
     	computeReferencedColumns(query);
     }
 
@@ -59,16 +60,7 @@ public class Query {
         scanner.close();
     }
 
-    public ArrayList<Column> getReferencedColumns() {
+    public Set<Column> getReferencedColumns() {
         return referencedColumns;
-    }
-    
-    public Query addReferencedColumn(Column column) {
-    	this.referencedColumns.add(column);
-    	return this;
-    }
-    
-    public Column getReferencedColumn(int index) {
-    	return this.referencedColumns.get(index);
     }
 }

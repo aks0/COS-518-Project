@@ -59,6 +59,7 @@ public class CostEstimator {
         double totalCost = 0.0;
         
         for (Query query : queries) {
+            //if query contains all the columns of the table subset
             boolean subsetRelevant = true;
             for (Column column : subset.getColumns()) {
                 subsetRelevant = subsetRelevant && query.getReferencedColumns().contains(column);
@@ -66,7 +67,8 @@ public class CostEstimator {
                     break;
                 }
             }
-            
+
+            // query contains all the columns of the table subset
             if (subsetRelevant) {
                 HashSet<Table> tables = new HashSet<Table>();
                 
