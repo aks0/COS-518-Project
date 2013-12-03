@@ -144,6 +144,11 @@ public class Table {
 			String table_name =
 				eElement.getElementsByTagName("name").item(0).getTextContent();
 			Table table = getInstance(table_name);
+			if (eElement.getElementsByTagName("rows").getLength() == 1) {
+			    Element row_item =
+			        (Element) eElement.getElementsByTagName("rows").item(0);
+			    table.size = Integer.parseInt(row_item.getTextContent());
+			}
 			NodeList columns = eElement.getElementsByTagName("column");
 			for (int i = 0; i < columns.getLength(); i++) {
 				Column column = getColumnFromNode(table_name, columns.item(i));
@@ -225,6 +230,7 @@ public class Table {
 			throws SAXException, IOException, ParserConfigurationException {
 		List<Table> tables = Table.getTablesFromModel("./data_models/data1.model");
 		for(Table table : tables) {
+		    System.out.print("(" + table.getSize() + ") ");
 			System.out.println(table.getColumns());
 		}
 	}
