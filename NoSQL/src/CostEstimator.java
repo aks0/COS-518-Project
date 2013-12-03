@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -116,8 +117,8 @@ public class CostEstimator {
      * @return cost
      */
     private static double denormalizedCost(Query query, TableSubset subset) {
-        int columns = 0;
-        int rows = 0;
+        double columns = 0;
+        double rows = 0;
         HashMap<Table, ArrayList<Column>> tablesToQueryColumns = Util518.newHashMap();
         HashSet<Column> primaryColumns = Util518.newHashSet();
         
@@ -139,7 +140,6 @@ public class CostEstimator {
         
         // get number of cells in join of referenced tables with projections
         for (Table table : tablesToQueryColumns.keySet()) {
-            boolean mustCrossJoin = true;
             for (Column column : tablesToQueryColumns.get(table)) {
                 // find foreign columns that join with primary columns in query
                 if (column.isForeignReference() 
@@ -158,5 +158,29 @@ public class CostEstimator {
         }
         // one unit of cost per cell
         return rows * columns;
+    }
+    
+    // test main
+    public static void main(String[] args) {
+		List<Table> tables = Table.getTablesFromModel("./data_models/data1.model");
+        ArrayList<Query> queryList = QueryLib.getQueryList("query_logs/queries.sql");
+        for (Query query : queryList) {
+            System.out.println(CostEstimator.normalizedCost(query));
+        }
+		/*
+        double baseline = 1;
+        int maxSize = 10;
+        ArrayList<TableSubset> subsets = TableSubsetProducer.produce(queryList, baseline, maxSize);
+        ArrayList<TableSubset> selectedSubsets = new ArrayList<TableSubset>();
+        for (Query query : queryList) {
+            ArrayList<TableSubset> candidateSubsets = new ArrayList<TableSubset>();
+            for (TableSubset subset : subsets) {
+                if (query.referencesColumns(subset.getColumns())) {
+                    candidateSubsets.add(subset);
+                }
+            }
+            TableSubset bestSubset = CostEstimator.findBestSubset(query, candidateSubsets);
+            selectedSubsets.add(bestSubset);
+        }*/
     }
 }

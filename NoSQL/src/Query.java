@@ -46,7 +46,7 @@ public class Query {
                     type = line;
                     break;
                 default:
-                // split line = <tableName>.<columnName> into its components
+                    // split line = <tableName>.<columnName> into its components
                     String[] split = line.split("\\.");
                     if (split.length == 2) {
                         String tableName = split[0];
