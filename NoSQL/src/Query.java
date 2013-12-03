@@ -27,7 +27,7 @@ public class Query {
      */
     Query(String query) {
         referencedColumns = new HashSet<Column>();
-    	computeReferencedColumns(query);
+        computeReferencedColumns(query);
     }
 
     /**
@@ -62,5 +62,22 @@ public class Query {
 
     public Set<Column> getReferencedColumns() {
         return referencedColumns;
+    }
+
+    /**
+     * If the given columns are referenced in the query
+     * @param columns
+     * @return true if the given columns are referenced in the query
+     */
+    public boolean referencesColumns(Set<Column> columns) {
+        if (columns == null) {
+            return false;
+        }
+        for (Column column : columns) {
+            if (!this.referencedColumns.contains(column)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

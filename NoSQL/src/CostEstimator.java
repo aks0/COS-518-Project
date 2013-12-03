@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 
 public class CostEstimator {
@@ -47,7 +48,22 @@ public class CostEstimator {
         // normalized cost is denormalized cost without table subset
         return denormalizedCost(query, null);
     }
-    
+
+    /**
+     * Computes the size of all the tables corresponding to the given columns
+     * Used in normalizedWeightedCost.
+     * 
+     * @param columns
+     * @return size of all tables
+     */
+    private static double computeColumnsSize(Set<Column> columns) {
+        double size = 0;
+        for (Column column : columns) {
+            size += column.getTable().getSize();
+        }
+        return size;
+    }
+
     /**
      * Weighted normalized cost of all queries which involve subset
      * 
@@ -60,42 +76,13 @@ public class CostEstimator {
         
         for (Query query : queries) {
             //if query contains all the columns of the table subset
-            boolean subsetRelevant = true;
-            for (Column column : subset.getColumns()) {
-                subsetRelevant = subsetRelevant && query.getReferencedColumns().contains(column);
-                if (!subsetRelevant) {
-                    break;
-                }
-            }
+            if (query.referencesColumns(subset.getColumns())) {
+                // size of tables in query
+                double totalTablesSize =
+                        computeColumnsSize(query.getReferencedColumns());
+                // size of tables in the table subset
+                double subsetTablesSize = computeColumnsSize(subset.getColumns());
 
-            // query contains all the columns of the table subset
-            if (subsetRelevant) {
-                HashSet<Table> tables = new HashSet<Table>();
-                
-                // Get Common tables in query
-                for (Column column : query.getReferencedColumns()) {
-                    tables.add(column.getTable());
-                }
-                
-                double totalTablesSize = 0.0;
-                // Add up size of tables
-                for (Table table : tables) {
-                    totalTablesSize += table.getSize();
-                }
-                
-                tables.clear();
-                
-                // Get Common tables in table subset
-                for (Column column : subset.getColumns()) {
-                    tables.add(column.getTable());
-                }
-                
-                double subsetTablesSize = 0.0;
-                // Add up size of tables
-                for (Table table : tables) {
-                    subsetTablesSize += table.getSize();
-                }
-                
                 totalCost += (subsetTablesSize/totalTablesSize) * normalizedCost(query);
             }
         }
