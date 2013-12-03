@@ -1,7 +1,14 @@
+import java.io.IOException;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 
 public class TableSubset {
@@ -77,4 +84,25 @@ public class TableSubset {
 	    	}
 	    }
 	}
+
+    @Override
+    public String toString() {
+        return this.tableset.toString();
+    }
+
+    /** For testing
+     *
+     * @param args
+     */
+    public static void main(String args[]) {
+        List<Table> tables =
+                Table.getTablesFromModel("./data_models/data1.model");
+        Set<Column> columns = new HashSet<Column>();
+        for (Table table : tables) {
+            columns.addAll(table.getColumns());
+        }
+        TableSubset tbset = new TableSubset(columns);
+        // should produced columns sorted by table and then sorted by column
+        System.out.println(tbset);
+    }
 }

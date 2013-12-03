@@ -93,7 +93,7 @@ public class Table {
 	 * <column><name>col1</name></column>
 	 * <column>
 	 * <name>col2</name>
-	 * <foreign><ftable>tab2</ftable><fcolumn>col_ref</fcolumn>
+	 * <foreign><ftable>tab2</ftable><fcolumn>col_ref</fcolumn></foreign>
 	 * </column>
 	 * <column><name>col3</name>
 	 * <primary/>
@@ -110,25 +110,30 @@ public class Table {
 	 * @return Table instance for that data model
 	 * @throws FileNotFoundException
 	 */
-	public static ArrayList<Table> getTablesFromModel(String model_path)
-			throws SAXException, IOException, ParserConfigurationException {
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(new File(model_path));
-		NodeList xml_tables = doc.getElementsByTagName("table");
-		ArrayList<Table> tables = Util518.newArrayList();
-		for (int i = 0; i < xml_tables.getLength(); i++) {
-			Table table = null;
-			try {
-				table = getTableFromNode(xml_tables.item(i));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			tables.add(table);
-		}
-		processForeignColumns();
-		return tables;
-	}
+    public static ArrayList<Table> getTablesFromModel(String model_path) {
+        try {
+            DocumentBuilderFactory dbFactory =
+                    DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(new File(model_path));
+            NodeList xml_tables = doc.getElementsByTagName("table");
+            ArrayList<Table> tables = Util518.newArrayList();
+            for (int i = 0; i < xml_tables.getLength(); i++) {
+                Table table = null;
+                try {
+                    table = getTableFromNode(xml_tables.item(i));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                tables.add(table);
+            }
+            processForeignColumns();
+            return tables;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 	
 	private static void processForeignColumns() {
 	    for (Pair<Column, Pair<String, String>> pair : foreignReferences) {
@@ -137,8 +142,10 @@ public class Table {
 	        String fcolumn_name = pair.getSecond().getSecond();
 	        Column fcolumn = Column.getInstance(ftable_name, fcolumn_name);
 	        column.setForeignKeyReference(fcolumn);
-	        System.out.println(String.format("Column: %s references Column %s.",
-	                column, fcolumn));
+	        System.out.println(
+	            String.format("FColumn: %s references Column %s.",
+	            column, fcolumn)
+	        );
 	    }
     }
 
@@ -223,19 +230,16 @@ public class Table {
 		return result;
 	}
 	
-	/**
-	 * For testing
-	 * @param args
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 */
-	public static void main(String args[])
-			throws SAXException, IOException, ParserConfigurationException {
-		List<Table> tables = Table.getTablesFromModel("./data_models/data1.model");
-		for(Table table : tables) {
-		    System.out.print("(" + table.getSize() + ") ");
-			System.out.println(table.getColumns());
-		}
-	}
+    /**
+     * For testing
+     * @param args
+     */
+    public static void main(String args[]) {
+        List<Table> tables =
+                Table.getTablesFromModel("./data_models/data1.model");
+        for(Table table : tables) {
+            System.out.print("(" + table.getSize() + ") ");
+            System.out.println(table.getColumns());
+        }
+    }
 }
