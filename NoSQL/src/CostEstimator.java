@@ -16,15 +16,7 @@ public class CostEstimator {
         double totalCost = 0.0;
         
         for (Query query : queries) {
-            boolean subsetRelevant = true;
-            for (Column column : subset.getColumns()) {
-                subsetRelevant = subsetRelevant && query.getReferencedColumns().contains(column);
-                if (!subsetRelevant) {
-                    break;
-                }
-            }
-            
-            if (subsetRelevant) {
+            if (query.referencesColumns(subset.getColumns())) {
                 totalCost += normalizedCost(query);
             }
         }
@@ -33,7 +25,6 @@ public class CostEstimator {
     }
     
     /**
-     * TODO: Discuss a cost model
      * Find normalized cost of query (assuming no indices, denormalization, etc)
      * 
      * Cost model:
@@ -113,8 +104,6 @@ public class CostEstimator {
     }
     
     /**
-     * TODO: Discuss a cost model
-     * Helper function to findBestSubset()
      * Find denormalized cost of query with respect to provided table subset
      * 
      * Cost model:
@@ -154,22 +143,17 @@ public class CostEstimator {
             for (Column column : tablesToQueryColumns.get(table)) {
                 // find foreign columns that join with primary columns in query
                 if (column.isForeignReference() 
-                        && primaryColumns.contains(column.getForeignKeyReference())) {
-                    // don't have to cross join
-                    mustCrossJoin = false;
+                        && primaryColumns.contains(column.getForeignKeyReference())) { 
                     columns--;
                 }
             }
             
-            // cross join worst case
-            if (mustCrossJoin) {
-                if (rows == 0) {
-                    // first table to fetch
-                    rows = table.getSize();
-                } else {
-                    // scan through table for joins
-                    rows *= table.getSize();
-                }
+            if (rows == 0) {
+                // first table to fetch
+                rows = table.getSize();
+            } else {
+                // scan through table for joins
+                rows *= table.getSize();
             }
         }
         // one unit of cost per cell
