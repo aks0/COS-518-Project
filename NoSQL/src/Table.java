@@ -143,7 +143,7 @@ public class Table {
 		if (item.getNodeType() == Node.ELEMENT_NODE) {
 			Element eElement = (Element) item;
 			String column_name = item.getTextContent();
-			Column column = new Column(table, column_name);
+			Column column = Column.getInstance(table, column_name);
 			if (eElement.getElementsByTagName("primary").getLength() == 1) {
 				column.primary();
 			}

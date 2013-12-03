@@ -1,13 +1,28 @@
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class Column {
+
+	private static Map<String, Column> columns = new HashMap<String, Column>();
 	private Table table;
 	private String name;
 	private Column foreignKeyReference;
 	private boolean isPrimary;
 
-	Column(Table table, String name) {
+	/**
+	 * Use the factory method {@link Column#getInstance} to get a Column
+	 * instance. Ensures uniqueness of Column instances.
+	 * @param table
+	 * @param col_name
+	 * @throws Exception
+	 */
+	private Column(Table table, String col_name) throws Exception {
+		if (columns.containsKey(toString(table, col_name))) {
+			throw new Exception("A column with this name already exists");
+		}
 		this.table = table;
-		this.name = name;
+		this.name = col_name;
 		foreignKeyReference = null;
 		isPrimary = false;
 	}
@@ -74,5 +89,31 @@ public class Column {
 	@Override
 	public String toString() {
 		return table.toString() + "#" + name;
+	}
+	
+	private static String toString(Table table, String col_name) {
+		return table.toString() + "#" + col_name;
+	}
+
+	/**
+	 * Column factory for generating new Columns or returning an already
+	 * existing instance. It ensures that only once instance of each column
+	 * exists.
+	 * @param table
+	 * @param column_name
+	 * @return Column instance
+	 */
+	public static Column getInstance(Table table, String col_name) {
+		String name = toString(table, col_name);
+		if (!columns.containsKey(name)) {
+			try {
+				return new Column(table, col_name);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			return columns.get(name);
+		}
+		return null;
 	}
 }
