@@ -23,7 +23,6 @@ public class Table {
 
 	private String name;
 	private ArrayList<Column> columns;
-	// TODO: need to set this parameter
 	private int size;
 	
 	public int getSize() {
@@ -90,11 +89,16 @@ public class Table {
 	 * 
 	 * <table>
 	 * <name>table_name</name>
-	 * <column>col1</column>
-	 * <column>col2</column>
-	 * <column>col3
+	 * <rows>integer number of rows</rows>
+	 * <column><name>col1</name></column>
+	 * <column>
+	 * <name>col2</name>
+	 * <foreign><ftable>tab2</ftable><fcolumn>col_ref</fcolumn>
+	 * </column>
+	 * <column><name>col3</name>
 	 * <primary/>
 	 * </column>
+	 * <column>
 	 * </table>
 	 * 
 	 * <table>....</table>
