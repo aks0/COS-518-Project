@@ -1,7 +1,7 @@
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NavigableSet;
 
@@ -17,36 +17,36 @@ public class TableSubsetProducer {
 	 * @return
 	 */
 	public static ArrayList<TableSubset> produce(ArrayList<Query> queries, double baseline, int maxSize) {
-		ArrayList<HashMap<TableSubset, Integer>> candidateSets = new ArrayList<HashMap<TableSubset, Integer>>();
+		ArrayList<HashSet<TableSubset>> candidateSets = new ArrayList<HashSet<TableSubset>>();
 		
 		// Produce table subsets of size 1
-		candidateSets.add(new HashMap<TableSubset, Integer>());
-		HashMap<TableSubset, Integer> singleton = candidateSets.get(0);
+		candidateSets.add(new HashSet<TableSubset>());
+		HashSet<TableSubset> singleton = candidateSets.get(0);
 		
 		for (Query query : queries) {
 			for (Column column : query.getReferencedColumns()) {
 				TableSubset subset = new TableSubset();
 				subset.addColumn(column);
-				if (!singleton.containsKey(subset))
-					singleton.put(subset, 1);
+				if (!singleton.contains(subset))
+					singleton.add(subset);
 			}
 		}
 		
 		// Algorithm for finding subsets of increasing size
 		int i = 1;
-		while (i < maxSize && candidateSets.get(i).keySet().size() > 0) {
-			HashMap<TableSubset, Integer> candidateSet = candidateSets.get(i - 1);
-			HashMap<TableSubset, Integer> newCandidateSet = new HashMap<TableSubset, Integer>();
+		while (i < maxSize && candidateSets.get(i-1).size() > 0) {
+			HashSet<TableSubset> candidateSet = candidateSets.get(i - 1);
+			HashSet<TableSubset> newCandidateSet = new HashSet<TableSubset>();
 			
 			for (Query query : queries) {
 				TableSubset tbset = new TableSubset(query.getReferencedColumns());
 				ArrayList<TableSubset> sizedCombos = combos(tbset.getColumns(), i);
 				for (TableSubset subset : sizedCombos) {
-					if (!newCandidateSet.containsKey(subset)) {
+					if (!newCandidateSet.contains(subset)) {
 						ArrayList<TableSubset> smallerSubsets = subsetOneSizeSmaller(subset);
 						for (TableSubset smallerSubset : smallerSubsets) {
-							if (candidateSet.containsKey(smallerSubset) && CostEstimator.normalizedCost(subset, queries) >= baseline) {
-								newCandidateSet.put(subset,1);
+							if (candidateSet.contains(smallerSubset) && CostEstimator.normalizedCost(subset, queries) >= baseline) {
+								newCandidateSet.add(subset);
 							}
 						}
 					}
