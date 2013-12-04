@@ -171,7 +171,7 @@ public class CostEstimator {
         double baseline = 1;
         int maxSize = 10;
         ArrayList<TableSubset> subsets = TableSubsetProducer.produce(queryList, baseline, maxSize);
-        ArrayList<TableSubset> selectedSubsets = new ArrayList<TableSubset>();
+        HashSet<TableSubset> selectedSubsets = new HashSet<TableSubset>();
         for (Query query : queryList) {
             ArrayList<TableSubset> candidateSubsets = new ArrayList<TableSubset>();
             for (TableSubset subset : subsets) {

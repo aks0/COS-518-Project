@@ -24,6 +24,7 @@ public class Column {
 		this.name = col_name;
 		foreignKeyReference = null;
 		isPrimary = false;
+		columns.put(getToken(table.getName(), col_name), this);
 	}
 	
 	public Table getTable() {
