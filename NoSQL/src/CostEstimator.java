@@ -120,15 +120,11 @@ public class CostEstimator {
         double columns = 0;
         double rows = 0;
         HashMap<Table, ArrayList<Column>> tablesToQueryColumns = Util518.newHashMap();
-        HashSet<Column> primaryColumns = Util518.newHashSet();
         
         // find all primary columns and tentative number of columns;
         // also fill in tablesToQueryColumns mapping
         for (Column column : query.getReferencedColumns()) {
             if (subset == null || !subset.getColumns().contains(column)) {
-                if (column.isPrimary()) {
-                    primaryColumns.add(column);
-                }
                 columns++;
                 
                 if (!tablesToQueryColumns.containsKey(column.getTable())) {
@@ -142,14 +138,11 @@ public class CostEstimator {
         for (Table table : tablesToQueryColumns.keySet()) {
             for (Column column : tablesToQueryColumns.get(table)) {
                 // find foreign columns that join with primary columns in query
-                if (column.isForeignReference()) {
-                    Pair<Column, Column> join = new Pair<Column, Column>(column.getForeignKeyReference(), column);
-                    if (query.getJoinedColumns().contains(join)) {
+                if (column.isForeignReference()
+                    && query.getJoinedColumns().contains(new Pair<Column, Column>(column.getForeignKeyReference(), column))) {
                         columns--;
                     }
-                }
             }
-            
             if (rows == 0) {
                 // first table to fetch
                 rows = table.getSize();

@@ -1,5 +1,3 @@
-import gudusoft.gsqlparser.JoinRelationAnalyze;
-
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -23,9 +21,9 @@ public class Query {
      * Default constructor
      */
     Query() {
-        referencedColumns = new HashSet<Column>();
-        whereColumns = new HashSet<Column>();
-        joinedColumns = new HashSet<Pair<Column, Column>>();
+        referencedColumns = Util518.newHashSet();
+        whereColumns = Util518.newHashSet();
+        joinedColumns = Util518.newHashSet();
     }
     
     /**
@@ -34,9 +32,9 @@ public class Query {
      * @param query
      */
     Query(String query) {
-        referencedColumns = new HashSet<Column>();
-        whereColumns = new HashSet<Column>();
-        joinedColumns = new HashSet<Pair<Column, Column>>();
+        referencedColumns = Util518.newHashSet();
+        whereColumns = Util518.newHashSet();
+        joinedColumns = Util518.newHashSet();
         computeReferencedColumns(query);
     }
 
@@ -75,7 +73,7 @@ public class Query {
                         firstColumn = secondColumn;
                         secondColumn = temp;
                     }
-                    getJoinedColumns().add(new Pair<Column, Column>(firstColumn, secondColumn));
+                    joinedColumns.add(new Pair<Column, Column>(firstColumn, secondColumn));
                     break;
                 default:
                     namePair = splitNameString(line);
