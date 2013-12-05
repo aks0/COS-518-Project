@@ -22,6 +22,8 @@ public class CrudAnalyzer {
         StringBuilder builder = new StringBuilder();
         // use GSP to find all statements in the SQL
         TGSqlParser sqlparser = new TGSqlParser(dbVendor);
+        // get Join analysis
+        builder.append(new JoinRelationAnalyze(query).getAnalysisResult());
         sqlparser.sqltext = query;
         int ret = sqlparser.parse();
         
@@ -81,7 +83,10 @@ public class CrudAnalyzer {
                     result.append(stmt.tables.getTable(i).getObjectNameReferences().getObjectName(j).getColumnNameOnly());
                     result.append("\n");
                 }
-            }
+            } 
+        }
+        if (stmt.getWhereClause() != null) {
+            result.append(new WhereCondition(stmt.getWhereClause().getCondition()).getColumnsString());
         }
         for (int i = 0; i < stmt.getStatements().size(); i++){
            analyzeStmt(stmt.getStatements().get(i), result);

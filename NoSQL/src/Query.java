@@ -1,3 +1,5 @@
+import gudusoft.gsqlparser.JoinRelationAnalyze;
+
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -10,14 +12,20 @@ public class Query {
     public static final String DELETE_LABEL = "delete";
     public static final String INSERT_LABEL = "insert";
     public static final String UPDATE_LABEL = "update";
+    public static final String JOIN_LABEL = "join";
+    public static final String WHERE_LABEL = "where";
     private String type; // type of query this represents (select, update, delete, insert)
     private Set<Column> referencedColumns;  // list of columns referenced by this query
+    private Set<Column> whereColumns;  // list of columns involved in where by this query
+    private Set<Pair<Column, Column>> joinedColumns;  // list of columns joined by this query
     
     /**
      * Default constructor
      */
     Query() {
         referencedColumns = new HashSet<Column>();
+        whereColumns = new HashSet<Column>();
+        joinedColumns = new HashSet<Pair<Column, Column>>();
     }
     
     /**
@@ -27,6 +35,8 @@ public class Query {
      */
     Query(String query) {
         referencedColumns = new HashSet<Column>();
+        whereColumns = new HashSet<Column>();
+        joinedColumns = new HashSet<Pair<Column, Column>>();
         computeReferencedColumns(query);
     }
 
@@ -45,20 +55,52 @@ public class Query {
                 case UPDATE_LABEL:
                     type = line;
                     break;
-                default:
-                    // split line = <tableName>.<columnName> into its components
-                    String[] split = line.split("\\.");
-                    if (split.length == 2) {
-                        String tableName = split[0];
-                        String columnName = split[1];
-                        Table table = Table.getInstance(tableName);
-                        referencedColumns.add(
-                            Column.getInstance(table.getName(), columnName));
+                case WHERE_LABEL:
+                    line = scanner.nextLine();
+                    Pair<String, String> namePair = splitNameString(line);
+                    whereColumns.add(
+                            Column.getInstance(namePair.getFirst(), namePair.getSecond()));
+                    break;
+                case JOIN_LABEL:
+                    line = scanner.nextLine();
+                    // split <tableName1>.<columnName1> <tableName2>.<columnName2>
+                    String[] joinedColumnsSplit = line.split(" ");
+                    Pair<String, String> firstNamePair = splitNameString(joinedColumnsSplit[0]);
+                    Pair<String, String> secondNamePair = splitNameString(joinedColumnsSplit[1]);
+                    Column firstColumn = Column.getInstance(firstNamePair.getFirst(), firstNamePair.getSecond());
+                    Column secondColumn = Column.getInstance(secondNamePair.getFirst(), secondNamePair.getSecond());
+                    // in cases that primary and foreign column joined, put primary column as first
+                    if (!firstColumn.isPrimary()) {
+                        Column temp = firstColumn;
+                        firstColumn = secondColumn;
+                        secondColumn = temp;
                     }
+                    getJoinedColumns().add(new Pair<Column, Column>(firstColumn, secondColumn));
+                    break;
+                default:
+                    namePair = splitNameString(line);
+                    referencedColumns.add(
+                            Column.getInstance(namePair.getFirst(), namePair.getSecond()));
                     break;
             }
         }
         scanner.close();
+    }
+    
+    /**
+     * splits line of format <tableName>.<columnName> into its components
+     * as a Pair of Strings
+     * @param line
+     * @return
+     */
+    public Pair<String, String> splitNameString(String line) {
+        
+        String[] split = line.split("\\.");
+        if (split.length == 2) {
+            return new Pair<String, String>(split[0], split[1]);
+        } else {
+            throw new RuntimeException("Parsing table and column name failed for: " + line);
+        }
     }
 
     public Set<Column> getReferencedColumns() {
@@ -80,5 +122,13 @@ public class Query {
             }
         }
         return true;
+    }
+
+    public Set<Column> getWhereColumns() {
+        return whereColumns;
+    }
+    
+    public Set<Pair<Column, Column>> getJoinedColumns() {
+        return joinedColumns;
     }
 }

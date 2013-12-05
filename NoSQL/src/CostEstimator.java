@@ -142,9 +142,11 @@ public class CostEstimator {
         for (Table table : tablesToQueryColumns.keySet()) {
             for (Column column : tablesToQueryColumns.get(table)) {
                 // find foreign columns that join with primary columns in query
-                if (column.isForeignReference() 
-                        && primaryColumns.contains(column.getForeignKeyReference())) { 
-                    columns--;
+                if (column.isForeignReference()) {
+                    Pair<Column, Column> join = new Pair<Column, Column>(column.getForeignKeyReference(), column);
+                    if (query.getJoinedColumns().contains(join)) {
+                        columns--;
+                    }
                 }
             }
             

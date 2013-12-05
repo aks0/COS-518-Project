@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -46,6 +47,7 @@ public class QueryLib {
      * @param args
      */
     public static void main(String[] args) {
+        List<Table> tables = Table.getTablesFromModel("./data_models/data1.model");
         ArrayList<Query> queries = getQueryList("query_logs/queries.sql");
         for (Query query : queries) {
             for (Column column : query.getReferencedColumns()) {
