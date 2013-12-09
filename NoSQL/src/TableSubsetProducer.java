@@ -36,7 +36,7 @@ public class TableSubsetProducer {
         // Algorithm for finding subsets of increasing size
         int i = 1;
         int subsetSize = i + 1;
-        while (subsetSize < maxSize && candidateSets.get(i - 1).size() > 0) {
+        while (subsetSize <= maxSize && candidateSets.get(i - 1).size() > 0) {
             HashSet<TableSubset> oldCandidateSet = candidateSets.get(i - 1);
             HashSet<TableSubset> newCandidateSet = Util518.newHashSet();
             
@@ -47,7 +47,8 @@ public class TableSubsetProducer {
                     if (!newCandidateSet.contains(subset)) {
                         ArrayList<TableSubset> smallerSubsets = subsetOneSizeSmaller(subset);
                         for (TableSubset smallerSubset : smallerSubsets) {
-                            if (oldCandidateSet.contains(smallerSubset) && CostEstimator.normalizedCost(subset, queries) >= baseline) {
+                            if (oldCandidateSet.contains(smallerSubset) 
+                                    && CostEstimator.normalizedWeightedCost(subset, queries) >= baseline) {
                                 newCandidateSet.add(subset);
                             }
                         }

@@ -3,7 +3,7 @@
 
 <table>
 <name>users</name>
-<rows>100</rows>
+<rows>10000</rows>
 <column>
 <name>userid</name>
 <primary/>
@@ -18,7 +18,7 @@
 
 <table>
 <name>user_item_like</name>
-<rows>1000</rows>
+<rows>10000</rows>
 <column>
 <name>id</name>
 <primary/>

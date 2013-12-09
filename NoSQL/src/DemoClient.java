@@ -7,7 +7,7 @@ import java.util.List;
  */
 public class DemoClient {
     public static double baseline = 1;
-    public static int maxSize = 10;
+    public static int maxSize = 4;
     
     public static void main(String[] args) {
         List<Table> tables = Table.getTablesFromModel("./data_models/data1.model");
@@ -22,10 +22,9 @@ public class DemoClient {
                 }
             }
             TableSubset bestSubset = CostEstimator.findBestSubset(query, candidateSubsets);
+            System.out.println(bestSubset);
+            System.out.println();
             selectedSubsets.add(bestSubset);
-        }
-        for (TableSubset subset : selectedSubsets) {
-            System.out.println(subset);
         }
     }
 }

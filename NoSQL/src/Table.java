@@ -142,10 +142,10 @@ public class Table {
             String fcolumn_name = pair.getSecond().getSecond();
             Column fcolumn = Column.getInstance(ftable_name, fcolumn_name);
             column.setForeignKeyReference(fcolumn);
-            System.out.println(
+            /*System.out.println(
                 String.format("FColumn: %s references Column %s.",
                 column, fcolumn)
-            );
+            );*/
         }
     }
 
