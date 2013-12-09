@@ -15,7 +15,7 @@ public class Query {
     private String type; // type of query this represents (select, update, delete, insert)
     private Set<Column> referencedColumns;  // list of columns referenced by this query
     private Set<Column> whereColumns;  // list of columns involved in where by this query
-    private Set<Pair<Column, Column>> joinedColumns;  // list of columns joined by this query
+    private Set<Column> equijoinedColumns;  // list of columns equi-joined by this query
     
     /**
      * Default constructor
@@ -23,7 +23,7 @@ public class Query {
     Query() {
         referencedColumns = Util518.newHashSet();
         whereColumns = Util518.newHashSet();
-        joinedColumns = Util518.newHashSet();
+        equijoinedColumns = Util518.newHashSet();
     }
     
     /**
@@ -34,7 +34,7 @@ public class Query {
     Query(String query) {
         referencedColumns = Util518.newHashSet();
         whereColumns = Util518.newHashSet();
-        joinedColumns = Util518.newHashSet();
+        equijoinedColumns = Util518.newHashSet();
         computeReferencedColumns(query);
     }
 
@@ -62,18 +62,13 @@ public class Query {
                 case JOIN_LABEL:
                     line = scanner.nextLine();
                     // split <tableName1>.<columnName1> <tableName2>.<columnName2>
-                    String[] joinedColumnsSplit = line.split(" ");
-                    Pair<String, String> firstNamePair = splitNameString(joinedColumnsSplit[0]);
-                    Pair<String, String> secondNamePair = splitNameString(joinedColumnsSplit[1]);
+                    String[] equijoinedColumnsSplit = line.split(" ");
+                    Pair<String, String> firstNamePair = splitNameString(equijoinedColumnsSplit[0]);
+                    Pair<String, String> secondNamePair = splitNameString(equijoinedColumnsSplit[1]);
                     Column firstColumn = Column.getInstance(firstNamePair.getFirst(), firstNamePair.getSecond());
                     Column secondColumn = Column.getInstance(secondNamePair.getFirst(), secondNamePair.getSecond());
-                    // in cases that primary and foreign column joined, put primary column as first
-                    if (!firstColumn.isPrimary()) {
-                        Column temp = firstColumn;
-                        firstColumn = secondColumn;
-                        secondColumn = temp;
-                    }
-                    joinedColumns.add(new Pair<Column, Column>(firstColumn, secondColumn));
+                    equijoinedColumns.add(firstColumn);
+                    equijoinedColumns.add(secondColumn);
                     break;
                 default:
                     namePair = splitNameString(line);
@@ -126,7 +121,7 @@ public class Query {
         return whereColumns;
     }
     
-    public Set<Pair<Column, Column>> getJoinedColumns() {
-        return joinedColumns;
+    public Set<Column> getEquijoinedColumns() {
+        return equijoinedColumns;
     }
 }

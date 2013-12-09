@@ -120,6 +120,7 @@ public class CostEstimator {
         double columns = 0;
         double rows = 0;
         HashMap<Table, ArrayList<Column>> tablesToQueryColumns = Util518.newHashMap();
+        HashSet<Column> primaryColumns = Util518.newHashSet();
         
         // find all primary columns and tentative number of columns;
         // also fill in tablesToQueryColumns mapping
@@ -136,19 +137,24 @@ public class CostEstimator {
         
         // get number of cells in join of referenced tables with projections
         for (Table table : tablesToQueryColumns.keySet()) {
+            boolean isJoinedPrimary = false;
             for (Column column : tablesToQueryColumns.get(table)) {
-                // find foreign columns that join with primary columns in query
-                if (column.isForeignReference()
-                    && query.getJoinedColumns().contains(new Pair<Column, Column>(column.getForeignKeyReference(), column))) {
-                        columns--;
-                    }
+                // find primary columns that join with foreign columns in query
+                if (column.isPrimary() && query.getEquijoinedColumns().contains(column)) {
+                    columns--;
+                    isJoinedPrimary = true;
+                }
             }
-            if (rows == 0) {
-                // first table to fetch
-                rows = table.getSize();
-            } else {
-                // scan through table for joins
-                rows *= table.getSize();
+            
+            // increase cost with foreign columns and cross joined columns
+            if (!isJoinedPrimary) {
+                if (rows == 0) {
+                    // first table to fetch
+                    rows = table.getSize();
+                } else {
+                    // scan through table for joins
+                    rows *= table.getSize();
+                }
             }
         }
         // one unit of cost per cell
@@ -159,13 +165,14 @@ public class CostEstimator {
     public static void main(String[] args) {
 		List<Table> tables = Table.getTablesFromModel("./data_models/data1.model");
         ArrayList<Query> queryList = QueryLib.getQueryList("query_logs/queries.sql");
+        /*
         for (Query query : queryList) {
             System.out.println(CostEstimator.normalizedCost(query));
         }
-		/*
+		*/
         double baseline = 1;
         int maxSize = 10;
-        ArrayList<TableSubset> subsets = TableSubsetProducer.produce(queryList, baseline, maxSize);
+        HashSet<TableSubset> subsets = TableSubsetProducer.produce(queryList, baseline, maxSize);
         HashSet<TableSubset> selectedSubsets = new HashSet<TableSubset>();
         for (Query query : queryList) {
             ArrayList<TableSubset> candidateSubsets = new ArrayList<TableSubset>();
@@ -176,6 +183,9 @@ public class CostEstimator {
             }
             TableSubset bestSubset = CostEstimator.findBestSubset(query, candidateSubsets);
             selectedSubsets.add(bestSubset);
-        }*/
+        }
+        for (TableSubset subset : selectedSubsets) {
+            System.out.println(subset);
+        }
     }
 }

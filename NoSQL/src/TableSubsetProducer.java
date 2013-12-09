@@ -9,14 +9,14 @@ import java.util.NavigableSet;
 public class TableSubsetProducer {
 	
 	/**
-	 * Given quries, baseline threshold, and maxSize, produces candidate list of table subsets
+	 * Given queries, baseline threshold, and maxSize, produces candidate list of table subsets
 	 * 
 	 * @param queries
 	 * @param baseline
 	 * @param maxSize
 	 * @return
 	 */
-	public static ArrayList<TableSubset> produce(ArrayList<Query> queries, double baseline, int maxSize) {
+	public static HashSet<TableSubset> produce(ArrayList<Query> queries, double baseline, int maxSize) {
 		ArrayList<HashSet<TableSubset>> candidateSets = Util518.newArrayList();
 		
 		// Produce table subsets of size 1
@@ -24,28 +24,30 @@ public class TableSubsetProducer {
 		HashSet<TableSubset> singleton = candidateSets.get(0);
 		
 		for (Query query : queries) {
-			for (Column column : query.getReferencedColumns()) {
-				TableSubset subset = new TableSubset();
-				subset.addColumn(column);
-				if (!singleton.contains(subset))
-					singleton.add(subset);
-			}
+		    if (CostEstimator.normalizedCost(query) >= baseline) {
+    			for (Column column : query.getReferencedColumns()) {
+    				TableSubset subset = new TableSubset();
+    				subset.addColumn(column);
+    				singleton.add(subset);
+    			}
+		    }
 		}
 		
 		// Algorithm for finding subsets of increasing size
 		int i = 1;
-		while (i < maxSize && candidateSets.get(i-1).size() > 0) {
-			HashSet<TableSubset> candidateSet = candidateSets.get(i - 1);
+	    int subsetSize = i + 1;
+		while (subsetSize < maxSize && candidateSets.get(i - 1).size() > 0) {
+			HashSet<TableSubset> oldCandidateSet = candidateSets.get(i - 1);
 			HashSet<TableSubset> newCandidateSet = Util518.newHashSet();
 			
 			for (Query query : queries) {
-				TableSubset tbset = new TableSubset(query.getReferencedColumns());
-				ArrayList<TableSubset> sizedCombos = combos(tbset.getColumns(), i);
+				TableSubset querySubset = new TableSubset(query.getReferencedColumns());
+				ArrayList<TableSubset> sizedCombos = combos(querySubset.getColumns(), subsetSize);
 				for (TableSubset subset : sizedCombos) {
 					if (!newCandidateSet.contains(subset)) {
 						ArrayList<TableSubset> smallerSubsets = subsetOneSizeSmaller(subset);
 						for (TableSubset smallerSubset : smallerSubsets) {
-							if (candidateSet.contains(smallerSubset) && CostEstimator.normalizedCost(subset, queries) >= baseline) {
+							if (oldCandidateSet.contains(smallerSubset) && CostEstimator.normalizedCost(subset, queries) >= baseline) {
 								newCandidateSet.add(subset);
 							}
 						}
@@ -55,9 +57,14 @@ public class TableSubsetProducer {
 			
 			candidateSets.add(newCandidateSet);
 			i++;
+			subsetSize++;
 		}
 		
-		return null;
+		HashSet<TableSubset> combinedSubsets = new HashSet<TableSubset>();
+		for (HashSet<TableSubset> candidateSet : candidateSets) {
+		    combinedSubsets.addAll(candidateSet);
+		}
+		return combinedSubsets;
 	}
 	
 	/**
