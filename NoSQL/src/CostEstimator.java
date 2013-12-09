@@ -163,29 +163,10 @@ public class CostEstimator {
     
     // test main
     public static void main(String[] args) {
-		List<Table> tables = Table.getTablesFromModel("./data_models/data1.model");
+        List<Table> tables = Table.getTablesFromModel("./data_models/data1.model");
         ArrayList<Query> queryList = QueryLib.getQueryList("query_logs/queries.sql");
-        /*
         for (Query query : queryList) {
             System.out.println(CostEstimator.normalizedCost(query));
-        }
-		*/
-        double baseline = 1;
-        int maxSize = 10;
-        HashSet<TableSubset> subsets = TableSubsetProducer.produce(queryList, baseline, maxSize);
-        HashSet<TableSubset> selectedSubsets = new HashSet<TableSubset>();
-        for (Query query : queryList) {
-            ArrayList<TableSubset> candidateSubsets = new ArrayList<TableSubset>();
-            for (TableSubset subset : subsets) {
-                if (query.referencesColumns(subset.getColumns())) {
-                    candidateSubsets.add(subset);
-                }
-            }
-            TableSubset bestSubset = CostEstimator.findBestSubset(query, candidateSubsets);
-            selectedSubsets.add(bestSubset);
-        }
-        for (TableSubset subset : selectedSubsets) {
-            System.out.println(subset);
         }
     }
 }
