@@ -22,9 +22,9 @@ public class DemoClient {
                 }
             }
             TableSubset bestSubset = CostEstimator.findBestSubset(query, candidateSubsets);
+            selectedSubsets.add(bestSubset);
             System.out.println(bestSubset);
             System.out.println();
-            selectedSubsets.add(bestSubset);
         }
     }
 }

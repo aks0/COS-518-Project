@@ -148,15 +148,15 @@ public class CostEstimator {
             tablesToQueryColumns.get(column.getTable()).add(column);
         }
         
-        HashSet<Column> columns = new HashSet<Column>();
-        HashSet<Column> otherColumns = new HashSet<Column>();
+        HashSet<Column> columnsInSubset = new HashSet<Column>();
         for (HashSet<Column> value : tablesToQueryColumnsInSubset.values()) {
-            columns.addAll(value);
+            columnsInSubset.addAll(value);
         }
+        HashSet<Column> columnsNotInSubset = new HashSet<Column>();
         for (HashSet<Column> value : tablesToQueryColumnsNotInSubset.values()) {
-            otherColumns.addAll(value);
+            columnsNotInSubset.addAll(value);
         }
-        Column foreignColumn = searchForEquijoin(columns, otherColumns, query);
+        Column joinedForeignColumn = searchForEquijoin(columnsInSubset, columnsNotInSubset, query);
         
         Pair<Double, Double> inSubsetDimensions = calculateJoinDimensions(tablesToQueryColumnsInSubset, query); 
         Pair<Double, Double> notInSubsetDimensions = calculateJoinDimensions(tablesToQueryColumnsNotInSubset, query); 
@@ -167,11 +167,12 @@ public class CostEstimator {
         double columnsNotInSubsetJoin = notInSubsetDimensions.getSecond();
         double cost = STORAGE_PENALTY * (rowsInSubsetJoin * columnsInSubsetJoin);
         cost += NOT_IN_SUBSET_PENALTY * (rowsNotInSubsetJoin * columnsNotInSubsetJoin);
-        if (foreignColumn == null) {
+        if (joinedForeignColumn == null) {
             cost += FINAL_JOIN_PENALTY * (rowsInSubsetJoin * rowsNotInSubsetJoin);
-        } else {
-            // just going to upper bound this for now
-            cost += FINAL_JOIN_PENALTY * foreignColumn.getTable().getSize();
+        } else if (columnsInSubset.contains(joinedForeignColumn)) {
+            cost += FINAL_JOIN_PENALTY * rowsInSubsetJoin;
+        } else if (columnsNotInSubset.contains(joinedForeignColumn)){
+            cost += FINAL_JOIN_PENALTY * rowsNotInSubsetJoin;
         }
         return cost;
     }
