@@ -12,7 +12,9 @@ public class DemoClient {
     public static void main(String[] args) {
         List<Table> tables = Table.getTablesFromModel("./data_models/data1.model");
         ArrayList<Query> queryList = QueryLib.getQueryList("query_logs/queries.sql");
+//        ArrayList<Query> queryList = QueryLib.getQueryList("query_logs/query_workload500.sql");
         HashSet<TableSubset> subsets = TableSubsetProducer.produce(queryList, baseline, maxSize);
+        System.out.println(subsets.size());
         HashSet<TableSubset> selectedSubsets = new HashSet<TableSubset>();
         for (Query query : queryList) {
             ArrayList<TableSubset> candidateSubsets = new ArrayList<TableSubset>();

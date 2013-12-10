@@ -106,7 +106,7 @@ public class CostEstimator {
             }
             if (subsetTables.size() == 1) continue;
             double cost = denormalizedCost(query, subset);
-            System.out.println(subset + " " + cost);
+            //System.out.println(subset + " " + cost);
             if (cost < minCost) {
                 minCost = cost;
                 bestSubset = subset;
