@@ -65,7 +65,7 @@ public class TableSubsetProducer {
         for (HashSet<TableSubset> candidateSet : candidateSets) {
             for (TableSubset subset : candidateSet) {
                 if (CostEstimator.normalizedWeightedCost(subset, queries) >= baseline) {
-                    combinedSubsets.addAll(candidateSet);
+                    combinedSubsets.add(subset);
                 }
             }
         }
