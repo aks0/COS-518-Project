@@ -48,7 +48,7 @@ public class TableSubsetProducer {
                         ArrayList<TableSubset> smallerSubsets = subsetOneSizeSmaller(subset);
                         for (TableSubset smallerSubset : smallerSubsets) {
                             if (oldCandidateSet.contains(smallerSubset) 
-                                    && CostEstimator.normalizedWeightedCost(subset, queries) >= baseline) {
+                                    && CostEstimator.normalizedCost(subset, queries) >= baseline) {
                                 newCandidateSet.add(subset);
                             }
                         }
@@ -63,7 +63,11 @@ public class TableSubsetProducer {
         
         HashSet<TableSubset> combinedSubsets = new HashSet<TableSubset>();
         for (HashSet<TableSubset> candidateSet : candidateSets) {
-            combinedSubsets.addAll(candidateSet);
+            for (TableSubset subset : candidateSet) {
+                if (CostEstimator.normalizedWeightedCost(subset, queries) >= baseline) {
+                    combinedSubsets.addAll(candidateSet);
+                }
+            }
         }
         return combinedSubsets;
     }
