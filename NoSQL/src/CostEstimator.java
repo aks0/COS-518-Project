@@ -6,9 +6,9 @@ import java.util.Set;
 
 
 public class CostEstimator {
-    public static double STORAGE_PENALTY = 0.01;
-    public static double NOT_IN_SUBSET_PENALTY = 10.0;
-    public static double FINAL_JOIN_PENALTY = 10.0; 
+    public static double STORAGE_PENALTY = 1.0;
+    public static double NOT_IN_SUBSET_PENALTY = 1.0;
+    public static double FINAL_JOIN_PENALTY = 1.0; 
     
     /**
      * Normalized cost of all queries which involve subset
@@ -106,7 +106,7 @@ public class CostEstimator {
             }
             if (subsetTables.size() == 1) continue;
             double cost = denormalizedCost(query, subset);
-            //System.out.println(subset + " " + cost);
+            System.out.println(subset + " " + cost);
             if (cost < minCost) {
                 minCost = cost;
                 bestSubset = subset;
@@ -127,7 +127,7 @@ public class CostEstimator {
      * @param subset
      * @return cost
      */
-    private static double denormalizedCost(Query query, TableSubset subset) {
+    public static double denormalizedCost(Query query, TableSubset subset) {
         HashMap<Table, HashSet<Column>> tablesToQueryColumnsInSubset = Util518.newHashMap();
         HashMap<Table, HashSet<Column>> tablesToQueryColumnsNotInSubset = Util518.newHashMap();
         
