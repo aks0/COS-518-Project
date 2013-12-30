@@ -13,13 +13,14 @@ import materializedViews.Util518;
 
 
 public class EntityProducer {
+    
 	public static void produce(List<Table> tables, List<Query> queries, double computationMemoryRatio) {
-		HashMap<Pair<String, String>, Double> costMap = Util518.newHashMap();
+		HashMap<TablePair, Double> costMap = Util518.newHashMap();
 		
 		for (Table table1 : tables) {
 			for (Table table2 : tables) {
-				Table foreignKeyTable;
-				if (!table1.equals(table2) && (foreignKeyTable = Table.equiJoined(table1, table2)) != null) {
+				Table foreignTable;
+				if (!table1.equals(table2) && (foreignTable = Table.findForeignTable(table1, table2)) != null) {
 					TableSubset subset = new TableSubset();
 					for (Column column : table1.getColumns()) {
 						subset.addColumn(column);
@@ -34,16 +35,13 @@ public class EntityProducer {
 						cost += CostEstimator.denormalizedCost(query, subset);
 					}
 					
-					if (foreignKeyTable.equals(table1))
-						costMap.put(new Pair<String, String>(table1.getName(), table2.getName()), cost);
-					else
-						costMap.put(new Pair<String, String>(table2.getName(), table1.getName()), cost);
-						
+					if (foreignTable.equals(table1)) {
+						costMap.put(new TablePair(table2, table1), cost);
+					} else {
+						costMap.put(new TablePair(table1, table2), cost);
+					}
 				}
 			}
 		}
-		
-		
 	}
-	
 }

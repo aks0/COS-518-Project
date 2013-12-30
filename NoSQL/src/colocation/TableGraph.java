@@ -11,139 +11,148 @@ import materializedViews.Pair;
 import materializedViews.Table;
 import materializedViews.Util518;
 
-public class TableGraph {
-	class Edge {
-		public Table table;
-		public double cost;
-		
-		public Edge(Table table, double cost) {
-			this.table = table;
-			this.cost = cost;
-		}
-	}
-	
-	class Entry {
-		public List<Edge> outEdges;
-		
-		public Entry() {
-			outEdges = new ArrayList<Edge>();
-		}
-		
-		public double maxEdge() {
-			double max = 0;
-			for (Edge edge : outEdges) {
-				if (max < edge.cost)
-					max = edge.cost;
-			}
-			
-			return max;
-		}
-		
-		public double getCost(Table table) {
-			for (Edge edge : outEdges) {
-				if (edge.table.equals(table)) {
-					return edge.cost;
-				}
-			}
-			
-			return Double.POSITIVE_INFINITY;
-		}
-		
-	}
-	
-	class ValueComparator implements Comparator<Table> {
+class Edge {
+    // table being linked to
+    private Table table;
+    // cost assigned
+    private double cost;
+    
+    public Edge(Table table, double cost) {
+        this.table = table;
+        this.cost = cost;
+    }
+    
+    public Table getTable() {
+        return table;
+    }
+    
+    public double getCost() {
+        return cost;
+    }
+}
 
-	    Map<Table, Entry> base;
-	    public ValueComparator(Map<Table, Entry> base) {
-	        this.base = base;
-	    }
-	    
-	    public int compare(Table a, Table b) {
-	    	return (int)(base.get(a).maxEdge() - base.get(b).maxEdge());
-	    }
-	}
+class TableNode {
+    // parent table being represented
+    private Table table;
+    // list of edges to children
+    private ArrayList<Edge> outEdges;
+    
+    public TableNode(Table table) {
+        this.table = table;
+        outEdges = new ArrayList<Edge>();
+    }
+    
+    public Table getTable() {
+        return table;
+    }
+    
+    public ArrayList<Edge> getOutEdges() {
+        return outEdges;
+    }
+    
+    public double maxEdge() {
+        double max = 0;
+        for (Edge edge : outEdges) {
+            if (max < edge.getCost()) {
+                max = edge.getCost();
+            }
+        }
+        return max;
+    }
+    
+    public double getCostTo(Table table) {
+        for (Edge edge : outEdges) {
+            if (edge.getTable().equals(table)) {
+                return edge.getCost();
+            }
+        }
+        return Double.POSITIVE_INFINITY;
+    }
+}
+
+class ValueComparator implements Comparator<Table> {
+    private Map<Table, TableNode> base;
+    
+    public ValueComparator(Map<Table, TableNode> base) {
+        this.base = base;
+    }
+    
+    public int compare(Table a, Table b) {
+        return (int)(base.get(a).maxEdge() - base.get(b).maxEdge());
+    }
+}
+
+public class TableGraph {	
+	// mapping from table to the table's node in the graph 
+	private HashMap<Table, TableNode> tableToNode;
 	
-	private HashMap<Table, Entry> adjMap;
-	
-	public TableGraph(List<Table> tables, HashMap<Pair<String, String>, Double> costMap) {
-		adjMap = Util518.newHashMap();
+	public TableGraph(List<Table> tables, HashMap<TablePair, Double> costMap) {
+		tableToNode = Util518.newHashMap();
 		
-		for (Pair<String, String> pair : costMap.keySet()) {
-			Table foreignKeyTable = Table.getInstance(pair.getFirst());
-			double cost = costMap.get(pair);
-			
-			Entry entry;
-			if (adjMap.containsKey(foreignKeyTable)) {
-				entry = adjMap.get(foreignKeyTable);
+		for (TablePair pair : costMap.keySet()) {
+			Table table = pair.getPrimaryTable();
+			TableNode node;
+
+			if (tableToNode.containsKey(table)) {
+				node = tableToNode.get(table);
+			} else {
+				node = new TableNode(table);
+				tableToNode.put(table, node);
 			}
-			else {
-				entry = new Entry();
-			}
-			
-			entry.outEdges.add(new Edge(Table.getInstance(pair.getSecond()), cost));
-			adjMap.put(foreignKeyTable, entry);
-				
+			node.getOutEdges().add(new Edge(pair.getForeignTable(), costMap.get(pair)));
 		}
 	}
 	
-	public List<ArrayList<Table> >produceEntities(int k) {
-		List<ArrayList<Table>> entities = new ArrayList<ArrayList<Table> >();
-		List<Table> entityCenters = getHighestOutDegree(k);
-		
-		for (Table table : entityCenters) {
-			ArrayList<Table> entity = new ArrayList<Table>();
-			entity.add(table);
-			entities.add(entity);
+	public HashMap<Table, ArrayList<Table>> produceEntities(int k) {
+	    // entities as mapping from parent table to children tables
+		HashMap<Table, ArrayList<Table>> entities = new HashMap<Table, ArrayList<Table>>();
+		for (TableNode node : getHighestOutDegreeNodes(k)) {
+		    // put parent tables
+			entities.put(node.getTable(), new ArrayList<Table>());
 		}
 		
-		for (Table table : adjMap.keySet()) {
-			int bestTableIndex = -1;
+		// add every table to a partition
+		for (Table table : tableToNode.keySet()) {
 			double bestCost = Double.MAX_VALUE;
-			boolean exists = false;
-			for (int i = 0; i < entityCenters.size(); ++i) {
-				Table center = entityCenters.get(i);
+			Table bestCenter = null;
+			boolean isACenter = false;
+			for (Table center : entities.keySet()) {
 				if (table.equals(center)) {
-					exists = true;
+					isACenter = true;
 					break;
 				}
 				
-				double cost = adjMap.get(center).getCost(table);
+				// find best center to join with table
+				double cost = tableToNode.get(center).getCostTo(table);
 				if (cost < bestCost) {
 					bestCost = cost;
-					bestTableIndex = i;
+					bestCenter = center;
 				}
 			}
 			
-			if (!exists) {
-				if (bestTableIndex != -1)
-					entities.get(bestTableIndex).add(table);
-				else {
-					ArrayList<Table> entity = new ArrayList<Table>();
-					entity.add(table);
-					entities.add(entity);
+			if (!isACenter) {
+				if (bestCenter != null && bestCost != Double.POSITIVE_INFINITY) {
+					entities.get(bestCenter).add(table);
+				} else {
+				    // create new entity with only center
+					entities.put(table, new ArrayList<Table>());
 				}
 			}
 		}
-		
 		return entities;
 	}
 	
-	public List<Table> getHighestOutDegree(int k) {
-		ValueComparator bvc = new ValueComparator(adjMap);
-		TreeMap<Table, Entry> sortedMap = new TreeMap<Table, Entry>(bvc);
-		sortedMap.putAll(adjMap);
+	public List<TableNode> getHighestOutDegreeNodes(int k) {
+		ValueComparator comparator = new ValueComparator(tableToNode);
+		TreeMap<Table, TableNode> sortedMap = new TreeMap<Table, TableNode>(comparator);
+		sortedMap.putAll(tableToNode);
 		
-		ArrayList<Table> entityCenters = new ArrayList<Table>();
+		ArrayList<TableNode> entityCenters = new ArrayList<TableNode>();
 		int i = 0;
 		for (Table table : sortedMap.keySet()) {
-			entityCenters.add(table);
-			
-			i++;
-			if (i == k)
-				break;
+			entityCenters.add(tableToNode.get(table));
+			if (++i == k) break;
 		}
-		
 		return entityCenters;
 	}
-	
 }
