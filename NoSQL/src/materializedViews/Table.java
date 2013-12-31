@@ -22,6 +22,7 @@ public class Table {
 	private String name;
 	private ArrayList<Column> columns;
 	private int size;
+	private double updateRate;
 
 	public int getSize() {
 		return size;
@@ -88,13 +89,13 @@ public class Table {
 	 * @param table2
 	 * @return
 	 */
-	public static Table findForeignTable(Table table1, Table table2) {
+	public static Table findParentTable(Table table1, Table table2) {
 		
 		for (Column column1 : table1.getColumns()) {
 			for (Column column2 : table2.getColumns()) {
 			    // table 1 has foreign version of table 2 column
 				if (column1.getForeignKeyReference() != null && column1.getForeignKeyReference().equals(column2))
-					return table1;
+					return table2;
 			}
 		}
 		
@@ -102,7 +103,7 @@ public class Table {
 			for (Column column2 : table1.getColumns()) {
 			    // table 2 has foreign version of table 1 column
 				if (column1.getForeignKeyReference() != null && column1.getForeignKeyReference().equals(column2))
-					return table2;
+					return table1;
 			}
 		}
 		

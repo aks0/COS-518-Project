@@ -3,19 +3,19 @@ package colocation;
 import materializedViews.Table;
 
 public class TablePair {
-    private Table primaryTable;
-    private Table foreignTable;
+    private Table parentTable;
+    private Table childTable;
 
-    public TablePair(Table primaryTable, Table foreignTable) {
-        this.primaryTable = primaryTable;
-        this.foreignTable = foreignTable;
+    public TablePair(Table parentTable, Table childTable) {
+        this.parentTable = parentTable;
+        this.childTable = childTable;
     }
     
-    public Table getPrimaryTable() {
-        return primaryTable;
+    public Table getParentTable() {
+        return parentTable;
     }
     
-    public Table getForeignTable() {
-        return foreignTable;
+    public Table getChildTable() {
+        return childTable;
     }
 }
