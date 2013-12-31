@@ -68,6 +68,16 @@ class TableNode {
         return min;
     }
     
+    public double getBenefit(double normalizedCost) {
+    	double benefit = 0;
+    	for (Edge edge : outEdges) {
+    		benefit += (normalizedCost - edge.getCost());
+    	}
+    	
+    	benefit += table.getSize();
+    	return benefit;
+    }
+    
     /**
      * Get cost of edge to specific table (infinity if it doesn't exist)
      * @param table
@@ -100,9 +110,11 @@ class TableNode {
  */
 class ValueComparator implements Comparator<Table> {
     private Map<Table, TableNode> base;
+    private double normalizedCost;
     
-    public ValueComparator(Map<Table, TableNode> base) {
+    public ValueComparator(Map<Table, TableNode> base, double normalizedCost) {
         this.base = base;
+        this.normalizedCost = normalizedCost;
     }
     
     /**
@@ -113,16 +125,21 @@ class ValueComparator implements Comparator<Table> {
      * Doing this because edge cost indicates the amount of saving offered by join represented by edge
      */
     public int compare(Table a, Table b) {
-        return (int)(-1*(base.get(a).minEdge() - base.get(b).minEdge()));
+        TableNode tNodeA = base.get(a);
+        TableNode tNodeB = base.get(b);
+    	
+        return (int)(tNodeB.getBenefit(normalizedCost) - tNodeA.getBenefit(normalizedCost)); 
     }
 }
 
 public class TableGraph {	
 	// mapping from table to the table's node in the graph 
 	private HashMap<Table, TableNode> tableToNode;
+	private double normalizedCost;
 	
-	public TableGraph(List<Table> tables, HashMap<TablePair, Double> costMap) {
+	public TableGraph(List<Table> tables, HashMap<TablePair, Double> costMap, double normalizedCost) {
 		tableToNode = Util518.newHashMap();
+		this.normalizedCost = normalizedCost;
 		
 		// For each pair in the costMap, record edge in the graph
 		for (TablePair pair : costMap.keySet()) {
@@ -195,7 +212,7 @@ public class TableGraph {
 	 */
 	public List<TableNode> getHighestScoreNodes(int k) {
 		// Sort nodes by adding to treeMap
-		ValueComparator comparator = new ValueComparator(tableToNode);
+		ValueComparator comparator = new ValueComparator(tableToNode, normalizedCost);
 		TreeMap<Table, TableNode> sortedMap = new TreeMap<Table, TableNode>(comparator);
 		sortedMap.putAll(tableToNode);
 		
