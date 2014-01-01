@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.TreeMap;
 
+import materializedViews.Pair;
 import materializedViews.Table;
 import materializedViews.Util518;
 
@@ -68,14 +70,27 @@ class TableNode {
         return min;
     }
     
-    public double getBenefit(double totalNormalizedCost) {
-    	double benefit = totalNormalizedCost;
+    public double getPartitionBenefit(double totalNormalizedCost) {
+    	double benefit = 0;
     	for (Edge edge : outEdges) {
-    		benefit -= edge.getCost();
+    		benefit += totalNormalizedCost - edge.getCost();
     	}
     	
     	benefit += table.getSize();
     	return benefit;
+    }
+    
+    public double getReplicationBenefit(EntityGroup group, double totalNormalizedCost) {
+        double benefit = 0;
+        for (Edge edge : outEdges) {
+            if (group.contains(edge.getTable())) {
+                benefit += totalNormalizedCost - edge.getCost();
+            }
+        }
+        
+        benefit -= table.getSize();
+        benefit -= table.getUpdateRate() * table.getSize();
+        return benefit;
     }
     
     /**
@@ -108,11 +123,11 @@ class TableNode {
  * @author sachin1
  *
  */
-class ValueComparator implements Comparator<Table> {
+class PartitionValueComparator implements Comparator<Table> {
     private Map<Table, TableNode> base;
     private double totalNormalizedCost;
     
-    public ValueComparator(Map<Table, TableNode> base, double totalNormalizedCost) {
+    public PartitionValueComparator(Map<Table, TableNode> base, double totalNormalizedCost) {
         this.base = base;
         this.totalNormalizedCost = totalNormalizedCost;
     }
@@ -128,7 +143,35 @@ class ValueComparator implements Comparator<Table> {
         TableNode tNodeA = base.get(a);
         TableNode tNodeB = base.get(b);
     	
-        return (int)(tNodeB.getBenefit(totalNormalizedCost) - tNodeA.getBenefit(totalNormalizedCost)); 
+        return (int)(tNodeB.getPartitionBenefit(totalNormalizedCost) - tNodeA.getPartitionBenefit(totalNormalizedCost)); 
+    }
+}
+
+/**
+ * Allows one to compare two tables in terms of the graph
+ */
+class ReplicationValueComparator implements Comparator<Pair<Table, EntityGroup>> {
+    private Map<Table, TableNode> base;
+    private double totalNormalizedCost;
+    
+    public ReplicationValueComparator(Map<Table, TableNode> base, double totalNormalizedCost) {
+        this.base = base;
+        this.totalNormalizedCost = totalNormalizedCost;
+    }
+    
+    /**
+     * > 0 : a has min edge of lower cost than b
+     * < 0 : a has min edge of higher cost than b
+     * == 0 : a has min edge of same cost as b
+     * 
+     * Doing this because edge cost indicates the amount of saving offered by join represented by edge
+     */
+    public int compare(Pair<Table, EntityGroup> a, Pair<Table, EntityGroup> b) {
+        TableNode tNodeA = base.get(a.getFirst());
+        TableNode tNodeB = base.get(b.getFirst());
+        
+        return (int)(tNodeB.getReplicationBenefit(b.getSecond(), totalNormalizedCost) 
+                - tNodeA.getReplicationBenefit(a.getSecond(), totalNormalizedCost)); 
     }
 }
 
@@ -164,12 +207,16 @@ public class TableGraph {
 		}
 	}
 	
-	public HashMap<Table, ArrayList<Table>> produceEntities(int k) {
-	    // entities as mapping from parent table to children tables
-		HashMap<Table, ArrayList<Table>> entities = new HashMap<Table, ArrayList<Table>>();
-		for (TableNode node : getHighestScoreNodes(k)) {
+	public HashMap<Table, TableNode> getTableToNode() {
+	    return tableToNode;
+	}
+	
+	public HashMap<Table, EntityGroup> produceEntityGroups(int k) {
+	    // mapping from entity center to entity group
+		HashMap<Table, EntityGroup> entityMap = new HashMap<Table, EntityGroup>();
+		for (TableNode node : getHighestPartitionScoreNodes(k)) {
 		    // put parent tables
-			entities.put(node.getTable(), new ArrayList<Table>());
+			entityMap.put(node.getTable(), new EntityGroup(node.getTable()));
 		}
 		
 		// add every table to a partition
@@ -177,7 +224,7 @@ public class TableGraph {
 			double bestCost = Double.MAX_VALUE;
 			Table bestCenter = null;
 			boolean isACenter = false;
-			for (Table center : entities.keySet()) {
+			for (Table center : entityMap.keySet()) {
 				if (table.equals(center)) {
 					isACenter = true;
 					break;
@@ -193,14 +240,14 @@ public class TableGraph {
 			
 			if (!isACenter) {
 				if (bestCenter != null && bestCost != Double.POSITIVE_INFINITY) {
-					entities.get(bestCenter).add(table);
+					entityMap.get(bestCenter).add(table);
 				} else {
 				    // create new entity with only center
-					entities.put(table, new ArrayList<Table>());
+        			entityMap.put(table, new EntityGroup(table));
 				}
 			}
 		}
-		return entities;
+		return entityMap;
 	}
 	
 	/**
@@ -210,29 +257,61 @@ public class TableGraph {
 	 * @param k
 	 * @return
 	 */
-	public List<TableNode> getHighestScoreNodes(int k) {
+	public List<TableNode> getHighestPartitionScoreNodes(int k) {
 		// Sort nodes by adding to treeMap
-		ValueComparator comparator = new ValueComparator(tableToNode, totalNormalizedCost);
+        Comparator<Table> comparator = new PartitionValueComparator(tableToNode, totalNormalizedCost);
 		TreeMap<Table, TableNode> sortedMap = new TreeMap<Table, TableNode>(comparator);
 		sortedMap.putAll(tableToNode);
 		
 		// Iterate through sortedMap
-		ArrayList<TableNode> entityCenters = new ArrayList<TableNode>();
+		ArrayList<TableNode> nodes = new ArrayList<TableNode>();
 		int count = 0;
 		Iterator<Table> it = sortedMap.keySet().iterator();
 		while (it.hasNext()) {
 			Table table = it.next();
 			
 			// Don't make table a center if it can be joined with existing center
-			for (TableNode tableNode : entityCenters) {
+			for (TableNode tableNode : nodes) {
 				if (Table.findParentTable(table, tableNode.getTable()) != null) continue;
 			}
 			
-			entityCenters.add(tableToNode.get(table));
+			nodes.add(tableToNode.get(table));
 			if (++count == k) break;
 		}
 		
-		return entityCenters;
+		return nodes;
+	}
+
+	/**
+	 * Get the best k pairs of tables and entity groups from the graph according to
+     * the comparator defined between two tables
+	 * @param k
+	 * @param tables
+	 * @param groups
+	 * @return
+	 */
+	public ArrayList<Pair<Table, EntityGroup>> getHighestReplicationScorePairs(int k, 
+	        ArrayList<Table> tables, ArrayList<EntityGroup> groups) {
+		// Sort nodes by adding to treeMap
+        Comparator<Pair<Table, EntityGroup>> comparator = new ReplicationValueComparator(tableToNode, totalNormalizedCost);
+		PriorityQueue<Pair<Table, EntityGroup>> pqueue = 
+		        new PriorityQueue<Pair<Table, EntityGroup>>(tables.size() * groups.size(), comparator);
+		for (Table table : tables) {
+		    for (EntityGroup group : groups) {
+		        pqueue.add(new Pair<Table, EntityGroup>(table, group));
+		    }
+		}
+		
+		// Iterate 
+		ArrayList<Pair<Table, EntityGroup>> pairs = new ArrayList<Pair<Table, EntityGroup>>();
+		int count = 0;
+		Iterator<Pair<Table, EntityGroup>> it = pqueue.iterator();
+		while (it.hasNext()) {
+			pairs.add(it.next());
+			if (++count == k) break;
+		}
+		
+		return pairs;
 	}
 	
 	public String toString() {

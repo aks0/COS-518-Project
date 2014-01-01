@@ -13,9 +13,9 @@ import materializedViews.TableSubset;
 import materializedViews.Util518;
 
 
-public class EntityProducer {
+public class GraphBuilder {
     
-	public static void produce(List<Table> tables, List<Query> queries) {
+	public static TableGraph build(List<Table> tables, List<Query> queries) {
 		HashMap<TablePair, Double> costMap = Util518.newHashMap();
 		
 		// Iterate through every possible pair of tables
@@ -62,20 +62,8 @@ public class EntityProducer {
 		for (Query query : queries) {
 			totalNormalizedCost += CostEstimator.normalizedCost(query);
 		}
-		
-		System.out.println("Printing graph: ***********************");
 		TableGraph graph = new TableGraph(tables, costMap, totalNormalizedCost);
-		System.out.println(graph);
-		
-		HashMap<Table, ArrayList<Table>> entityMap = graph.produceEntities(2);
-		System.out.println("Printing entities: ********************");
-		for (Table table : entityMap.keySet()) {
-			System.out.println("Entity Center: " + table);
-			for (Table member : entityMap.get(table)) {
-				System.out.println("Entity Member: " + member);
-			}
-			System.out.println("-------------------");
-		}
+		return graph;
 	}
 	
 	public static void main(String args[]) {
@@ -89,6 +77,18 @@ public class EntityProducer {
 			}
 			System.out.println("--------");
 		}*/
-		produce(tables, queryList);
+		TableGraph graph = build(tables, queryList);
+	    System.out.println("Printing graph: ***********************");
+	    System.out.println(graph);
+	    
+		HashMap<Table, EntityGroup> entityMap = graph.produceEntityGroups(2);
+		System.out.println("Printing entities: ********************");
+        for (Table table : entityMap.keySet()) {
+            System.out.println("Center Entity: " + table);
+            for (Table member : entityMap.get(table)) {
+                System.out.println("Entity Group Member: " + member);
+            }
+            System.out.println("-------------------");
+        }
 	}
 }

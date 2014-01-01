@@ -16,6 +16,8 @@ import org.w3c.dom.NodeList;
 public class Table {
     // total number of updates to all tables
     private static int totalUpdates;
+    // total number of row across all tables
+    private static int totalSize;
 	private static Map<String, Table> tables = Util518.newHashMap();
 	private static ArrayList<Pair<Column, Pair<String, String>>> foreignReferences = Util518
 			.newArrayList();
@@ -28,6 +30,10 @@ public class Table {
 
 	public int getSize() {
 		return size;
+	}
+	
+	public static int getTotalSize() {
+	    return totalSize;
 	}
 
 	/**
@@ -204,6 +210,7 @@ public class Table {
 				Element row_item = (Element) eElement.getElementsByTagName(
 						"rows").item(0);
 				table.size = Integer.parseInt(row_item.getTextContent());
+				totalSize += table.size;
 			}
 			NodeList columns = eElement.getElementsByTagName("column");
 			for (int i = 0; i < columns.getLength(); i++) {
