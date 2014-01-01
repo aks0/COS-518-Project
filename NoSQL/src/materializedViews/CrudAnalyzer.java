@@ -22,7 +22,7 @@ public class CrudAnalyzer {
         // use GSP to find all statements in the SQL
         TGSqlParser sqlparser = new TGSqlParser(dbVendor);
         // get Join analysis
-        if (query.substring(0, query.indexOf(" ")).toLowerCase().startsWith(Query.SELECT_LABEL)) {
+        if (query.toLowerCase().startsWith(Query.SELECT_LABEL)) {
             builder.append(new JoinRelationAnalyze(query).getAnalysisResult());
         }
         sqlparser.sqltext = query;

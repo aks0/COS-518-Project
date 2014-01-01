@@ -79,8 +79,12 @@ public class Query {
                 break;
             default:
                 Pair<String, String> namePair = splitNameString(line);
-                referencedColumns.add(Column.getInstance(namePair.getFirst(),
+                if (namePair.getSecond().equals("*")) {
+                    referencedColumns.addAll(Table.getInstance(namePair.getFirst()).getColumns());
+                } else {
+                    referencedColumns.add(Column.getInstance(namePair.getFirst(),
                         namePair.getSecond()));
+                }
                 break;
             }
         }
