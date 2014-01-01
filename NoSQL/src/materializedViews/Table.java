@@ -14,7 +14,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Table {
-
+    // total number of updates to all tables
+    private static int totalUpdates;
 	private static Map<String, Table> tables = Util518.newHashMap();
 	private static ArrayList<Pair<Column, Pair<String, String>>> foreignReferences = Util518
 			.newArrayList();
@@ -22,7 +23,8 @@ public class Table {
 	private String name;
 	private ArrayList<Column> columns;
 	private int size;
-	private double updateRate;
+	// number of updates to this table
+    private int updates;
 
 	public int getSize() {
 		return size;
@@ -62,6 +64,23 @@ public class Table {
 		return this.columns;
 	}
 
+    public void incrementUpdates() {
+        updates++;
+        totalUpdates++;
+    }
+    
+    public int getUpdates() {
+        return updates;
+    }
+	
+    public static int getTotalUpdates() {
+        return totalUpdates;
+    }
+    
+    public double getUpdateRate() {
+        return updates/totalUpdates;
+    }
+    
 	/**
 	 * Table factory for generating new tables or returning an already existing
 	 * instance. It ensures that only once instance of each table exists.
