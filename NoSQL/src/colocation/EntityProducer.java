@@ -58,13 +58,13 @@ public class EntityProducer {
 		}
 		
 		// Calculate normalized cost of query workload
-		double normalizedCost = 0;
+		double totalNormalizedCost = 0;
 		for (Query query : queries) {
-			normalizedCost += CostEstimator.normalizedCost(query);
+			totalNormalizedCost += CostEstimator.normalizedCost(query);
 		}
 		
 		System.out.println("Printing graph: ***********************");
-		TableGraph graph = new TableGraph(tables, costMap, normalizedCost);
+		TableGraph graph = new TableGraph(tables, costMap, totalNormalizedCost);
 		System.out.println(graph);
 		
 		HashMap<Table, ArrayList<Table>> entityMap = graph.produceEntities(2);

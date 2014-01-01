@@ -68,10 +68,10 @@ class TableNode {
         return min;
     }
     
-    public double getBenefit(double normalizedCost) {
-    	double benefit = 0;
+    public double getBenefit(double totalNormalizedCost) {
+    	double benefit = totalNormalizedCost;
     	for (Edge edge : outEdges) {
-    		benefit += (normalizedCost - edge.getCost());
+    		benefit -= edge.getCost();
     	}
     	
     	benefit += table.getSize();
@@ -110,11 +110,11 @@ class TableNode {
  */
 class ValueComparator implements Comparator<Table> {
     private Map<Table, TableNode> base;
-    private double normalizedCost;
+    private double totalNormalizedCost;
     
-    public ValueComparator(Map<Table, TableNode> base, double normalizedCost) {
+    public ValueComparator(Map<Table, TableNode> base, double totalNormalizedCost) {
         this.base = base;
-        this.normalizedCost = normalizedCost;
+        this.totalNormalizedCost = totalNormalizedCost;
     }
     
     /**
@@ -128,18 +128,18 @@ class ValueComparator implements Comparator<Table> {
         TableNode tNodeA = base.get(a);
         TableNode tNodeB = base.get(b);
     	
-        return (int)(tNodeB.getBenefit(normalizedCost) - tNodeA.getBenefit(normalizedCost)); 
+        return (int)(tNodeB.getBenefit(totalNormalizedCost) - tNodeA.getBenefit(totalNormalizedCost)); 
     }
 }
 
 public class TableGraph {	
 	// mapping from table to the table's node in the graph 
 	private HashMap<Table, TableNode> tableToNode;
-	private double normalizedCost;
+	private double totalNormalizedCost;
 	
-	public TableGraph(List<Table> tables, HashMap<TablePair, Double> costMap, double normalizedCost) {
+	public TableGraph(List<Table> tables, HashMap<TablePair, Double> costMap, double totalNormalizedCost) {
 		tableToNode = Util518.newHashMap();
-		this.normalizedCost = normalizedCost;
+		this.totalNormalizedCost = totalNormalizedCost;
 		
 		// For each pair in the costMap, record edge in the graph
 		for (TablePair pair : costMap.keySet()) {
@@ -212,7 +212,7 @@ public class TableGraph {
 	 */
 	public List<TableNode> getHighestScoreNodes(int k) {
 		// Sort nodes by adding to treeMap
-		ValueComparator comparator = new ValueComparator(tableToNode, normalizedCost);
+		ValueComparator comparator = new ValueComparator(tableToNode, totalNormalizedCost);
 		TreeMap<Table, TableNode> sortedMap = new TreeMap<Table, TableNode>(comparator);
 		sortedMap.putAll(tableToNode);
 		
