@@ -34,6 +34,23 @@ public class EntityGroup implements Iterable<Table> {
     public boolean onlyContainsCenter() {
         return entities.size() == 1;
     }
+    
+    /**
+     * Returns total size of entity group in bytes
+     * @return
+     */
+    public long getSize() {
+    	long size = 0;
+    	size += center.getSizeInBytes();
+    	
+    	Iterator<Table> iterator = this.iterator();
+    	while (iterator.hasNext()) {
+    		Table table = iterator.next();
+    		size += table.getSizeInBytes();
+    	}
+    	
+    	return size;
+    }
 
     @Override
     public Iterator<Table> iterator() {
