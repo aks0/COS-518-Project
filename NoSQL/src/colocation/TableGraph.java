@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.TreeMap;
 
+import common.ServerGroup;
+
 import materializedViews.Pair;
 import materializedViews.Table;
 import materializedViews.Util518;
@@ -150,7 +152,7 @@ class PartitionValueComparator implements Comparator<Table> {
 /**
  * Allows one to compare two tables in terms of the graph
  */
-class ReplicationValueComparator implements Comparator<Pair<Table, EntityGroup>> {
+class ReplicationValueComparator implements Comparator<Pair<Table, ServerGroup>> {
     private Map<Table, TableNode> base;
     private double totalNormalizedCost;
     
@@ -166,13 +168,26 @@ class ReplicationValueComparator implements Comparator<Pair<Table, EntityGroup>>
      * 
      * Doing this because edge cost indicates the amount of saving offered by join represented by edge
      */
-    public int compare(Pair<Table, EntityGroup> a, Pair<Table, EntityGroup> b) {
+    /*public int compare(Pair<Table, EntityGroup> a, Pair<Table, EntityGroup> b) {
         TableNode tNodeA = base.get(a.getFirst());
         TableNode tNodeB = base.get(b.getFirst());
         
         return (int)(tNodeB.getReplicationBenefit(b.getSecond(), totalNormalizedCost) 
                 - tNodeA.getReplicationBenefit(a.getSecond(), totalNormalizedCost)); 
-    }
+    }*/
+
+	@Override
+	public int compare(Pair<Table, ServerGroup> a, Pair<Table, ServerGroup> b) {
+		TableNode tNodeA = base.get(a.getFirst());
+        TableNode tNodeB = base.get(b.getFirst());
+        
+		double scoreA =  tNodeA.getReplicationBenefit(a.getSecond().getEntityGroup(), totalNormalizedCost) 
+				- a.getFirst().getSize() * a.getSecond().getNumServers() * a.getFirst().getUpdateRate();
+		double scoreB =  tNodeB.getReplicationBenefit(b.getSecond().getEntityGroup(), totalNormalizedCost) 
+				- b.getFirst().getSize() * b.getSecond().getNumServers() * b.getFirst().getUpdateRate();
+		
+		return (int)(scoreB - scoreA);
+	}
 }
 
 public class TableGraph {	
@@ -283,29 +298,29 @@ public class TableGraph {
 	}
 
 	/**
-	 * Get the best k pairs of tables and entity groups from the graph according to
+	 * Get the best k pairs of tables and server groups from the graph according to
      * the comparator defined between two tables
 	 * @param k
 	 * @param tables
 	 * @param groups
 	 * @return
 	 */
-	public ArrayList<Pair<Table, EntityGroup>> getHighestReplicationScorePairs(int k, 
-	        ArrayList<Table> tables, ArrayList<EntityGroup> groups) {
+	public ArrayList<Pair<Table, ServerGroup>> getHighestReplicationScorePairs(int k, 
+	        ArrayList<Table> tables, ArrayList<ServerGroup> groups) {
 		// Sort nodes by adding to treeMap
-        Comparator<Pair<Table, EntityGroup>> comparator = new ReplicationValueComparator(tableToNode, totalNormalizedCost);
-		PriorityQueue<Pair<Table, EntityGroup>> pqueue = 
-		        new PriorityQueue<Pair<Table, EntityGroup>>(tables.size() * groups.size(), comparator);
+        Comparator<Pair<Table, ServerGroup>> comparator = new ReplicationValueComparator(tableToNode, totalNormalizedCost);
+		PriorityQueue<Pair<Table, ServerGroup>> pqueue = 
+		        new PriorityQueue<Pair<Table, ServerGroup>>(tables.size() * groups.size(), comparator);
 		for (Table table : tables) {
-		    for (EntityGroup group : groups) {
-		        pqueue.add(new Pair<Table, EntityGroup>(table, group));
+		    for (ServerGroup group : groups) {
+		        pqueue.add(new Pair<Table, ServerGroup>(table, group));
 		    }
 		}
 		
 		// Iterate 
-		ArrayList<Pair<Table, EntityGroup>> pairs = new ArrayList<Pair<Table, EntityGroup>>();
+		ArrayList<Pair<Table, ServerGroup>> pairs = new ArrayList<Pair<Table, ServerGroup>>();
 		int count = 0;
-		Iterator<Pair<Table, EntityGroup>> it = pqueue.iterator();
+		Iterator<Pair<Table, ServerGroup>> it = pqueue.iterator();
 		while (it.hasNext()) {
 			pairs.add(it.next());
 			if (++count == k) break;

@@ -32,6 +32,14 @@ public class Table {
 		return size;
 	}
 	
+	/**
+	 * Assumption is that each column is 4 bytes!!!
+	 * @return
+	 */
+	public long getSizeInBytes() {
+		return 4 * this.getColumns().size() * this.getSize();
+	}
+	
 	public static int getTotalSize() {
 	    return totalSize;
 	}

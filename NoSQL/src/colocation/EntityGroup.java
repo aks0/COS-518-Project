@@ -8,10 +8,12 @@ import materializedViews.Table;
 public class EntityGroup implements Iterable<Table> {
     private Table center;
     private HashSet<Table> entities;
+    private HashSet<Table> replicatedTables;
     
     public EntityGroup(Table center) {
         this.center = center;
         entities = new HashSet<Table>();
+        replicatedTables = new HashSet<Table>();
         entities.add(center);
     }
     
@@ -27,6 +29,10 @@ public class EntityGroup implements Iterable<Table> {
         entities.add(entity);
     }
     
+    public void addReplicatedTable(Table table) {
+    	replicatedTables.add(table);
+    }
+    
     public boolean contains(Table entity) {
         return entities.contains(entity);
     }
@@ -37,6 +43,7 @@ public class EntityGroup implements Iterable<Table> {
     
     /**
      * Returns total size of entity group in bytes
+     * TODO: add replicated tables?
      * @return
      */
     public long getSize() {
@@ -50,6 +57,30 @@ public class EntityGroup implements Iterable<Table> {
     	}
     	
     	return size;
+    }
+    
+    /**
+     * Returns size in bytes of one partition of entity group (assuming perfect partitioning)
+     * and include replicated tables
+     * 
+     * @return
+     */
+    public long getPartitionedSize(int numServers) { 
+    	return getSize()/numServers + getReplicatedSize();
+    }
+    
+    /**
+     * Get size in bytes of all replicated tables in entity group
+     * 
+     * @return
+     */
+    public long getReplicatedSize() {
+    	long replicatedSize = 0;
+    	for (Table table : replicatedTables) {
+    		replicatedSize += table.getSizeInBytes();
+    	}
+    	
+    	return replicatedSize;
     }
 
     @Override

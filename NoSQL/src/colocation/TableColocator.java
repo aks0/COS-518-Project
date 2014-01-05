@@ -8,6 +8,7 @@ import common.MemoryManager;
 import common.MemorySize;
 import common.ServerGroup;
 
+import materializedViews.Pair;
 import materializedViews.Query;
 import materializedViews.Table;
 import materializedViews.Util518;
@@ -44,9 +45,17 @@ public class TableColocator {
         }
         
         // Do initial entity to server group mapping
-        HashMap<EntityGroup, ServerGroup> entityToServerGroupMap = MemoryManager.assignEntityGroups(entityGroups, avgServerSize);
+        ArrayList<ServerGroup> serverGroups = MemoryManager.assignEntityGroups(entityGroups, avgServerSize);
         
         // Get Best candidates for replication
-        graph.getHighestReplicationScorePairs(2, replicationCandidates, entityGroups);
+        ArrayList<Pair<Table, ServerGroup>> pairs = graph.getHighestReplicationScorePairs(2, replicationCandidates, serverGroups);
+    
+        // For each pair, decide how many servers to add in light of adding the replicated table
+        for (Pair<Table, ServerGroup> pair : pairs) {
+        	Table replicatedTable = pair.getFirst();
+        	ServerGroup group = pair.getSecond();
+        	
+        	group.addReplicatedTable(replicatedTable);
+        }
     }
 }
