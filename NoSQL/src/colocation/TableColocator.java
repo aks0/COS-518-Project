@@ -48,7 +48,7 @@ public class TableColocator {
         // Do initial entity to server group mapping
         ArrayList<ServerGroup> serverGroups = MemoryManager.assignEntityGroups(entityGroups, avgServerSize);
         
-        System.out.println(serverGroups.toString());
+        //System.out.println(serverGroups.toString());
         
         // Get Best candidates for replication
         ArrayList<Pair<Table, ServerGroup>> pairs = graph.getHighestReplicationScorePairs(2, replicationCandidates, serverGroups);
@@ -58,8 +58,8 @@ public class TableColocator {
         	Table replicatedTable = pair.getFirst();
         	ServerGroup group = pair.getSecond();
         	
-        	//System.out.println("Replicated table: " + replicatedTable.getName());
-        	//System.out.println("Replicate to: " + group.toString());
+        	System.out.println("Replicated table: " + replicatedTable.getName());
+        	System.out.println("Replicate to: " + group.toString());
         	
         	group.addReplicatedTable(replicatedTable);
         }

@@ -29,12 +29,16 @@ public class EntityGroup implements Iterable<Table> {
         entities.add(entity);
     }
     
-    public void addReplicatedTable(Table table) {
-    	replicatedTables.add(table);
+    public boolean addReplicatedTable(Table table) {
+    	if (!contains(table)) {
+    		replicatedTables.add(table);
+    	}
+    	
+    	return !contains(table);
     }
     
     public boolean contains(Table entity) {
-        return entities.contains(entity);
+        return (entities.contains(entity) || replicatedTables.contains(entity));
     }
     
     public boolean onlyContainsCenter() {

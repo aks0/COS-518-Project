@@ -65,7 +65,10 @@ public class ServerGroup {
 	 * @param table
 	 */
 	public void addReplicatedTable(Table table) {
-		partitionedEntityGroup.addReplicatedTable(table);
+		boolean added = partitionedEntityGroup.addReplicatedTable(table);
+		if (added)
+			return;
+		
 		while (true) {
 			double benefit = partitionedEntityGroup.getPartitionedSize(servers.size()) - 
 					partitionedEntityGroup.getPartitionedSize(servers.size()+1);
