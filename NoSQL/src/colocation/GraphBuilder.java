@@ -68,9 +68,9 @@ public class GraphBuilder {
 	
 	public static void main(String args[]) {
 		List<Table> tables = Table
-				.getTablesFromModel("../data_models/data2.model");
+				.getTablesFromModel("data_models/data2.model");
 		ArrayList<Query> queryList = QueryLib
-				.getQueryList("../query_logs/queries_sqlfire.sql");
+				.getQueryList("query_logs/queries_sqlfire.sql");
 		/*for (Query query : queryList) {
 			for (Column column : query.getReferencedColumns()) {
 				System.out.println(column);

@@ -26,7 +26,7 @@ public class ServerGroup {
 	private EntityGroup partitionedEntityGroup;
 	
 	public ServerGroup(int n, MemorySize avgServerSize, EntityGroup group) {
-		if (n == 0) {
+		if (n <= 0) {
 			throw new RuntimeException("Need to add at least one server"); 
 		}
 		
