@@ -257,7 +257,7 @@ public class TableGraph {
 				if (bestCenter != null && bestCost != Double.POSITIVE_INFINITY) {
 					entityMap.get(bestCenter).add(table);
 				} else {
-				    // create new entity with only center
+				    // create new entity with only center if it doesn't have join with any existing center
         			entityMap.put(table, new EntityGroup(table));
 				}
 			}

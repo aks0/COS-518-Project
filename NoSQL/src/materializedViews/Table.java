@@ -92,6 +92,9 @@ public class Table {
     }
     
     public double getUpdateRate() {
+    	if (totalUpdates == 0)
+    		return 0;
+    	
         return updates/totalUpdates;
     }
     

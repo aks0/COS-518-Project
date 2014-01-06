@@ -14,8 +14,9 @@ public class MemoryManager {
 		for (EntityGroup entityGroup : entityGroups) {
 			long entityGroupSize = entityGroup.getSize();
 			
-			int numServers = (int) (entityGroupSize/avgServerSize.getBytes());
+			int numServers = (int)Math.ceil((double)entityGroupSize/avgServerSize.getBytes());
 			ServerGroup serverGroup = new ServerGroup(numServers, avgServerSize, entityGroup);
+			serverGroups.add(serverGroup);
 		}
 		
 		return serverGroups;

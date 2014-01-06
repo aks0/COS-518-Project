@@ -48,7 +48,6 @@ public class EntityGroup implements Iterable<Table> {
      */
     public long getSize() {
     	long size = 0;
-    	size += center.getSizeInBytes();
     	
     	Iterator<Table> iterator = this.iterator();
     	while (iterator.hasNext()) {
@@ -86,5 +85,19 @@ public class EntityGroup implements Iterable<Table> {
     @Override
     public Iterator<Table> iterator() {
         return entities.iterator();
+    }
+    
+    public String toString() {
+    	String str = "";
+    	str += "Center: " + center.getName() + "\n";
+    	str += "Partitioned Tables: \n";
+        for (Table table : entities) {
+        	str += table.getName() + "\n";
+        }
+        for (Table table : replicatedTables) {
+        	str += table.getName() + "\n";
+        }
+        
+        return str;
     }
 }

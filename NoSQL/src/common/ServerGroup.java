@@ -26,6 +26,10 @@ public class ServerGroup {
 	private EntityGroup partitionedEntityGroup;
 	
 	public ServerGroup(int n, MemorySize avgServerSize, EntityGroup group) {
+		if (n == 0) {
+			throw new RuntimeException("Need to add at least one server"); 
+		}
+		
 		servers = new ArrayList<Server>();
 		partitionedEntityGroup = group;
 		
@@ -72,5 +76,17 @@ public class ServerGroup {
 			
 			addServer();
 		}
+	}
+	
+	public String toString() {
+		String str = "";
+		str += "\n-------------------------------\n";
+		str += partitionedEntityGroup.toString();
+		str += "Num Servers: " + servers.size() + "; AvgSize: " + servers.get(0).getSize() + "\n";
+		str += "Partition Size: " + new MemorySize(partitionedEntityGroup.getPartitionedSize(servers.size())).toString() 
+				+ "; Total Size: " + new MemorySize(partitionedEntityGroup.getSize()).toString() + "\n";
+		str += "-------------------------------\n";
+		
+		return str;
 	}
 }

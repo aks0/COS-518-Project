@@ -7,9 +7,11 @@ import java.util.List;
 import common.MemoryManager;
 import common.MemorySize;
 import common.ServerGroup;
+import common.Size;
 
 import materializedViews.Pair;
 import materializedViews.Query;
+import materializedViews.QueryLib;
 import materializedViews.Table;
 import materializedViews.Util518;
 
@@ -23,8 +25,7 @@ public class TableColocator {
      * @param averageMemory - average memory on a server in GB
      * @param dataSetSize - size of entire dataset in GB, if using TPC-H it is either 1 or 10
      */
-    public static void colocate(List<Table> tables, List<Query> queries, 
-            int numServers, MemorySize avgServerSize, double dataSetSize) {
+    public static void colocate(List<Table> tables, List<Query> queries, MemorySize avgServerSize) {
         
         // decide colocation via partitioning
         TableGraph graph = GraphBuilder.build(tables, queries);
@@ -47,6 +48,8 @@ public class TableColocator {
         // Do initial entity to server group mapping
         ArrayList<ServerGroup> serverGroups = MemoryManager.assignEntityGroups(entityGroups, avgServerSize);
         
+        System.out.println(serverGroups.toString());
+        
         // Get Best candidates for replication
         ArrayList<Pair<Table, ServerGroup>> pairs = graph.getHighestReplicationScorePairs(2, replicationCandidates, serverGroups);
     
@@ -55,7 +58,20 @@ public class TableColocator {
         	Table replicatedTable = pair.getFirst();
         	ServerGroup group = pair.getSecond();
         	
+        	//System.out.println("Replicated table: " + replicatedTable.getName());
+        	//System.out.println("Replicate to: " + group.toString());
+        	
         	group.addReplicatedTable(replicatedTable);
         }
+        
+    }
+    
+    public static void main(String[] args) {
+    	List<Table> tables = Table
+				.getTablesFromModel("../data_models/data2.model");
+		ArrayList<Query> queryList = QueryLib
+				.getQueryList("../query_logs/queries_sqlfire.sql");
+		
+		colocate(tables, queryList, new MemorySize(1.0, Size.MB));
     }
 }
