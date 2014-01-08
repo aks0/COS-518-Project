@@ -82,6 +82,11 @@ class TableNode {
      */
     public double getPartitionBenefit(double totalNormalizedCost) {
     	double benefit = 0;
+    	
+    	// If no outgoing edges, no partition benefit
+    	if (outEdges.size() == 0)
+    		return 0;
+    	
     	for (Edge edge : outEdges) {
     		benefit += totalNormalizedCost - edge.getCost();
     	}
@@ -200,9 +205,9 @@ class ReplicationValueComparator implements Comparator<Pair<Table, ServerGroup>>
 		TableNode tNodeA = base.get(a.getFirst());
         TableNode tNodeB = base.get(b.getFirst());
         
-		double scoreA =  tNodeA.getReplicationBenefit(a.getSecond().getEntityGroup(), totalNormalizedCost) 
+		double scoreA =  tNodeA.getReplicationBenefit(a.getSecond().getEntityGroup(0), totalNormalizedCost) 
 				- a.getFirst().getSize() * a.getSecond().getNumServers() * a.getFirst().getUpdateRate();
-		double scoreB =  tNodeB.getReplicationBenefit(b.getSecond().getEntityGroup(), totalNormalizedCost) 
+		double scoreB =  tNodeB.getReplicationBenefit(b.getSecond().getEntityGroup(0), totalNormalizedCost) 
 				- b.getFirst().getSize() * b.getSecond().getNumServers() * b.getFirst().getUpdateRate();
 		
 		return (int)(scoreB - scoreA);
@@ -218,6 +223,8 @@ public class TableGraph {
 		tableToNode = Util518.newHashMap();
 		this.totalNormalizedCost = totalNormalizedCost;
 		
+		System.out.println("totalNormalizedCost: " + totalNormalizedCost);
+		
 		// For each pair in the costMap, record edge in the graph
 		for (TablePair pair : costMap.keySet()) {
 			Table table = pair.getParentTable();
@@ -230,6 +237,8 @@ public class TableGraph {
 				tableToNode.put(table, node);
 			}
 			node.getOutEdges().add(new Edge(pair.getChildTable(), costMap.get(pair)));
+			System.out.println("Node name: " + node.getTable().getName());
+			System.out.println("Benefit: " + node.getPartitionBenefit(totalNormalizedCost));
 		}
 		
 		// Make node with no edges for tables not existing in any pair in above costMap
@@ -237,6 +246,9 @@ public class TableGraph {
 			if (!tableToNode.containsKey(table)) {
 				TableNode node = new TableNode(table);
 				tableToNode.put(table, node);
+				
+				System.out.println("Node name: " + node.getTable().getName());
+				System.out.println("Benefit: " + node.getPartitionBenefit(totalNormalizedCost));
 			}
 		}
 	}

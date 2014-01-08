@@ -61,8 +61,17 @@ public class TableColocator {
         	ServerGroup group = pair.getSecond();
         	
         	System.out.println("Replicated table: " + replicatedTable.getName());
-        	group.addReplicatedTable(replicatedTable);
+        	group.addReplicatedTable(replicatedTable, 0);
         	System.out.println("Replicate to: " + group.toString());
+        }
+        
+        for (int i = 0; i < pairs.size(); ++i) {
+        	for (int j = i+1; j < pairs.size(); ++j) {
+        		ServerGroup group1 = pairs.get(i).getSecond();
+        		ServerGroup group2 = pairs.get(j).getSecond();
+        		
+        		group1.merge(group2, queries);
+        	}
         }
         
     }
@@ -71,7 +80,7 @@ public class TableColocator {
     	List<Table> tables = Table
 				.getTablesFromModel("../data_models/data2.model");
 		ArrayList<Query> queryList = QueryLib
-				.getQueryList("../query_logs/queries_sqlfire.sql");
+				.getQueryList("../query_logs/queries_sqlfire_test_merge.sql");
 		
 		colocate(tables, queryList, new MemorySize(1.0, Size.MB));
     }

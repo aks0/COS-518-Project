@@ -25,6 +25,10 @@ public class EntityGroup implements Iterable<Table> {
         return entities;
     }
     
+    public HashSet<Table> getReplicatedTables() {
+    	return replicatedTables;
+    }
+    
     public void add(Table entity) {
         entities.add(entity);
     }
@@ -47,8 +51,7 @@ public class EntityGroup implements Iterable<Table> {
     }
     
     /**
-     * Returns total size of entity group in bytes
-     * TODO: add replicated tables?
+     * Returns total size of entity group in bytes (includes replicated table)
      * @return
      */
     public long getSize() {
@@ -57,6 +60,10 @@ public class EntityGroup implements Iterable<Table> {
     	Iterator<Table> iterator = this.iterator();
     	while (iterator.hasNext()) {
     		Table table = iterator.next();
+    		size += table.getSizeInBytes();
+    	}
+    	
+    	for (Table table : replicatedTables) {
     		size += table.getSizeInBytes();
     	}
     	
