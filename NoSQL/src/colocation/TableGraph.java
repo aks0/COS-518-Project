@@ -72,6 +72,14 @@ class TableNode {
         return min;
     }
     
+    /**
+     * The benefit of a node for partitioning is the total savings it offers 
+     * For each existing edge of node, we calculate the savings by subtracting
+     * from the normalized cost, the denormalized cost assuming that edge exists
+     * 
+     * @param totalNormalizedCost
+     * @return
+     */
     public double getPartitionBenefit(double totalNormalizedCost) {
     	double benefit = 0;
     	for (Edge edge : outEdges) {
@@ -82,6 +90,17 @@ class TableNode {
     	return benefit;
     }
     
+    /**
+     * The benefit of a node for replication given an entity group is
+     * the savings provided by having that node be replicated 
+     * + savings in cost by having the edges from replicated node to nodes in entity group
+     * - Size of node 
+     * - update rate * size of node
+     * 
+     * @param group
+     * @param totalNormalizedCost
+     * @return
+     */
     public double getReplicationBenefit(EntityGroup group, double totalNormalizedCost) {
         double benefit = 0;
         for (Edge edge : outEdges) {
@@ -231,6 +250,7 @@ public class TableGraph {
 		HashMap<Table, EntityGroup> entityMap = new HashMap<Table, EntityGroup>();
 		for (TableNode node : getHighestPartitionScoreNodes(k)) {
 		    // put parent tables
+			System.out.println("Picked one of k center: " + node.getTable().getName());
 			entityMap.put(node.getTable(), new EntityGroup(node.getTable()));
 		}
 		
@@ -245,7 +265,7 @@ public class TableGraph {
 					break;
 				}
 				
-				// find best center to join with table
+				// find best center to join with table (one where the cost is lowest)
 				double cost = tableToNode.get(center).getCostTo(table);
 				if (cost < bestCost) {
 					bestCost = cost;

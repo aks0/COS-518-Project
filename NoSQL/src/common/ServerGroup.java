@@ -5,8 +5,6 @@ import java.util.List;
 
 import materializedViews.Table;
 
-import com.sun.org.glassfish.external.statistics.AverageRangeStatistic;
-
 import colocation.EntityGroup;
 
 class Server {
@@ -65,20 +63,29 @@ public class ServerGroup {
 	 * @param table
 	 */
 	public void addReplicatedTable(Table table) {
-		boolean added = partitionedEntityGroup.addReplicatedTable(table);
-		if (added)
+		boolean success = partitionedEntityGroup.addReplicatedTable(table);
+		if (!success)
 			return;
 		
-		while (true) {
+		// Keep adding servers till replicated table will fit in memory at each node
+		System.out.println("Avg: " + partitionedEntityGroup.getPartitionedSize(servers.size()));
+		System.out.println("Server Avg: " + servers.get(0).getSize().getBytes());
+		while (partitionedEntityGroup.getPartitionedSize(servers.size())  > servers.get(0).getSize().getBytes()) {
+			addServer();
+		}
+		
+		// See if adding servers past minimum necessary is useful
+		// TODO: is this really useful?
+		/*while (true) {
 			double benefit = partitionedEntityGroup.getPartitionedSize(servers.size()) - 
 					partitionedEntityGroup.getPartitionedSize(servers.size()+1);
-			double cost = partitionedEntityGroup.getReplicatedSize() * (servers.size() + 1);
+			double cost = partitionedEntityGroup.getReplicatedSize();
 			
 			if (benefit - cost < 0)
 				break;
 			
 			addServer();
-		}
+		}*/
 	}
 	
 	public String toString() {

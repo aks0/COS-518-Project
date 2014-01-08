@@ -32,9 +32,10 @@ public class EntityGroup implements Iterable<Table> {
     public boolean addReplicatedTable(Table table) {
     	if (!contains(table)) {
     		replicatedTables.add(table);
+    		return true;
     	}
     	
-    	return !contains(table);
+    	return false;
     }
     
     public boolean contains(Table entity) {
@@ -98,6 +99,7 @@ public class EntityGroup implements Iterable<Table> {
         for (Table table : entities) {
         	str += table.getName() + "\n";
         }
+        str += "Replicated Tables: \n";
         for (Table table : replicatedTables) {
         	str += table.getName() + "\n";
         }
