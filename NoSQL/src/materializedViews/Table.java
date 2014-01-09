@@ -17,19 +17,21 @@ public class Table {
     // total number of updates to all tables
     private static int totalUpdates;
     // total number of row across all tables
-    private static int totalSize;
+    private static int totalNumRows;
 	private static Map<String, Table> tables = Util518.newHashMap();
 	private static ArrayList<Pair<Column, Pair<String, String>>> foreignReferences = Util518
 			.newArrayList();
 
 	private String name;
 	private ArrayList<Column> columns;
-	private int size;
+	private int numrows;
 	// number of updates to this table
     private int updates;
+    // the size of the whole table in bytes
+    private int sizeInBytes;
 
 	public int getSize() {
-		return size;
+		return numrows;
 	}
 	
 	/**
@@ -37,11 +39,11 @@ public class Table {
 	 * @return
 	 */
 	public long getSizeInBytes() {
-		return 4 * this.getColumns().size() * this.getSize();
+		return sizeInBytes;
 	}
 	
-	public static int getTotalSize() {
-	    return totalSize;
+	public static int getTotalNumRows() {
+	    return totalNumRows;
 	}
 
 	/**
@@ -220,9 +222,14 @@ public class Table {
 			if (eElement.getElementsByTagName("rows").getLength() == 1) {
 				Element row_item = (Element) eElement.getElementsByTagName(
 						"rows").item(0);
-				table.size = Integer.parseInt(row_item.getTextContent());
-				totalSize += table.size;
+				table.numrows = Integer.parseInt(row_item.getTextContent());
+				totalNumRows += table.numrows;
 			}
+            if (eElement.getElementsByTagName("size").getLength() == 1) {
+                Element size_item = (Element) eElement.getElementsByTagName(
+                        "size").item(0);
+                table.sizeInBytes = Integer.parseInt(size_item.getTextContent());
+            }
 			NodeList columns = eElement.getElementsByTagName("column");
 			for (int i = 0; i < columns.getLength(); i++) {
 				Column column = getColumnFromNode(table_name, columns.item(i));

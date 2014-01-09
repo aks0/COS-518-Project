@@ -4,6 +4,7 @@
 <table>
 <name>Categories</name>
 <rows>1000</rows>
+<size>200000</size>
 <column>
 <name>CategoryID</name>
 <primary/>
@@ -22,6 +23,7 @@
 <table>
 <name>Customers</name>
 <rows>10000</rows>
+<size>200000</size>
 <column>
 <name>CustomerID</name>
 <primary/>
@@ -58,6 +60,7 @@
 <table>
 <name>Employees</name>
 <rows>5000</rows>
+<size>200000</size>
 <column>
 <name>EmployeeID</name>
 <primary/>
@@ -118,6 +121,7 @@
 <table>
 <name>OrderDetails</name>
 <rows>20000</rows>
+<size>200000</size>
 <column>
 <name>OrderID</name>
 <primary/>
@@ -148,6 +152,7 @@
 <table>
 <name>Shippers</name>
 <rows>200</rows>
+<size>200000</size>
 <column>
 <name>ShipperID</name>
 <primary/>
@@ -163,6 +168,7 @@
 <table>
 <name>Orders</name>
 <rows>20000</rows>
+<size>200000</size>
 <column>
 <name>OrderID</name>
 <primary/>
@@ -223,6 +229,7 @@
 <table>
 <name>Products</name>
 <rows>100000</rows>
+<size>200000</size>
 <column>
 <name>ProductID</name>
 <primary/>

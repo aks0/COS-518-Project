@@ -4,6 +4,7 @@
 <table>
 <name>users</name>
 <rows>10000</rows>
+<size>200000</size>
 <column>
 <name>userid</name>
 <primary/>
@@ -19,6 +20,7 @@
 <table>
 <name>user_item_like</name>
 <rows>10000</rows>
+<size>200000</size>
 <column>
 <name>id</name>
 <primary/>
@@ -45,6 +47,7 @@
 <table>
 <name>item</name>
 <rows>10000</rows>
+<size>200000</size>
 <column>
 <name>itemid</name>
 <primary/>
