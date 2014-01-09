@@ -123,7 +123,7 @@
 <primary/>
 <foreign>
 <ftable>Orders</ftable>
-<fcolumn>OrderId</fcolumn>
+<fcolumn>OrderID</fcolumn>
 </foreign>
 </column>
 <column>
@@ -131,7 +131,7 @@
 <primary/>
 <foreign>
 <ftable>Products</ftable>
-<fcolumn>ProductId</fcolumn>
+<fcolumn>ProductID</fcolumn>
 </foreign>
 </column>
 <column>
@@ -164,18 +164,18 @@
 <name>Orders</name>
 <rows>20000</rows>
 <column>
-<name>OrderId</name>
+<name>OrderID</name>
 <primary/>
 </column>
 <column>
-<name>CustomerId</name>
+<name>CustomerID</name>
 <foreign>
 <ftable>Customers</ftable>
 <fcolumn>CustomerID</fcolumn>
 </foreign>
 </column>
 <column>
-<name>EmployeeId</name>
+<name>EmployeeID</name>
 <foreign>
 <ftable>Employees</ftable>
 <fcolumn>EmployeeID</fcolumn>
@@ -224,7 +224,7 @@
 <name>Products</name>
 <rows>100000</rows>
 <column>
-<name>ProductId</name>
+<name>ProductID</name>
 <primary/>
 </column>
 <column>
@@ -234,7 +234,7 @@
 <name>SupplierID</name>
 <foreign>
 <ftable>Suppliers</ftable>
-<fcolumn>SupplierId</fcolumn>
+<fcolumn>SupplierID</fcolumn>
 </foreign>
 </column>
 <column>
@@ -268,7 +268,7 @@
 <name>Suppliers</name>
 <rows>200</rows>
 <column>
-<name>SupplierId</name>
+<name>SupplierID</name>
 <primary/>
 </column>
 <column>
