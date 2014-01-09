@@ -17,7 +17,7 @@ public class Query {
                                             // query
     private Set<Column> whereColumns; // list of columns involved in where by
                                         // this query
-    private Set<Column> equijoinedColumns; // list of columns equi-joined by
+    private Set<Pair<Column, Column>> equijoinedColumns; // list of columns equi-joined by
                                             // this query
 
     /**
@@ -74,8 +74,12 @@ public class Query {
                         firstNamePair.getFirst(), firstNamePair.getSecond());
                 Column secondColumn = Column.getInstance(
                         secondNamePair.getFirst(), secondNamePair.getSecond());
-                equijoinedColumns.add(firstColumn);
-                equijoinedColumns.add(secondColumn);
+                // primary column, then foreign column
+                if (firstColumn.isPrimary()) {
+                    equijoinedColumns.add(new Pair<Column, Column>(firstColumn, secondColumn));
+                } else {
+                    equijoinedColumns.add(new Pair<Column, Column>(secondColumn, firstColumn));
+                }
                 break;
             default:
                 Pair<String, String> namePair = splitNameString(line);
@@ -135,7 +139,7 @@ public class Query {
         return whereColumns;
     }
 
-    public Set<Column> getEquijoinedColumns() {
+    public Set<Pair<Column, Column>> getEquijoinedColumns() {
         return equijoinedColumns;
     }
 }

@@ -2,11 +2,12 @@ package materializedViews;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 public class CostEstimator {
-	public static double STORAGE_PENALTY = 1.0;
+	public static double IN_SUBSET_PENALTY = 0.0000001;
 	public static double NOT_IN_SUBSET_PENALTY = 1.0;
 	public static double FINAL_JOIN_PENALTY = 1.0;
 
@@ -154,6 +155,55 @@ public class CostEstimator {
 			tablesToQueryColumns.get(column.getTable()).add(column);
 		}
 
+		HashSet<Table> tablesInSubset = new HashSet<Table>();
+		for (Table table : tablesToQueryColumnsInSubset.keySet()) {
+			tablesInSubset.add(table);
+		}
+		HashSet<Table> tablesNotInSubset = new HashSet<Table>();
+		for (Table table : tablesToQueryColumnsNotInSubset.keySet()) {
+			tablesNotInSubset.add(table);
+		}
+		
+		double cost = 0.0;
+		for (Pair<Column, Column> join : query.getEquijoinedColumns()) {
+		    Table parentTable = join.getFirst().getTable();
+		    Table childTable = join.getSecond().getTable();
+		    // if join is colocated
+		    if (tablesInSubset.contains(parentTable)
+		            && tablesInSubset.contains(childTable)) {
+		        // rows is limited by child table; columns is combined number
+		        cost += IN_SUBSET_PENALTY 
+		                * childTable.getSize() 
+		                * (tablesToQueryColumnsInSubset.get(childTable).size()
+		                        + tablesToQueryColumnsInSubset.get(parentTable).size());
+		    } else if (tablesNotInSubset.contains(parentTable)
+                    && tablesNotInSubset.contains(childTable)) {
+		        // join is completely distributed
+	            cost += NOT_IN_SUBSET_PENALTY
+	                      * childTable.getSize() 
+	                      * (tablesToQueryColumnsNotInSubset.get(childTable).size()
+	                              + tablesToQueryColumnsNotInSubset.get(parentTable).size());
+		    } else {
+		        // fetch is partly distributed
+		        Table distributedTable;
+		        Table localTable;
+		        if (tablesInSubset.contains(childTable)) {
+		            localTable = childTable;
+		            distributedTable = parentTable;
+		        } else {
+		            localTable = parentTable;
+		            distributedTable = childTable;
+		        }
+		        cost += NOT_IN_SUBSET_PENALTY
+		                * childTable.getSize()
+		                * tablesToQueryColumnsNotInSubset.get(distributedTable).size();
+		        cost += IN_SUBSET_PENALTY
+		                * childTable.getSize()
+		                * tablesToQueryColumnsInSubset.get(localTable).size();
+		    }
+		}
+		
+		/*
 		HashSet<Column> columnsInSubset = new HashSet<Column>();
 		for (HashSet<Column> value : tablesToQueryColumnsInSubset.values()) {
 			columnsInSubset.addAll(value);
@@ -162,9 +212,7 @@ public class CostEstimator {
 		for (HashSet<Column> value : tablesToQueryColumnsNotInSubset.values()) {
 			columnsNotInSubset.addAll(value);
 		}
-		Column joinedForeignColumn = searchForEquijoin(columnsInSubset,
-				columnsNotInSubset, query);
-
+		
 		Pair<Double, Double> inSubsetDimensions = calculateJoinDimensions(
 				tablesToQueryColumnsInSubset, query);
 		Pair<Double, Double> notInSubsetDimensions = calculateJoinDimensions(
@@ -185,7 +233,7 @@ public class CostEstimator {
 			cost += FINAL_JOIN_PENALTY * rowsInSubsetJoin;
 		} else if (columnsNotInSubset.contains(joinedForeignColumn)) {
 			cost += FINAL_JOIN_PENALTY * rowsNotInSubsetJoin;
-		}
+		}*/
 		return cost;
 	}
 
@@ -279,9 +327,7 @@ public class CostEstimator {
 					// scan through table for joins
 					rows *= table.getSize();
 				}
-			} else {
-				columns--;
-			}
+			} 
 		}
 		return new Pair<Double, Double>(rows, columns);
 	}
