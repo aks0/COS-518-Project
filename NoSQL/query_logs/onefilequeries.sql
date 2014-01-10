@@ -276,7 +276,7 @@ select
 	s.name,
 	count(*) as numwait
 from
-	supplier,
+	supplier s,
 	lineitem l1,
 	orders o,
 	nation n

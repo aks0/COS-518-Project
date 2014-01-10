@@ -77,10 +77,12 @@ public class Query {
                 Column secondColumn = Column.getInstance(
                         secondNamePair.getFirst(), secondNamePair.getSecond());
                 // primary column, then foreign column
-                if (firstColumn.isPrimary()) {
-                    equijoinedColumns.add(new Pair<Column, Column>(firstColumn, secondColumn));
-                } else {
-                    equijoinedColumns.add(new Pair<Column, Column>(secondColumn, firstColumn));
+                if (!firstColumn.getTable().equals(secondColumn.getTable())) {
+                    if (firstColumn.isPrimary()) {
+                        equijoinedColumns.add(new Pair<Column, Column>(firstColumn, secondColumn));
+                    } else {
+                        equijoinedColumns.add(new Pair<Column, Column>(secondColumn, firstColumn));
+                    }
                 }
                 break;
             default:
