@@ -4,7 +4,7 @@
 <table>
 <name>part</name>
 <rows>200000</rows>
-<size>23477/size>
+<size>23477</size>
 <column>
 <name>partkey</name>
 <primary/>
