@@ -20,15 +20,22 @@ public class QueryLib {
 	public static ArrayList<Query> getQueryList(String filepath) {
 		StringBuilder query = new StringBuilder();
 		ArrayList<Query> queryList = Util518.newArrayList();
+		boolean buildingQuery = false;
 		try {
 			Scanner scanner = new Scanner(new File(filepath));
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
 				// queries in the file are separated by empty lines
 				if (line.isEmpty()) {
-					queryList.add(new Query(query.toString()));
-					query = new StringBuilder();
+				    if (buildingQuery) {
+				        buildingQuery = false;
+    					queryList.add(new Query(query.toString()));
+    					query = new StringBuilder();
+				    } else {
+				        continue;
+				    }
 				} else {
+				    if (!buildingQuery) buildingQuery = true;
 					query.append(line + "\n");
 					// append if EOF is reached
 					if (!scanner.hasNextLine()) {
@@ -56,7 +63,7 @@ public class QueryLib {
 			for (Column column : query.getReferencedColumns()) {
 				System.out.println(column);
 			}
-			System.out.println();
+			System.out.println(query.getEquijoinedColumns());
 		}
 	}
 }

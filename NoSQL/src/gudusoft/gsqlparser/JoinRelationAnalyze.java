@@ -507,7 +507,7 @@ public class JoinRelationAnalyze
     private List<TCustomSqlStatement> searchInTables = new ArrayList<TCustomSqlStatement>( );
     private List<TCustomSqlStatement> searchInClauses = new ArrayList<TCustomSqlStatement>( );
     public HashMap queryAliasMap = new HashMap( );
-    public HashSet<JoinCondition> joinRelationSet = new HashSet<JoinCondition>( );
+    public ArrayList<JoinCondition> joinRelationSet = new ArrayList<JoinCondition>( );
     private List<JoinCondition> conditions = new ArrayList<JoinCondition>( );
 
     public String getAnalysisResult( )
@@ -596,20 +596,17 @@ public class JoinRelationAnalyze
                         condition.leftcolumn = leftJoinNames[1];
                         condition.rightcolumn = rightJoinNames[1];
 
-                        if ( !conditions.contains( condition ) )
-                        {
-                            conditions.add( condition );
-                            buffer.append( 
-                                    "join\n"
-                                    + condition.lefttable
-                                    + "."
-                                    + condition.leftcolumn
-                                    + " "
-                                    + condition.righttable
-                                    + "."
-                                    + condition.rightcolumn
-                                    + "\n" );
-                        }
+                        conditions.add( condition );
+                        buffer.append( 
+                                "join\n"
+                                + condition.lefttable
+                                + "."
+                                + condition.leftcolumn
+                                + " "
+                                + condition.righttable
+                                + "."
+                                + condition.rightcolumn
+                                + "\n" );
                     }
                 }
             }
