@@ -106,8 +106,11 @@ class TableNode {
      * @param totalNormalizedCost
      * @return
      */
-    public double getReplicationBenefit(EntityGroup group, HashMap<Table, TableNode> tableToNode, double totalNormalizedCost) {
+    public double getReplicationBenefit(ServerGroup serverGroup, HashMap<Table, TableNode> tableToNode, double totalNormalizedCost) {
         double benefit = 0;
+        
+        
+        EntityGroup group = serverGroup.getEntityGroup(0);
         
         // If group already contains table, no benefit in replicating it
         if (group.contains(this.getTable()))
@@ -132,8 +135,8 @@ class TableNode {
             }
         }
         
-        //benefit -= table.getSize();
-        //benefit -= table.getUpdateRate() * table.getSize();
+        benefit -= table.getSize() * serverGroup.getNumServers();
+        benefit -= table.getUpdateRate() * table.getSize() * serverGroup.getNumServers();
         return benefit;
     }
     
@@ -223,9 +226,9 @@ class ReplicationValueComparator implements Comparator<Pair<Table, ServerGroup>>
 		TableNode tNodeA = base.get(a.getFirst());
         TableNode tNodeB = base.get(b.getFirst());
         
-		double scoreA =  tNodeA.getReplicationBenefit(a.getSecond().getEntityGroup(0), base, totalNormalizedCost); 
+		double scoreA =  tNodeA.getReplicationBenefit(a.getSecond(), base, totalNormalizedCost); 
 				//- a.getFirst().getSize() * a.getSecond().getNumServers() * a.getFirst().getUpdateRate();
-		double scoreB =  tNodeB.getReplicationBenefit(b.getSecond().getEntityGroup(0), base, totalNormalizedCost); 
+		double scoreB =  tNodeB.getReplicationBenefit(b.getSecond(), base, totalNormalizedCost); 
 				//- b.getFirst().getSize() * b.getSecond().getNumServers() * b.getFirst().getUpdateRate();
 		
 		return (int)(scoreB - scoreA);
