@@ -10,8 +10,7 @@ select
 from
 	orders
 where
-	o_orderdate >= date ':1'
-	and o_orderdate < date ':1' + interval '3' month
+	o_orderdate >= ':1'
 group by
 	o_orderpriority
 order by

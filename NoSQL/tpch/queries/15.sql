@@ -1,34 +1,18 @@
--- @(#)15.sql	2.1.8.1
--- TPC-H/TPC-R Top Supplier Query (Q15)
--- Functional Query Definition
+-- @(#)20.sql	2.1.8.1
+-- TPC-H/TPC-R Potential Part Promotion Query (Q20)
+-- Function Query Definition
 -- Approved February 1998
 :x
-create view revenue:s (supplier_no, total_revenue) as
-	select
-		l_suppkey,
-		sum(l_extendedprice * (1 - l_discount))
-	from
-		lineitem
-	where
-		l_shipdate >= date ':1'
-		and l_shipdate < date ':1' + interval '3' month
-	group by
-		l_suppkey;
-
 :o
 select
-	s_suppkey,
 	s_name,
-	s_address,
-	s_phone,
-	total_revenue
+	s_address
 from
 	supplier,
-	revenue:s
+	nation
 where
-	s_suppkey = supplier_no
+    s_nationkey = n_nationkey
+	and n_name = ':3'
 order by
-	s_suppkey;
-
-drop view revenue:s;
+	s_name;
 :n -1

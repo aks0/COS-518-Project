@@ -1,3 +1,4 @@
+
 -- @(#)12.sql	2.1.8.1
 -- TPC-H/TPC-R Shipping Modes and Order Priority Query (Q12)
 -- Functional Query Definition
@@ -26,8 +27,7 @@ where
 	and l_shipmode in (':1', ':2')
 	and l_commitdate < l_receiptdate
 	and l_shipdate < l_commitdate
-	and l_receiptdate >= date ':3'
-	and l_receiptdate < date ':3' + interval '1' year
+	and l_receiptdate >= ':3'
 group by
 	l_shipmode
 order by
