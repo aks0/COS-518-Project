@@ -6,30 +6,30 @@
 :x
 :o
 select
-	l_shipmode,
+	l.shipmode,
 	sum(case
-		when o_orderpriority = '1-URGENT'
-			or o_orderpriority = '2-HIGH'
+		when o.orderpriority = '1-URGENT'
+			or o.orderpriority = '2-HIGH'
 			then 1
 		else 0
 	end) as high_line_count,
 	sum(case
-		when o_orderpriority <> '1-URGENT'
-			and o_orderpriority <> '2-HIGH'
+		when o.orderpriority <> '1-URGENT'
+			and o.orderpriority <> '2-HIGH'
 			then 1
 		else 0
 	end) as low_line_count
 from
-	orders,
-	lineitem
+	orders o,
+	lineitem l
 where
-	o_orderkey = l_orderkey
-	and l_shipmode in (':1', ':2')
-	and l_commitdate < l_receiptdate
-	and l_shipdate < l_commitdate
-	and l_receiptdate >= ':3'
+	o.orderkey = l.orderkey
+	and l.shipmode in (':1', ':2')
+	and l.commitdate < l.receiptdate
+	and l.shipdate < l.commitdate
+	and l.receiptdate >= ':3'
 group by
-	l_shipmode
+	l.shipmode
 order by
-	l_shipmode;
+	l.shipmode;
 :n -1

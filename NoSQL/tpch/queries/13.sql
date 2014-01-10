@@ -5,23 +5,23 @@
 :x
 :o
 select
-	s_name,
+	s.name,
 	count(*) as numwait
 from
 	supplier,
 	lineitem l1,
-	orders,
-	nation
+	orders o,
+	nation n
 where
-	s_suppkey = l1.l_suppkey
-	and o_orderkey = l1.l_orderkey
-	and o_orderstatus = 'F'
-	and l1.l_receiptdate > l1.l_commitdate
-	and s_nationkey = n_nationkey
-	and n_name = ':1'
+	s.suppkey = l1.suppkey
+	and o.orderkey = l1.orderkey
+	and o.orderstatus = 'F'
+	and l1.receiptdate > l1.commitdate
+	and s.nationkey = n_nationkey
+	and n.name = ':1'
 group by
-	s_name
+	s.name
 order by
 	numwait desc,
-	s_name;
+	s.name;
 :n 100

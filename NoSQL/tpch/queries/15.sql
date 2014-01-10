@@ -5,14 +5,14 @@
 :x
 :o
 select
-	s_name,
-	s_address
+	s.name,
+	s.address
 from
-	supplier,
-	nation
+	supplier s,
+	nation n
 where
-    s_nationkey = n_nationkey
-	and n_name = ':3'
+    s.nationkey = n.nationkey
+	and n.name = ':3'
 order by
-	s_name;
+	s.name;
 :n -1

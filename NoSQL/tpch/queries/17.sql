@@ -5,12 +5,12 @@
 :x
 :o
 select
-	sum(l_extendedprice) as avg_yearly
+	sum(l.extendedprice) as avg_yearly
 from
-	lineitem,
-	part
+	lineitem l,
+	part p
 where
-	p_partkey = l_partkey
-	and p_brand = ':1'
-	and p_container = ':2';
+	p.partkey = l.partkey
+	and p.brand = ':1'
+	and p.container = ':2';
 :n -1

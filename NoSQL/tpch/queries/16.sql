@@ -5,25 +5,25 @@
 :x
 :o
 select
-	p_brand,
-	p_type,
-	p_size,
-	count(distinct ps_suppkey) as supplier_cnt
+	p.brand,
+	p.type,
+	p.size,
+	count(distinct ps.suppkey) as supplier_cnt
 from
-	partsupp,
-	part
+	partsupp ps,
+	part p
 where
-	p_partkey = ps_partkey
-	and p_brand <> ':1'
-	and p_type not like ':2%'
-	and p_size in (:3, :4, :5, :6, :7, :8, :9, :10)
+	p.partkey = ps.partkey
+	and p.brand <> ':1'
+	and p.type not like ':2%'
+	and p.size in (:3, :4, :5, :6, :7, :8, :9, :10)
 group by
-	p_brand,
-	p_type,
-	p_size
+	p.brand,
+	p.type,
+	p.size
 order by
 	supplier_cnt desc,
-	p_brand,
-	p_type,
-	p_size;
+	p.brand,
+	p.type,
+	p.size;
 :n -1

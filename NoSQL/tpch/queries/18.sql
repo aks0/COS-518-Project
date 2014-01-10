@@ -5,26 +5,26 @@
 :x
 :o
 select
-	c_name,
-	c_custkey,
-	o_orderkey,
-	o_orderdate,
-	o_totalprice,
-	sum(l_quantity)
+	c.name,
+	c.custkey,
+	o.orderkey,
+	o.orderdate,
+	o.totalprice,
+	sum(l.quantity)
 from
-	customer,
-	orders,
-	lineitem
+	customer c,
+	orders o,
+	lineitem l
 where
-    c_custkey = o_custkey
-	and o_orderkey = l_orderkey
+    c.custkey = o.custkey
+	and o.orderkey = l.orderkey
 group by
-	c_name,
-	c_custkey,
-	o_orderkey,
-	o_orderdate,
-	o_totalprice
+	c.name,
+	c.custkey,
+	o.orderkey,
+	o.orderdate,
+	o.totalprice
 order by
-	o_totalprice desc,
-	o_orderdate;
+	o.totalprice desc,
+	o.orderdate;
 :n 100

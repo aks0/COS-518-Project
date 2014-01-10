@@ -5,25 +5,25 @@
 :x
 :o
 select
-    n1.n_name as supp_nation,
-    n2.n_name as cust_nation,
-    extract(year from l_shipdate) as l_year,
-    sum(l_extendedprice * (1 - l_discount)) as volume
+    n1.name as supp.nation,
+    n2.name as cust.nation,
+    extract(year from l.shipdate) as l.year,
+    sum(l.extendedprice * (1 - l.discount)) as volume
 from
-    supplier,
-    lineitem,
-    orders,
-    customer,
+    supplier s,
+    lineitem l ,
+    orders o,
+    customer c,
     nation n1,
     nation n2
 where
-    s_suppkey = l_suppkey
-    and o_orderkey = l_orderkey
-    and c_custkey = o_custkey
-    and s_nationkey = n1.n_nationkey
-    and c_nationkey = n2.n_nationkey
+    s.suppkey = l.suppkey
+    and o.orderkey = l.orderkey
+    and c.custkey = o.custkey
+    and s.nationkey = n1.nationkey
+    and c.nationkey = n2.nationkey
     and (
-        (n1.n_name = ':1' and n2.n_name = ':2')
-        or (n1.n_name = ':2' and n2.n_name = ':1')
+        (n1.name = ':1' and n2.name = ':2')
+        or (n1.name = ':2' and n2.name = ':1')
     );
 :n -1
