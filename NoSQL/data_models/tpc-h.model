@@ -4,7 +4,7 @@
 <table>
 <name>part</name>
 <rows>200000</rows>
-<size>?</size>
+<size>23477/size>
 <column>
 <name>partkey</name>
 <primary/>
@@ -38,7 +38,7 @@
 <table>
 <name>nation</name>
 <rows>25</rows>
-<size>?</size>
+<size>2103</size>
 <column>
 <name>nationkey</name>
 <primary/>
@@ -57,7 +57,7 @@
 <table>
 <name>region</name>
 <rows>5</rows>
-<size>?</size>
+<size>396</size>
 <column>
 <name>regionkey</name>
 <primary/>
@@ -77,7 +77,7 @@
 <table>
 <name>customer</name>
 <rows>150000</rows>
-<size>?</size>
+<size>23635</size>
 <column>
 <name>custkey</name>
 <primary/>
@@ -113,7 +113,7 @@
 <table>
 <name>supplier</name>
 <rows>10000</rows>
-<size>?</size>
+<size>1368</size>
 <column>
 <name>suppkey</name>
 <primary/>
@@ -146,7 +146,7 @@
 <table>
 <name>partsupp</name>
 <rows>800000</rows>
-<size>?</size>
+<size>113206</size>
 <column>
 <name>partkey</name>
 <primary/>
@@ -177,7 +177,7 @@
 <table>
 <name>orders</name>
 <rows>1500000</rows>
-<size>?</size>
+<size>162716</size>
 <column>
 <name>orderkey</name>
 <primary/>
@@ -216,7 +216,7 @@
 <table>
 <name>lineitem</name>
 <rows>6000000</rows>
-<size>?</size>
+<size>707286</size>
 <column>
 <name>orderkey</name>
 <primary/>
