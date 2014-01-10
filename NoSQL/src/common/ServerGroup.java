@@ -28,6 +28,7 @@ public class ServerGroup {
 	private List<Server> servers;
 	private List<EntityGroup> partitionedEntityGroups;
 	private MemorySize avgServerSize;
+	private static int MAX_NUM_SERVERS = 1000;
 	
 	public ServerGroup(int n, MemorySize avgServerSize, EntityGroup group) {
 		if (n <= 0) {
@@ -82,8 +83,18 @@ public class ServerGroup {
 		// Keep adding servers till replicated table will fit in memory at each node
 		System.out.println("Avg: " + partitionedEntityGroup.getPartitionedSize(servers.size()));
 		System.out.println("Server Avg: " + avgServerSize.getBytes());
+		
+		int originalSize = servers.size();
 		while (partitionedEntityGroup.getPartitionedSize(servers.size())  > avgServerSize.getBytes()) {
 			addServer();
+			
+			// Sometimes not possible to add replicated table because not enough size
+			// Try adding servers and if you go past max, then that means replicated table cannot be added
+			if (servers.size() > MAX_NUM_SERVERS) {
+				servers = servers.subList(0, originalSize - 1);
+				partitionedEntityGroup.removeReplicatedTable(table);
+				return;
+			}
 		}
 		
 		// See if adding servers past minimum necessary is useful

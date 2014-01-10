@@ -42,6 +42,11 @@ public class EntityGroup implements Iterable<Table> {
     	return false;
     }
     
+    public void removeReplicatedTable(Table table) {
+    	if (contains(table)) 
+    		replicatedTables.remove(table);
+    }
+    
     public boolean contains(Table entity) {
         return (entities.contains(entity) || replicatedTables.contains(entity));
     }
