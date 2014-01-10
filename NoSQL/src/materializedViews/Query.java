@@ -1,4 +1,6 @@
 package materializedViews;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -17,7 +19,7 @@ public class Query {
                                             // query
     private Set<Column> whereColumns; // list of columns involved in where by
                                         // this query
-    private Set<Pair<Column, Column>> equijoinedColumns; // list of columns equi-joined by
+    private ArrayList<Pair<Column, Column>> equijoinedColumns; // list of columns equi-joined by
                                             // this query
 
     /**
@@ -26,7 +28,7 @@ public class Query {
     Query() {
         referencedColumns = Util518.newHashSet();
         whereColumns = Util518.newHashSet();
-        equijoinedColumns = Util518.newHashSet();
+        equijoinedColumns = Util518.newArrayList();
     }
 
     /**
@@ -37,7 +39,7 @@ public class Query {
     Query(String query) {
         referencedColumns = Util518.newHashSet();
         whereColumns = Util518.newHashSet();
-        equijoinedColumns = Util518.newHashSet();
+        equijoinedColumns = Util518.newArrayList();
         computeReferencedColumns(query);
     }
 
@@ -139,7 +141,7 @@ public class Query {
         return whereColumns;
     }
 
-    public Set<Pair<Column, Column>> getEquijoinedColumns() {
+    public ArrayList<Pair<Column, Column>> getEquijoinedColumns() {
         return equijoinedColumns;
     }
 }
