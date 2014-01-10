@@ -5,14 +5,14 @@
 :x
 :o
 select
-	o_orderpriority,
+	o.orderpriority,
 	count(*) as order_count
 from
-	orders
+	orders o
 where
-	o_orderdate >= ':1'
+	o.orderdate >= ':1'
 group by
-	o_orderpriority
+	o.orderpriority
 order by
-	o_orderpriority;
+	o.orderpriority;
 :n -1

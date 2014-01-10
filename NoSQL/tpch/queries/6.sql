@@ -5,11 +5,11 @@
 :x
 :o
 select
-	sum(l_extendedprice * l_discount) as revenue
+	sum(l.extendedprice * l.discount) as revenue
 from
-	lineitem
+	lineitem l
 where
-	l_shipdate >= ':1'
-	and l_discount between :2 - 0.01 and :2 + 0.01
-	and l_quantity < :3;
+	l.shipdate >= ':1'
+	and l.discount between :2 - 0.01 and :2 + 0.01
+	and l.quantity < :3;
 :n -1

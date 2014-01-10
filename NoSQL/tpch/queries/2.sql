@@ -5,31 +5,31 @@
 :x
 :o
 select
-	s_acctbal,
-	s_name,
-	n_name,
-	p_partkey,
-	p_mfgr,
-	s_address,
-	s_phone,
-	s_comment
+	s.acctbal,
+	s.name,
+	n.name,
+	p.partkey,
+	p.mfgr,
+	s.address,
+	s.phone,
+	s.comment
 from
-	part,
-	supplier,
-	partsupp,
-	nation,
-	region
+	part p,
+	supplier s,
+	partsupp ps,
+	nation n,
+	region r
 where
-	p_partkey = ps_partkey
-	and s_suppkey = ps_suppkey
-	and p_size = :1
-	and p_type like '%:2'
-	and s_nationkey = n_nationkey
-	and n_regionkey = r_regionkey
-	and r_name = ':3'
+	p.partkey = ps.partkey
+	and s.suppkey = ps.suppkey
+	and p.size = :1
+	and p.type like '%:2'
+	and s.nationkey = n.nationkey
+	and n.regionkey = r.regionkey
+	and r.name = ':3'
 order by
-	s_acctbal desc,
-	n_name,
-	s_name,
-	p_partkey;
+	s.acctbal desc,
+	n.name,
+	s.name,
+	p.partkey;
 :n 100

@@ -5,26 +5,26 @@
 :x
 :o
 select
-	n_name,
-	sum(l_extendedprice * (1 - l_discount)) as revenue
+	n.name,
+	sum(l.extendedprice * (1 - l.discount)) as revenue
 from
-	customer,
-	orders,
-	lineitem,
-	supplier,
-	nation,
-	region
+	customer c,
+	orders o,
+	lineitem l,
+	supplier s,
+	nation n,
+	region r
 where
-	c_custkey = o_custkey
-	and l_orderkey = o_orderkey
-	and l_suppkey = s_suppkey
-	and c_nationkey = s_nationkey
-	and s_nationkey = n_nationkey
-	and n_regionkey = r_regionkey
-	and r_name = ':1'
-	and o_orderdate >= ':2'
+	c.custkey = o.custkey
+	and l.orderkey = o.orderkey
+	and l.suppkey = s.suppkey
+	and c.nationkey = s.nationkey
+	and s.nationkey = n.nationkey
+	and n.regionkey = r.regionkey
+	and r.name = ':1'
+	and o.orderdate >= ':2'
 group by
-	n_name
+	n.name
 order by
 	revenue desc;
 :n -1

@@ -5,25 +5,25 @@
 :x
 :o
 select
-	l_orderkey,
-	sum(l_extendedprice * (1 - l_discount)) as revenue,
-	o_orderdate,
-	o_shippriority
+	l.orderkey,
+	sum(l.extendedprice * (1 - l.discount)) as revenue,
+	o.orderdate,
+	o.shippriority
 from
-	customer,
-	orders,
-	lineitem
+	customer c,
+	orders o,
+	lineitem l
 where
-	c_mktsegment = ':1'
-	and c_custkey = o_custkey
-	and l_orderkey = o_orderkey
-	and o_orderdate < ':2'
-	and l_shipdate > ':2'
+	c.mktsegment = ':1'
+	and c.custkey = o.custkey
+	and l.orderkey = o.orderkey
+	and o.orderdate < ':2'
+	and l.shipdate > ':2'
 group by
-	l_orderkey,
-	o_orderdate,
-	o_shippriority
+	l.orderkey,
+	o.orderdate,
+	o.shippriority
 order by
 	revenue desc,
-	o_orderdate;
+	o.orderdate;
 :n 10
