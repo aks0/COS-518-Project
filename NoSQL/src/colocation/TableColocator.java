@@ -25,7 +25,7 @@ public class TableColocator {
      * @param averageMemory - average memory on a server in GB
      * @param dataSetSize - size of entire dataset in GB, if using TPC-H it is either 1 or 10
      */
-    public static void colocate(List<Table> tables, List<Query> queries, MemorySize avgServerSize) {
+    public static void colocate(ArrayList<Table> tables, List<Query> queries, MemorySize avgServerSize) {
         
         // decide colocation via partitioning
         TableGraph graph = GraphBuilder.build(tables, queries);
@@ -65,22 +65,13 @@ public class TableColocator {
         	System.out.println("Replicate to: " + group.toString());
         }
         
-        for (int i = 0; i < pairs.size(); ++i) {
-        	for (int j = i+1; j < pairs.size(); ++j) {
-        		ServerGroup group1 = pairs.get(i).getSecond();
-        		ServerGroup group2 = pairs.get(j).getSecond();
-        		
-        		group1.merge(group2, queries);
-        	}
-        }
-        
     }
     
     public static void main(String[] args) {
-    	List<Table> tables = Table
-				.getTablesFromModel("./data_models/data2.model");
+    	ArrayList<Table> tables = Table
+				.getTablesFromModel("../data_models/data2.model");
 		ArrayList<Query> queryList = QueryLib
-				.getQueryList("./query_logs/queries_sqlfire_test_merge.sql");
+				.getQueryList("../query_logs/queries_sqlfire.sql");
 		
 		colocate(tables, queryList, new MemorySize(1.0, Size.MB));
     }

@@ -106,16 +106,34 @@ class TableNode {
      * @param totalNormalizedCost
      * @return
      */
-    public double getReplicationBenefit(EntityGroup group, double totalNormalizedCost) {
+    public double getReplicationBenefit(EntityGroup group, HashMap<Table, TableNode> tableToNode, double totalNormalizedCost) {
         double benefit = 0;
+        
+        // If group already contains table, no benefit in replicating it
+        if (group.contains(this.getTable()))
+        	return 0;
+        
+        // See if any joins exist from entity group to replicated table candidate
         for (Edge edge : outEdges) {
+        	//System.out.println("Edge: " + edge.getTable().getName());
             if (group.contains(edge.getTable())) {
                 benefit += totalNormalizedCost - edge.getCost();
             }
         }
         
-        benefit -= table.getSize();
-        benefit -= table.getUpdateRate() * table.getSize();
+        // See if any joins exist from replicated table candidate to table in entity group
+        for (Table entityTable : group.getEntities()) {
+        	TableNode node = tableToNode.get(entityTable);
+        	for (Edge edge : node.outEdges) {
+            	//System.out.println("Edge: " + edge.getTable().getName());
+                if (edge.getTable().equals(this.table)) {
+                    benefit += totalNormalizedCost - edge.getCost();
+                }
+            }
+        }
+        
+        //benefit -= table.getSize();
+        //benefit -= table.getUpdateRate() * table.getSize();
         return benefit;
     }
     
@@ -177,10 +195,10 @@ class PartitionValueComparator implements Comparator<Table> {
  * Allows one to compare two tables in terms of the graph
  */
 class ReplicationValueComparator implements Comparator<Pair<Table, ServerGroup>> {
-    private Map<Table, TableNode> base;
+    private HashMap<Table, TableNode> base;
     private double totalNormalizedCost;
     
-    public ReplicationValueComparator(Map<Table, TableNode> base, double totalNormalizedCost) {
+    public ReplicationValueComparator(HashMap<Table, TableNode> base, double totalNormalizedCost) {
         this.base = base;
         this.totalNormalizedCost = totalNormalizedCost;
     }
@@ -205,10 +223,10 @@ class ReplicationValueComparator implements Comparator<Pair<Table, ServerGroup>>
 		TableNode tNodeA = base.get(a.getFirst());
         TableNode tNodeB = base.get(b.getFirst());
         
-		double scoreA =  tNodeA.getReplicationBenefit(a.getSecond().getEntityGroup(0), totalNormalizedCost) 
-				- a.getFirst().getSize() * a.getSecond().getNumServers() * a.getFirst().getUpdateRate();
-		double scoreB =  tNodeB.getReplicationBenefit(b.getSecond().getEntityGroup(0), totalNormalizedCost) 
-				- b.getFirst().getSize() * b.getSecond().getNumServers() * b.getFirst().getUpdateRate();
+		double scoreA =  tNodeA.getReplicationBenefit(a.getSecond().getEntityGroup(0), base, totalNormalizedCost); 
+				//- a.getFirst().getSize() * a.getSecond().getNumServers() * a.getFirst().getUpdateRate();
+		double scoreB =  tNodeB.getReplicationBenefit(b.getSecond().getEntityGroup(0), base, totalNormalizedCost); 
+				//- b.getFirst().getSize() * b.getSecond().getNumServers() * b.getFirst().getUpdateRate();
 		
 		return (int)(scoreB - scoreA);
 	}
@@ -238,7 +256,7 @@ public class TableGraph {
 			}
 			node.getOutEdges().add(new Edge(pair.getChildTable(), costMap.get(pair)));
 			System.out.println("Node name: " + node.getTable().getName());
-			System.out.println("Benefit: " + node.getPartitionBenefit(totalNormalizedCost));
+			System.out.println("Partition Benefit: " + node.getPartitionBenefit(totalNormalizedCost));
 		}
 		
 		// Make node with no edges for tables not existing in any pair in above costMap
@@ -248,7 +266,7 @@ public class TableGraph {
 				tableToNode.put(table, node);
 				
 				System.out.println("Node name: " + node.getTable().getName());
-				System.out.println("Benefit: " + node.getPartitionBenefit(totalNormalizedCost));
+				System.out.println("Partition Benefit: " + node.getPartitionBenefit(totalNormalizedCost));
 			}
 		}
 	}
@@ -346,15 +364,18 @@ public class TableGraph {
 		for (Table table : tables) {
 		    for (ServerGroup group : groups) {
 		        pqueue.add(new Pair<Table, ServerGroup>(table, group));
+		        /*System.out.println("Table: " + table.getName());
+		        System.out.println("Entity Group: " + group.getEntityGroup(0).toString());
+		        System.out.println("Replication benefit: " + tableToNode.get(table).getReplicationBenefit(group.getEntityGroup(0), this.tableToNode, totalNormalizedCost));
+		        System.out.println("*************");*/
 		    }
 		}
 		
 		// Iterate 
 		ArrayList<Pair<Table, ServerGroup>> pairs = new ArrayList<Pair<Table, ServerGroup>>();
 		int count = 0;
-		Iterator<Pair<Table, ServerGroup>> it = pqueue.iterator();
-		while (it.hasNext()) {
-			pairs.add(it.next());
+		while (pqueue.size() > 0) {
+			pairs.add(pqueue.remove());
 			if (++count == k) break;
 		}
 		
