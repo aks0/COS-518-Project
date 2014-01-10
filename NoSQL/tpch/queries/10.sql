@@ -5,14 +5,15 @@
 :x
 :o
 select
-	c.custkey,
-	c.name,
-	sum(l.extendedprice * (1 - l.discount)) as revenue,
-	c.acctbal,
-	n.name,
-	c.address,
-	c.phone,
-	c.comment
+    c.custkey,
+    c.name,
+    l.extendedprice,
+    l.discount,
+    c.acctbal,
+    n.name,
+    c.address,
+    c.phone,
+    c.comment
 from
 	customer c,
 	orders o,
@@ -23,15 +24,5 @@ where
 	and l.orderkey = o.orderkey
 	and o.orderdate >= ':1'
 	and l.returnflag = 'R'
-	and c.nationkey = n.nationkey
-group by
-	c.custkey,
-	c.name,
-	c.acctbal,
-	c.phone,
-	n.name,
-	c.address,
-	c.comment
-order by
-	revenue desc;
+	and c.nationkey = n.nationkey;
 :n 20

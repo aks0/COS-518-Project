@@ -5,9 +5,10 @@
 :x
 :o
 select
-    extract(year from o.orderdate) as o.year,
-    sum(l.extendedprice * (1 - l.discount)) as volume,
-    n2.name as nation
+    o.orderdate,
+    l.extendedprice,
+    l.discount,
+    n2.name
 from
     part p,
     supplier s,

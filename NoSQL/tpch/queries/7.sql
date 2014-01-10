@@ -5,10 +5,11 @@
 :x
 :o
 select
-    n1.name as supp.nation,
-    n2.name as cust.nation,
-    extract(year from l.shipdate) as l.year,
-    sum(l.extendedprice * (1 - l.discount)) as volume
+    n1.name,
+    n2.name,
+    l.shipdate,
+    l.extendedprice,
+    l.discount
 from
     supplier s,
     lineitem l ,
