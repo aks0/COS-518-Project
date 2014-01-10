@@ -5,15 +5,14 @@
 :x
 :o
 select
-	o_orderpriority,
+	o.orderpriority,
 	count(*) as order_count
 from
-	orders
+	orders o
 where
-	o_orderdate >= date ':1'
-	and o_orderdate < date ':1' + interval '3' month
+	o.orderdate >= ':1'
 group by
-	o_orderpriority
+	o.orderpriority
 order by
-	o_orderpriority;
+	o.orderpriority;
 :n -1

@@ -6,7 +6,7 @@
 :o
 select
     extract(year from o_orderdate) as o_year,
-    l_extendedprice * (1 - l_discount) as volume,
+    sum(l_extendedprice * (1 - l_discount)) as volume,
     n2.n_name as nation
 from
     part,
@@ -26,6 +26,5 @@ where
     and n1.n_regionkey = r_regionkey
     and r_name = ':2'
     and s_nationkey = n2.n_nationkey
-    and o_orderdate between date '1995-01-01' and date '1996-12-31'
     and p_type = ':3';
 :n -1
