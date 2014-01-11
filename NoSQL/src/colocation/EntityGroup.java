@@ -9,12 +9,15 @@ public class EntityGroup implements Iterable<Table> {
     private Table center;
     private HashSet<Table> entities;
     private HashSet<Table> replicatedTables;
+    public boolean unused;;
     
     public EntityGroup(Table center) {
         this.center = center;
         entities = new HashSet<Table>();
         replicatedTables = new HashSet<Table>();
         entities.add(center);
+        
+        unused = false;
     }
     
     public Table getCenter() {

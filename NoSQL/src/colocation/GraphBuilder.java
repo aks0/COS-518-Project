@@ -15,7 +15,7 @@ import materializedViews.Util518;
 
 public class GraphBuilder {
     
-	public static TableGraph build(List<Table> tables, List<Query> queries) {
+	public static TableGraph2 build(List<Table> tables, List<Query> queries) {
 		HashMap<TablePair, Double> costMap = Util518.newHashMap();
 		
 		// Iterate through every possible pair of tables
@@ -62,7 +62,7 @@ public class GraphBuilder {
 		for (Query query : queries) {
 			totalNormalizedCost += CostEstimator.normalizedCost(query);
 		}
-		TableGraph graph = new TableGraph(tables, costMap, totalNormalizedCost);
+		TableGraph2 graph = new TableGraph2(tables, costMap, totalNormalizedCost);
 		return graph;
 	}
 	
@@ -77,7 +77,7 @@ public class GraphBuilder {
 			}
 			System.out.println("--------");
 		}*/
-		TableGraph graph = build(tables, queryList);
+		TableGraph2 graph = build(tables, queryList);
 	    System.out.println("Printing graph: ***********************");
 	    System.out.println(graph);
 	    

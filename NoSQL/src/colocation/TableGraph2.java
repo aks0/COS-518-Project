@@ -30,8 +30,11 @@ class Edge {
         return table;
     }
     
-    public double getCost() {
-        return cost;
+    public double getCost(double normCost) {
+    	if (!table.getClaimed())
+    		return cost;
+    	else 
+    		return normCost;
     }
     
     public String toString() {
@@ -59,20 +62,6 @@ class TableNode {
     }
     
     /**
-     * Get cost of min edge outgoing
-     * @return
-     */
-    public double minEdge() {
-        double min = Double.MAX_VALUE;
-        for (Edge edge : outEdges) {
-            if (min > edge.getCost()) {
-                min = edge.getCost();
-            }
-        }
-        return min;
-    }
-    
-    /**
      * The benefit of a node for partitioning is the total savings it offers 
      * For each existing edge of node, we calculate the savings by subtracting
      * from the normalized cost, the denormalized cost assuming that edge exists
@@ -88,10 +77,10 @@ class TableNode {
     		return 0;
     	
     	for (Edge edge : outEdges) {
-    		benefit += totalNormalizedCost - edge.getCost();
+    		benefit += totalNormalizedCost - edge.getCost(totalNormalizedCost);
     	}
     	
-    	benefit += table.getSize();
+    	//benefit += table.getSize();
     	return benefit;
     }
     
@@ -120,7 +109,7 @@ class TableNode {
         for (Edge edge : outEdges) {
         	//System.out.println("Edge: " + edge.getTable().getName());
             if (group.contains(edge.getTable())) {
-                benefit += totalNormalizedCost - edge.getCost();
+                benefit += totalNormalizedCost - edge.getCost(totalNormalizedCost);
             }
         }
         
@@ -130,7 +119,7 @@ class TableNode {
         	for (Edge edge : node.outEdges) {
             	//System.out.println("Edge: " + edge.getTable().getName());
                 if (edge.getTable().equals(this.table)) {
-                    benefit += totalNormalizedCost - edge.getCost();
+                    benefit += totalNormalizedCost - edge.getCost(totalNormalizedCost);
                 }
             }
         }
@@ -145,10 +134,10 @@ class TableNode {
      * @param table
      * @return
      */
-    public double getCostTo(Table table) {
+    public double getCostTo(Table table, double normCost) {
         for (Edge edge : outEdges) {
             if (edge.getTable().equals(table)) {
-                return edge.getCost();
+                return edge.getCost(normCost);
             }
         }
         return Double.POSITIVE_INFINITY;
@@ -213,34 +202,29 @@ class ReplicationValueComparator implements Comparator<Pair<Table, ServerGroup>>
      * 
      * Doing this because edge cost indicates the amount of saving offered by join represented by edge
      */
-    /*public int compare(Pair<Table, EntityGroup> a, Pair<Table, EntityGroup> b) {
-        TableNode tNodeA = base.get(a.getFirst());
-        TableNode tNodeB = base.get(b.getFirst());
-        
-        return (int)(tNodeB.getReplicationBenefit(b.getSecond(), totalNormalizedCost) 
-                - tNodeA.getReplicationBenefit(a.getSecond(), totalNormalizedCost)); 
-    }*/
 
 	@Override
 	public int compare(Pair<Table, ServerGroup> a, Pair<Table, ServerGroup> b) {
 		TableNode tNodeA = base.get(a.getFirst());
         TableNode tNodeB = base.get(b.getFirst());
         
-		double scoreA =  tNodeA.getReplicationBenefit(a.getSecond(), base, totalNormalizedCost); 
-				//- a.getFirst().getSize() * a.getSecond().getNumServers() * a.getFirst().getUpdateRate();
-		double scoreB =  tNodeB.getReplicationBenefit(b.getSecond(), base, totalNormalizedCost); 
-				//- b.getFirst().getSize() * b.getSecond().getNumServers() * b.getFirst().getUpdateRate();
+		double scoreA =  tNodeA.getReplicationBenefit(a.getSecond(), base, totalNormalizedCost)
+				- a.getFirst().getSize() * a.getSecond().getNumServers() 
+				- a.getFirst().getSize() * a.getSecond().getNumServers() * a.getFirst().getUpdateRate();
+		double scoreB =  tNodeB.getReplicationBenefit(b.getSecond(), base, totalNormalizedCost) 
+				- b.getFirst().getSize() * b.getSecond().getNumServers()
+				- b.getFirst().getSize() * b.getSecond().getNumServers() * b.getFirst().getUpdateRate();
 		
 		return (int)(scoreB - scoreA);
 	}
 }
 
-public class TableGraph {	
+public class TableGraph2 {	
 	// mapping from table to the table's node in the graph 
 	private HashMap<Table, TableNode> tableToNode;
 	private double totalNormalizedCost;
 	
-	public TableGraph(List<Table> tables, HashMap<TablePair, Double> costMap, double totalNormalizedCost) {
+	public TableGraph2(List<Table> tables, HashMap<TablePair, Double> costMap, double totalNormalizedCost) {
 		tableToNode = Util518.newHashMap();
 		this.totalNormalizedCost = totalNormalizedCost;
 		
@@ -279,12 +263,29 @@ public class TableGraph {
 	}
 	
 	public HashMap<Table, EntityGroup> produceEntityGroups(int k) {
-	    // mapping from entity center to entity group
+		int count = 0;
+		
+		// mapping from entity center to entity group
 		HashMap<Table, EntityGroup> entityMap = new HashMap<Table, EntityGroup>();
-		for (TableNode node : getHighestPartitionScoreNodes(k)) {
-		    // put parent tables
-			System.out.println("Picked one of k center: " + node.getTable().getName());
-			entityMap.put(node.getTable(), new EntityGroup(node.getTable()));
+		HashMap<Table, EntityGroup> oneCenterMap = new HashMap<Table, EntityGroup>();
+				
+		while (count < k) {
+			TableNode node = getHighestPartitionScore();
+			for (Edge edge : node.getOutEdges()) {
+				edge.getTable().setClaimed(true);
+			}
+			
+			if (!entityMap.containsKey(node.getTable()))
+				entityMap.put(node.getTable(), new EntityGroup(node.getTable()));
+			
+			count++;
+		}
+		
+		// Reset edges
+		for (TableNode node : tableToNode.values()) {
+			for (Edge edge : node.getOutEdges()) {
+				edge.getTable().setClaimed(false);
+			}
 		}
 		
 		// add every table to a partition
@@ -299,7 +300,7 @@ public class TableGraph {
 				}
 				
 				// find best center to join with table (one where the cost is lowest)
-				double cost = tableToNode.get(center).getCostTo(table);
+				double cost = tableToNode.get(center).getCostTo(table, this.totalNormalizedCost);
 				if (cost < bestCost) {
 					bestCost = cost;
 					bestCenter = center;
@@ -311,10 +312,15 @@ public class TableGraph {
 					entityMap.get(bestCenter).add(table);
 				} else {
 				    // create new entity with only center if it doesn't have join with any existing center
-        			entityMap.put(table, new EntityGroup(table));
+					EntityGroup group = new EntityGroup(table);
+					group.unused = true;
+        			oneCenterMap.put(table, group);
+        			
 				}
 			}
 		}
+		
+		entityMap.putAll(oneCenterMap);
 		return entityMap;
 	}
 	
@@ -325,29 +331,20 @@ public class TableGraph {
 	 * @param k
 	 * @return
 	 */
-	public List<TableNode> getHighestPartitionScoreNodes(int k) {
+	public TableNode getHighestPartitionScore() {
 		// Sort nodes by adding to treeMap
         Comparator<Table> comparator = new PartitionValueComparator(tableToNode, totalNormalizedCost);
 		TreeMap<Table, TableNode> sortedMap = new TreeMap<Table, TableNode>(comparator);
 		sortedMap.putAll(tableToNode);
 		
-		// Iterate through sortedMap
-		ArrayList<TableNode> nodes = new ArrayList<TableNode>();
-		int count = 0;
-		Iterator<Table> it = sortedMap.keySet().iterator();
-		while (it.hasNext()) {
-			Table table = it.next();
-			
-			// Don't make table a center if it can be joined with existing center
-			for (TableNode tableNode : nodes) {
-				if (Table.findParentTable(table, tableNode.getTable()) != null) continue;
-			}
-			
-			nodes.add(tableToNode.get(table));
-			if (++count == k) break;
-		}
 		
-		return nodes;
+		// Get first item from Sorted Map
+		Iterator<Table> it = sortedMap.keySet().iterator();
+		Table table = it.next();
+		System.out.println("Table picked: " + table.getName());
+		System.out.println("Partition score: " + tableToNode.get(table).getPartitionBenefit(totalNormalizedCost));
+		return tableToNode.get(table);
+		
 	}
 
 	/**
@@ -366,11 +363,15 @@ public class TableGraph {
 		        new PriorityQueue<Pair<Table, ServerGroup>>(tables.size() * groups.size(), comparator);
 		for (Table table : tables) {
 		    for (ServerGroup group : groups) {
-		        pqueue.add(new Pair<Table, ServerGroup>(table, group));
-		        /*System.out.println("Table: " + table.getName());
+		    	Pair<Table, ServerGroup> a = new Pair<Table, ServerGroup>(table, group);
+		        pqueue.add(a);
+		        System.out.println("Table: " + table.getName());
 		        System.out.println("Entity Group: " + group.getEntityGroup(0).toString());
-		        System.out.println("Replication benefit: " + tableToNode.get(table).getReplicationBenefit(group.getEntityGroup(0), this.tableToNode, totalNormalizedCost));
-		        System.out.println("*************");*/
+		        double scoreA = tableToNode.get(table).getReplicationBenefit(a.getSecond(), tableToNode, totalNormalizedCost)
+				- a.getFirst().getSize() * a.getSecond().getNumServers() 
+				- a.getFirst().getSize() * a.getSecond().getNumServers() * a.getFirst().getUpdateRate();
+		        System.out.println("Replication benefit: " + scoreA);
+		        System.out.println("*************");
 		    }
 		}
 		

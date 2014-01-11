@@ -25,10 +25,10 @@ public class TableColocator {
      * @param averageMemory - average memory on a server in GB
      * @param dataSetSize - size of entire dataset in GB, if using TPC-H it is either 1 or 10
      */
-    public static void colocate(ArrayList<Table> tables, List<Query> queries, MemorySize avgServerSize) {
+    public static void colocate(ArrayList<Table> tables, List<Query> queries, MemorySize avgServerSize, int maxServers) {
         
         // decide colocation via partitioning
-        TableGraph graph = GraphBuilder.build(tables, queries);
+        TableGraph2 graph = GraphBuilder.build(tables, queries);
         HashMap<Table, EntityGroup> entityMap = graph.produceEntityGroups(2);
         
         // Get replication candidates
@@ -42,18 +42,20 @@ public class TableColocator {
         // Get entity groups
         ArrayList<EntityGroup> entityGroups = Util518.newArrayList();
         for (Table center : entityMap.keySet()) {
-            entityGroups.add(entityMap.get(center));
+        	 if (!entityMap.get(center).onlyContainsCenter()) {
+        		 entityGroups.add(entityMap.get(center));
+             }
         }
         
         // Do initial entity to server group mapping
-        ArrayList<ServerGroup> serverGroups = MemoryManager.assignEntityGroups(entityGroups, avgServerSize);
+        ArrayList<ServerGroup> serverGroups = MemoryManager.assignEntityGroups(entityGroups, avgServerSize, maxServers);
         
         System.out.println(serverGroups.toString());
         
         System.out.println("\n----------------------\n");
         
         // Get Best candidates for replication
-        ArrayList<Pair<Table, ServerGroup>> pairs = graph.getHighestReplicationScorePairs(2, replicationCandidates, serverGroups);
+        ArrayList<Pair<Table, ServerGroup>> pairs = graph.getHighestReplicationScorePairs(3, replicationCandidates, serverGroups);
     
         // For each pair, decide how many servers to add in light of adding the replicated table
         for (Pair<Table, ServerGroup> pair : pairs) {
@@ -61,18 +63,24 @@ public class TableColocator {
         	ServerGroup group = pair.getSecond();
         	
         	System.out.println("Replicated table: " + replicatedTable.getName());
-        	group.addReplicatedTable(replicatedTable, 0);
+        	group.addReplicatedTable(replicatedTable, 0, maxServers);
         	System.out.println("Replicate to: " + group.toString());
+        }
+        
+        System.out.println("-----------------");
+        System.out.println("Printing final server groups");
+        for (ServerGroup group : serverGroups) {
+        	System.out.println(group.toString());
         }
         
     }
     
     public static void main(String[] args) {
     	ArrayList<Table> tables = Table
-				.getTablesFromModel("../data_models/data2.model");
+				.getTablesFromModel("../data_models/tpc-h.model");
 		ArrayList<Query> queryList = QueryLib
-				.getQueryList("../query_logs/queries_sqlfire.sql");
+				.getQueryList("../query_logs/onefilequeries.sql");
 		
-		colocate(tables, queryList, new MemorySize(1.0, Size.MB));
+		colocate(tables, queryList, new MemorySize(1.5, Size.GB), 3);
     }
 }

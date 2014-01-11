@@ -29,6 +29,17 @@ public class Table {
     private int updates;
     // the size of the whole table in bytes
     private int sizeInBytes;
+    
+    // used in table graph
+    private boolean claimed = false;
+    
+    public void setClaimed(boolean flag) {
+    	claimed = flag;
+    }
+    
+    public boolean getClaimed() {
+    	return claimed;
+    }
 
 	public int getSize() {
 		return numrows;

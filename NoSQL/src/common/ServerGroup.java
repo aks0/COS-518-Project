@@ -28,7 +28,6 @@ public class ServerGroup {
 	private List<Server> servers;
 	private List<EntityGroup> partitionedEntityGroups;
 	private MemorySize avgServerSize;
-	private static int MAX_NUM_SERVERS = 1000;
 	
 	public ServerGroup(int n, MemorySize avgServerSize, EntityGroup group) {
 		if (n <= 0) {
@@ -74,7 +73,7 @@ public class ServerGroup {
 	 * 
 	 * @param table
 	 */
-	public void addReplicatedTable(Table table, int index) {
+	public void addReplicatedTable(Table table, int index, int maxServers) {
 		EntityGroup partitionedEntityGroup = partitionedEntityGroups.get(index);
 		boolean success = partitionedEntityGroup.addReplicatedTable(table);
 		if (!success)
@@ -90,7 +89,7 @@ public class ServerGroup {
 			
 			// Sometimes not possible to add replicated table because not enough size
 			// Try adding servers and if you go past max, then that means replicated table cannot be added
-			if (servers.size() > MAX_NUM_SERVERS) {
+			if (servers.size() > maxServers) {
 				servers = servers.subList(0, originalSize - 1);
 				partitionedEntityGroup.removeReplicatedTable(table);
 				return;
@@ -99,16 +98,22 @@ public class ServerGroup {
 		
 		// See if adding servers past minimum necessary is useful
 		// TODO: is this really useful?
-		/*while (true) {
+		while (true) {
+			if (servers.size() == maxServers)
+				return;
+			
 			double benefit = partitionedEntityGroup.getPartitionedSize(servers.size()) - 
 					partitionedEntityGroup.getPartitionedSize(servers.size()+1);
 			double cost = partitionedEntityGroup.getReplicatedSize();
+			
+			System.out.println("Benefit of adding server: " + benefit);
+			System.out.println("Cost of adding server: " + cost);
 			
 			if (benefit - cost < 0)
 				break;
 			
 			addServer();
-		}*/
+		}
 	}
 	
 	/**
