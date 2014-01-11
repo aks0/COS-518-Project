@@ -13,6 +13,7 @@ public class Query {
     public static final String INSERT_LABEL = "insert";
     public static final String UPDATE_LABEL = "update";
     public static final String JOIN_LABEL = "join";
+    private String statement;
     private String type; // type of query this represents (select, update,
                             // delete, insert)
     private Set<Column> referencedColumns; // list of columns referenced by this
@@ -37,6 +38,7 @@ public class Query {
      * @param query
      */
     Query(String query) {
+        statement = query;
         referencedColumns = Util518.newHashSet();
         whereColumns = Util518.newHashSet();
         equijoinedColumns = Util518.newArrayList();
@@ -99,6 +101,10 @@ public class Query {
         scanner.close();
     }
 
+    public String getStatement() {
+        return statement;
+    }
+    
     /**
      * splits line of format <tableName>.<columnName> into its components as a
      * Pair of Strings
