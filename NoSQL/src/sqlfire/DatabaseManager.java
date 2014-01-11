@@ -6,9 +6,14 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import materializedViews.Query;
+import materializedViews.Table;
+import materializedViews.Util518;
 
 /**
  * Class for managing the database.
@@ -80,11 +85,53 @@ public class DatabaseManager {
         statement.executeQuery(query.getStatement()); 
     }
     
-    public void handleError(Query query, SQLException e) {
-        System.out.println(e);
+    public long handleError(Query query, SQLException e) {
+        String error = e.getMessage();
+        ArrayList<String> tables = extractBetweenDelimiters(error, "(.*?)", "APP\\.", "\\[server groups");
+        if (tables.size() == 2) {
+            // distributed join
+            Table table1 = Table.getInstance(tables.get(0).toLowerCase());
+            Table table2 = Table.getInstance(tables.get(1).toLowerCase());
+
+            // I/O's for fetching rows of both tables
+            long cost = (long)table1.getSize() + (long)table2.getSize();
+            // I/O's for join, assume no index?
+            cost += (long)table1.getSize() * (long)table2.getSize();
+            System.out.println(table1.getName() + "X" + table2.getName() + " Cost: " + cost);
+            return cost;
+        }
+        return 0;
     }
     
-    public static void main(String[] args) {
+    /**
+     * Extracts a substring of a specified format that is between a specified
+     * start substring delimiter and end substring delimiter.
+     * @param content - String to extract substring from
+     * @param formatOfExtract - String describing regex format of the substring to extract
+     * @param start - start substring delimiter in regex format
+     * @param end - end substring delimiter in regex format
+     * @return String for extracted substring
+     */
+    public static ArrayList<String> extractBetweenDelimiters(String content, String formatOfExtract,
+            String start, String end) {
+        ArrayList<String> matches = Util518.newArrayList();
+        // Find the number of groups in start
+        Pattern pattern = Pattern.compile(start);
+        Matcher matcher = pattern.matcher("");
+        // the group number of the extract is 1 plus the number of groups in start
+        int groupNumOfExtract = matcher.groupCount() + 1;
         
+        pattern = Pattern.compile(start + "\\s*" + formatOfExtract  + "\\s*" + end);
+        matcher = pattern.matcher(content);
+        while (matcher.find()) {
+            // return what matches between the parentheses of pattern
+            matches.add(matcher.group(groupNumOfExtract));
+        }
+        return matches;
+    }
+
+    
+    public static void main(String[] args) {
+        new DatabaseClient().run();
     }
 }

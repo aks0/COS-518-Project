@@ -19,19 +19,20 @@ public class DatabaseClient extends Thread {
     @Override
     public void run() {
         List<Table> tables = Table
-                .getTablesFromModel("./data_models/tpc-h.model");
+                .getTablesFromModel("data_models/tpc-h.model");
         ArrayList<Query> queries = QueryLib.getQueryList("query_logs/onefilequeries.sql");
         DatabaseManager dbManager = null;
         try {
             dbManager = new DatabaseManager();
-            // Insert each datum into the database
+            long distributedCost = 0;
             for (Query query : queries) {
                 try {
                     dbManager.sendQuery(query);
                 } catch (SQLException e) {
-                    dbManager.handleError(query, e);
+                    distributedCost += dbManager.handleError(query, e);
                 }
             }
+            System.out.println("Total Distributed Cost: " + distributedCost);
         } catch(SQLException e) {
             e.printStackTrace();
         } catch(Exception e) {
