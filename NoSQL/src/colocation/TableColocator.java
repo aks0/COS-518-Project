@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import common.CreateTableStatements;
 import common.MemoryManager;
 import common.MemorySize;
+import common.Server;
 import common.ServerGroup;
 import common.Size;
-
 import materializedViews.Pair;
 import materializedViews.Query;
 import materializedViews.QueryLib;
@@ -65,14 +66,50 @@ public class TableColocator {
         	System.out.println("Replicate to: " + group.toString());
         }
         
+        // Create Table Statements for TPC-H; comment out if not using TPC-H
+        CreateTableStatements.print(serverGroups);
+        
+        System.out.println("\n----------------------\n");
+
+        // map every server to the server groups it belongs to
+        HashMap<Server, ArrayList<ServerGroup>> serverToServerGroup = Util518.newHashMap();
+        for (ServerGroup group : serverGroups) {
+            for (Server server : group.getServers()) {
+		        ArrayList<ServerGroup> groups;
+		        if (!serverToServerGroup.containsKey(server)) {
+		            groups = Util518.newArrayList();
+		            serverToServerGroup.put(server, groups);
+		        } else {
+		            groups = serverToServerGroup.get(server);
+		        }
+		        groups.add(group);
+            }
+        }
+        
+        // print server followed by the server groups it belongs to
+        StringBuilder builder = new StringBuilder();
+        int serverNum = 0;
+        for (Server server : serverToServerGroup.keySet()) {
+            builder.append("Server" + ++serverNum + ": ");
+            ArrayList<ServerGroup> groups = serverToServerGroup.get(server);
+            for (int i = 0; i < groups.size(); i++) {
+                ServerGroup group = groups.get(i);
+                builder.append(group.getName());
+                if (i != groups.size() - 1) {
+                    builder.append(",");
+                }
+            }
+            builder.append("\n");
+        }
+        System.out.println(builder.toString());
     }
     
     public static void main(String[] args) {
     	ArrayList<Table> tables = Table
-				.getTablesFromModel("../data_models/data2.model");
+				.getTablesFromModel("./data_models/tpc-h.model");
 		ArrayList<Query> queryList = QueryLib
-				.getQueryList("../query_logs/queries_sqlfire.sql");
+				.getQueryList("./query_logs/onefilequeries.sql");
 		
-		colocate(tables, queryList, new MemorySize(1.0, Size.MB));
+		colocate(tables, queryList, new MemorySize(1.0, Size.GB));
     }
 }

@@ -12,28 +12,21 @@ import materializedViews.TableSubset;
 
 import colocation.EntityGroup;
 
-class Server {
-	private MemorySize size;
-	
-	public Server(MemorySize size) {
-		this.size = size;
-	}
-	
-	public MemorySize getSize() {
-		return size;
-	}
-}
-
 public class ServerGroup {
+    private String name;
 	private List<Server> servers;
 	private List<EntityGroup> partitionedEntityGroups;
 	private MemorySize avgServerSize;
 	private static int MAX_NUM_SERVERS = 1000;
+	private static int NUM_GROUPS = 0;
 	
 	public ServerGroup(int n, MemorySize avgServerSize, EntityGroup group) {
 		if (n <= 0) {
 			throw new RuntimeException("Need to add at least one server"); 
 		}
+		
+		NUM_GROUPS++;
+		name = "GROUP" + NUM_GROUPS;
 		
 		this.avgServerSize = avgServerSize;
 		servers = new ArrayList<Server>();
@@ -43,6 +36,10 @@ public class ServerGroup {
 		for (int i = 0; i < n; ++i) {
 			servers.add(new Server(avgServerSize));
 		}
+	}
+	
+	public String getName() {
+	    return name;
 	}
 	
 	public void addServer() {
@@ -55,6 +52,10 @@ public class ServerGroup {
 	
 	public int getNumServers() {
 		return servers.size();
+	}
+	
+	public List<Server> getServers() {
+	    return servers;
 	}
 	
 	public EntityGroup getEntityGroup(int index) {
