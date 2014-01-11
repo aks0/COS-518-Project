@@ -5,8 +5,9 @@
 :x
 :o
 select
-	ps.partkey,
-	sum(ps.supplycost * ps.availqty) as value
+    ps.partkey,
+    ps.supplycost,
+    ps.availqty
 from
 	partsupp ps,
 	supplier s,
@@ -14,7 +15,5 @@ from
 where
 	ps.suppkey = s.suppkey
 	and s.nationkey = n.nationkey
-	and n.name = ':1'
-order by
-	value desc;
+	and n.name = ':1';
 :n -1

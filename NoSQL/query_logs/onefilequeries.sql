@@ -14,7 +14,7 @@ select
 from
 	lineitem l
 where
-	l.orderkey <= '67'
+	l.orderkey <= 84
 group by
 	l.returnflag,
 	l.linestatus
@@ -41,11 +41,11 @@ from
 where
 	p.partkey = ps.partkey
 	and s.suppkey = ps.suppkey
-	and p.size = 6
+	and p.size = 28
 	and p.type like '%COPPER'
 	and s.nationkey = n.nationkey
 	and n.regionkey = r.regionkey
-	and r.name = 'AFRICA'
+	and r.name = 'ASIA'
 order by
 	s.acctbal desc,
 	n.name,
@@ -63,11 +63,11 @@ from
 	orders o,
 	lineitem l
 where
-	c.mktsegment = 'HOUSEHOLD'
+	c.mktsegment = 'AUTOMOBILE'
 	and c.custkey = o.custkey
 	and l.orderkey = o.orderkey
-	and o.orderdate < '1995-03-06'
-	and l.shipdate > '1995-03-06'
+	and o.orderdate < '1995-03-17'
+	and l.shipdate > '1995-03-17'
 group by
 	l.orderkey,
 	o.orderdate,
@@ -83,7 +83,7 @@ select
 from
 	orders o
 where
-	o.orderdate >= '1994-06-01'
+	o.orderdate >= '1995-11-01'
 group by
 	o.orderpriority
 order by
@@ -107,7 +107,7 @@ where
 	and c.nationkey = s.nationkey
 	and s.nationkey = n.nationkey
 	and n.regionkey = r.regionkey
-	and r.name = 'ASIA'
+	and r.name = 'AFRICA'
 	and o.orderdate >= '1993-01-01'
 group by
 	n.name
@@ -120,16 +120,17 @@ select
 from
 	lineitem l
 where
-	l.shipdate >= '1995-01-01'
-	and l.discount between 0.08 - 0.01 and 0.08 + 0.01
+	l.shipdate >= '1994-01-01'
+	and l.discount between 0.04 - 0.01 and 0.04 + 0.01
 	and l.quantity < 24;
 
 
 select
-    n1.name as supp.nation,
-    n2.name as cust.nation,
-    extract(year from l.shipdate) as l.year,
-    sum(l.extendedprice * (1 - l.discount)) as volume
+    n1.name,
+    n2.name,
+    l.shipdate,
+    l.extendedprice,
+    l.discount
 from
     supplier s,
     lineitem l ,
@@ -144,15 +145,16 @@ where
     and s.nationkey = n1.nationkey
     and c.nationkey = n2.nationkey
     and (
-        (n1.name = 'PERU' and n2.name = 'FRANCE')
-        or (n1.name = 'FRANCE' and n2.name = 'PERU')
+        (n1.name = 'IRAN' and n2.name = 'MOZAMBIQUE')
+        or (n1.name = 'MOZAMBIQUE' and n2.name = 'IRAN')
     );
 
 
 select
-    extract(year from o.orderdate) as o.year,
-    sum(l.extendedprice * (1 - l.discount)) as volume,
-    n2.name as nation
+    o.orderdate,
+    l.extendedprice,
+    l.discount,
+    n2.name
 from
     part p,
     supplier s,
@@ -169,15 +171,18 @@ where
     and o.custkey = c.custkey
     and c.nationkey = n1.nationkey
     and n1.regionkey = r.regionkey
-    and r.name = 'AFRICA'
+    and r.name = 'AMERICA'
     and s.nationkey = n2.nationkey
-    and p.type = 'MEDIUM BRUSHED COPPER';
+    and p.type = 'SMALL BRUSHED COPPER';
 
 
 select
-    n.name as nation,
-    extract(year from o.orderdate) as o.year,
-    sum(l.extendedprice * (1 - l.discount) - ps.supplycost * l.quantity) as amount
+    n.name,
+    o.orderdate,
+    l.extendedprice,
+    l.discount,
+    ps.supplycost,
+    l.quantity
 from
     part p,
     supplier s,
@@ -192,18 +197,19 @@ where
     and p.partkey = l.partkey
     and o.orderkey = l.orderkey
     and s.nationkey = n.nationkey
-    and p.name like '%lemon%';
+    and p.name like '%sky%';
 
 
 select
-	c.custkey,
-	c.name,
-	sum(l.extendedprice * (1 - l.discount)) as revenue,
-	c.acctbal,
-	n.name,
-	c.address,
-	c.phone,
-	c.comment
+    c.custkey,
+    c.name,
+    l.extendedprice,
+    l.discount,
+    c.acctbal,
+    n.name,
+    c.address,
+    c.phone,
+    c.comment
 from
 	customer c,
 	orders o,
@@ -212,24 +218,15 @@ from
 where
 	c.custkey = o.custkey
 	and l.orderkey = o.orderkey
-	and o.orderdate >= '1995-01-01'
+	and o.orderdate >= '1994-02-01'
 	and l.returnflag = 'R'
-	and c.nationkey = n.nationkey
-group by
-	c.custkey,
-	c.name,
-	c.acctbal,
-	c.phone,
-	n.name,
-	c.address,
-	c.comment
-order by
-	revenue desc;
+	and c.nationkey = n.nationkey;
 
 
 select
-	ps.partkey,
-	sum(ps.supplycost * ps.availqty) as value
+    ps.partkey,
+    ps.supplycost,
+    ps.availqty
 from
 	partsupp ps,
 	supplier s,
@@ -237,9 +234,7 @@ from
 where
 	ps.suppkey = s.suppkey
 	and s.nationkey = n.nationkey
-	and n.name = 'ALGERIA'
-order by
-	value desc;
+	and n.name = 'IRAQ';
 
 
 
@@ -262,10 +257,10 @@ from
 	lineitem l
 where
 	o.orderkey = l.orderkey
-	and l.shipmode in ('REG AIR', 'TRUCK')
+	and l.shipmode in ('RAIL', 'FOB')
 	and l.commitdate < l.receiptdate
 	and l.shipdate < l.commitdate
-	and l.receiptdate >= '1996-01-01'
+	and l.receiptdate >= '1994-01-01'
 group by
 	l.shipmode
 order by
@@ -274,7 +269,7 @@ order by
 
 select
 	s.name,
-	count(*) as numwait
+    count(*)
 from
 	supplier s,
 	lineitem l1,
@@ -285,12 +280,11 @@ where
 	and o.orderkey = l1.orderkey
 	and o.orderstatus = 'F'
 	and l1.receiptdate > l1.commitdate
-	and s.nationkey = n_nationkey
-	and n.name = 'express'
+	and s.nationkey = n.nationkey
+	and n.name = 'pending'
 group by
 	s.name
 order by
-	numwait desc,
 	s.name;
 
 
@@ -306,7 +300,7 @@ from
 	part p
 where
 	l.partkey = p.partkey
-	and l.shipdate >= '1996-09-01'
+	and l.shipdate >= '1995-08-01'
 
 
 select
@@ -332,9 +326,9 @@ from
 	part p
 where
 	p.partkey = ps.partkey
-	and p.brand <> 'Brand#25'
-	and p.type not like 'SMALL PLATED%'
-	and p.size in (26, 16, 18, 41, 33, 35, 4, 1)
+	and p.brand <> 'Brand#15'
+	and p.type not like 'SMALL BURNISHED%'
+	and p.size in (32, 7, 13, 42, 31, 44, 8, 22)
 group by
 	p.brand,
 	p.type,
@@ -353,8 +347,8 @@ from
 	part p
 where
 	p.partkey = l.partkey
-	and p.brand = 'Brand#33'
-	and p.container = 'LG CASE';
+	and p.brand = 'Brand#44'
+	and p.container = 'WRAP CAN';
 
 
 select
@@ -383,16 +377,17 @@ order by
 
 
 select
-	sum(l.extendedprice* (1 - l.discount)) as revenue
+	l.extendedprice,
+    l.discount
 from
 	lineitem l,
 	part p
 where
 	(
 		p.partkey = l.partkey
-		and p.brand = 'Brand#43'
+		and p.brand = 'Brand#23'
 		and p.container in ('SM CASE', 'SM BOX', 'SM PACK', 'SM PKG')
-		and l.quantity >= 9 and l_quantity <= 9 + 10
+		and l.quantity >= 7 and l.quantity <= 7 + 10
 		and p.size between 1 and 5
 		and l.shipmode in ('AIR', 'AIR REG')
 		and l.shipinstruct = 'DELIVER IN PERSON'
@@ -400,9 +395,9 @@ where
 	or
 	(
 		p.partkey = l.partkey
-		and p.brand = 'Brand#45'
+		and p.brand = 'Brand#31'
 		and p.container in ('MED BAG', 'MED BOX', 'MED PKG', 'MED PACK')
-		and l.quantity >= 10 and l_quantity <= 10 + 10
+		and l.quantity >= 19 and l.quantity <= 19 + 10
 		and p.size between 1 and 10
 		and l.shipmode in ('AIR', 'AIR REG')
 		and l.shipinstruct = 'DELIVER IN PERSON'
@@ -410,9 +405,9 @@ where
 	or
 	(
 		p.partkey = l.partkey
-		and p.brand = 'Brand#55'
+		and p.brand = 'Brand#12'
 		and p.container in ('LG CASE', 'LG BOX', 'LG PACK', 'LG PKG')
-		and l.quantity >= 28 and l.quantity <= 28 + 10
+		and l.quantity >= 30 and l.quantity <= 30 + 10
 		and p.size between 1 and 15
 		and l.shipmode in ('AIR', 'AIR REG')
 		and l.shipinstruct = 'DELIVER IN PERSON'

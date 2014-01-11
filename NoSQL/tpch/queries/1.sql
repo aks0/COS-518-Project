@@ -18,7 +18,7 @@ select
 from
 	lineitem l
 where
-	l.orderkey <= ':1'
+	l.orderkey <= :1
 group by
 	l.returnflag,
 	l.linestatus
