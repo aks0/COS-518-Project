@@ -12,6 +12,13 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.JoinRowSet;
+import javax.sql.rowset.Joinable;
+
+import com.sun.rowset.CachedRowSetImpl;
+import com.sun.rowset.JoinRowSetImpl;
+
 import materializedViews.Column;
 import materializedViews.Pair;
 import materializedViews.Query;
@@ -152,11 +159,42 @@ public class DatabaseManager {
             } catch (SQLException error) {
                 Table table1 = Table.getInstance(column1.getTable().getName().toLowerCase());
                 Table table2 = Table.getInstance(column2.getTable().getName().toLowerCase());
-				System.out.println(table1.getName() + "X" + table2.getName() + " joined");
+                System.out.println(table1.getName() + "X" + table2.getName() + " joined");
                 
                 // fetch both tables
                 String selectQuery1 = constructSelectQuery(table1, query.getTableToColumns().get(table1));
                 String selectQuery2 = constructSelectQuery(table2, query.getTableToColumns().get(table2));
+                
+                try{
+                    CachedRowSet tableResult1 = new CachedRowSetImpl();
+                    tableResult1.setUrl(URL); 
+                    tableResult1.setCommand(selectQuery1);
+                    tableResult1.execute();
+    
+                    CachedRowSet tableResult2 = new CachedRowSetImpl();
+                    tableResult2.setUrl(URL); 
+                    tableResult2.setCommand(selectQuery2);
+                    tableResult2.execute();
+                    
+                    JoinRowSet joinResults = new JoinRowSetImpl();
+                    ((Joinable)tableResult1).setMatchColumn(column1.getName());
+                    ((Joinable)tableResult2).setMatchColumn(column2.getName());
+                    joinResults.addRowSet(tableResult1);            
+                    joinResults.addRowSet(tableResult2);
+                    
+                    // display records in JoinRowSet object
+                    while (joinResults.next()) {
+                        // match
+                        ;
+                    }
+                    tableResult1.close();
+                    tableResult2.close();
+                    joinResults.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                
+                /*
                 try {
                     ResultSet result1 = sendQuery(selectQuery1);
                     // execute join
@@ -178,7 +216,7 @@ public class DatabaseManager {
                     additionalStatement.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         }
         System.out.println();
