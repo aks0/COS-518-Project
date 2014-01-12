@@ -95,11 +95,12 @@ public class DatabaseManager {
     }
     
     public double handleError(Query query, SQLException e) {
-        double cost = 0.0;
+        double totalCost = 0.0;
         for (Pair<Column, Column> join : query.getEquijoinedColumns()) {
             Column column1 = join.getFirst();
             Column column2 = join.getSecond();
             String joinQuery = constructJoinQuery(column1, column2);
+			double cost = 0.0;
             try {
                 sendQuery(joinQuery);
             } catch (SQLException error) {
@@ -112,9 +113,10 @@ public class DatabaseManager {
                 cost += (double)table1.getSize() * (double)table2.getSize();
                 System.out.println(table1.getName() + "X" + table2.getName() + " Cost: " + cost);
             }
+			totalCost += cost;
         }
         System.out.println();
-        return cost;
+        return totalCost;
         /*String error = e.getMessage();
         ArrayList<String> tables = extractBetweenDelimiters(error, "(.*?)", " 'APP\\.", "(\\[|')");
         if (tables.size() == 2) {
