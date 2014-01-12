@@ -1,3 +1,25 @@
+0.5 MB
+------
+node4:/proj/astream561> ls -lh tpcr/appendix/dbgen/*.tbl
+-rw-r--r-- 1 aks0 astream561  12K 2014-01-12 16:22 tpcr/appendix/dbgen/customer.tbl
+-rw-r--r-- 1 aks0 astream561 338K 2014-01-12 16:22 tpcr/appendix/dbgen/lineitem.tbl
+-rw-r--r-- 1 aks0 astream561 2.1K 2014-01-12 16:22 tpcr/appendix/dbgen/nation.tbl
+-rw-r--r-- 1 aks0 astream561  77K 2014-01-12 16:22 tpcr/appendix/dbgen/orders.tbl
+-rw-r--r-- 1 aks0 astream561  54K 2014-01-12 16:22 tpcr/appendix/dbgen/partsupp.tbl
+-rw-r--r-- 1 aks0 astream561  12K 2014-01-12 16:22 tpcr/appendix/dbgen/part.tbl
+-rw-r--r-- 1 aks0 astream561  396 2014-01-12 16:22 tpcr/appendix/dbgen/region.tbl
+-rw-r--r-- 1 aks0 astream561  572 2014-01-12 16:22 tpcr/appendix/dbgen/supplier.tbl
+
+node4:/proj/astream561> ls -l tpcr/appendix/dbgen/*.tbl
+-rw-r--r-- 1 aks0 astream561  11512 2014-01-12 16:22 tpcr/appendix/dbgen/customer.tbl
+-rw-r--r-- 1 aks0 astream561 345211 2014-01-12 16:22 tpcr/appendix/dbgen/lineitem.tbl
+-rw-r--r-- 1 aks0 astream561   2103 2014-01-12 16:22 tpcr/appendix/dbgen/nation.tbl
+-rw-r--r-- 1 aks0 astream561  78608 2014-01-12 16:22 tpcr/appendix/dbgen/orders.tbl
+-rw-r--r-- 1 aks0 astream561  54561 2014-01-12 16:22 tpcr/appendix/dbgen/partsupp.tbl
+-rw-r--r-- 1 aks0 astream561  11281 2014-01-12 16:22 tpcr/appendix/dbgen/part.tbl
+-rw-r--r-- 1 aks0 astream561    396 2014-01-12 16:22 tpcr/appendix/dbgen/region.tbl
+-rw-r--r-- 1 aks0 astream561    572 2014-01-12 16:22 tpcr/appendix/dbgen/supplier.tbl
+
 1 GB
 ----
 node4:/proj/astream561/tpcr/appendix/dbgen> ls -lh *.tbl
