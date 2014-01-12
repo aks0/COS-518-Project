@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,18 +84,25 @@ public class DatabaseManager {
     /**
      * @throws SQLException
      */
-    public void sendQuery(Query query) throws SQLException {
-        statement.executeQuery(query.getStatement()); 
+    public ResultSet sendQuery(Query query) throws SQLException {
+        return statement.executeQuery(query.getStatement()); 
     }
     
     /**
      * @throws SQLException
      */
-    public void sendQuery(String query) throws SQLException {
-        statement.executeQuery(query); 
+    public ResultSet sendQuery(String query) throws SQLException {
+        return statement.executeQuery(query); 
     }
     
-    public double handleError(Query query, SQLException e) {
+    /**
+     * @throws SQLException
+     */
+    public ResultSet sendQuery(String query, Statement additionalStatement) throws SQLException {
+        return additionalStatement.executeQuery(query); 
+    }
+    
+    public double handleErrorWithCost(Query query) {
         double totalCost = 0.0;
         for (Pair<Column, Column> join : query.getEquijoinedColumns()) {
             Column column1 = join.getFirst();
@@ -133,10 +141,124 @@ public class DatabaseManager {
         }*/
     }
     
+    public void handleErrorWithTime(Query query) {
+        for (Pair<Column, Column> join : query.getEquijoinedColumns()) {
+            Column column1 = join.getFirst();
+            Column column2 = join.getSecond();
+            String joinQuery = constructJoinQuery(column1, column2);
+            try {
+                ResultSet results = sendQuery(joinQuery);
+                results.close();
+            } catch (SQLException error) {
+                Table table1 = Table.getInstance(column1.getTable().getName().toLowerCase());
+                Table table2 = Table.getInstance(column2.getTable().getName().toLowerCase());
+                
+                //find parent child relationship
+                Table parent = Table.findParentTable(table1, table2);
+                Table child;
+                if (parent.equals(table1)) {
+                    child = table2;
+                } else {
+                    child = table1;
+                }
+                
+                //find primary key
+                String primaryKey = null;
+    		    for (Column column : parent.getColumns()) {
+    		        if (column.isPrimary()) {
+    		            primaryKey = column.getName();
+    		            break;
+    		        }
+    		    }
+
+                // fetch both tables
+                String selectQuery1 = constructSelectQuery(child, query.getTableToColumns().get(child));
+                String selectQuery2 = constructSelectQuery(parent, query.getTableToColumns().get(parent));
+                try {
+                    ResultSet result1 = sendQuery(selectQuery1);
+                    // execute join
+                    System.out.println(table1.getName() + "X" + table2.getName() + " joined");
+                    Statement additionalStatement = connection.createStatement();
+                    ResultSet result2 = sendQuery(selectQuery2, additionalStatement);
+                    while (result1.next()) {
+                        int key1 = result1.getInt(primaryKey);
+                        while (result2.next()) {
+                            int key2 = result2.getInt(primaryKey);
+                            if (key1 == key2) {
+                                //match
+                                ;
+                            }
+                        }
+                        result2.first();
+                    }
+                    result1.close();
+                    result2.close();
+                    additionalStatement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        System.out.println();
+    }
+    
+    public double handleErrorWithCost(Query query, SQLException e) {
+        double totalCost = 0.0;
+        for (Pair<Column, Column> join : query.getEquijoinedColumns()) {
+            Column column1 = join.getFirst();
+            Column column2 = join.getSecond();
+            String joinQuery = constructJoinQuery(column1, column2);
+			double cost = 0.0;
+            try {
+                ResultSet results = sendQuery(joinQuery);
+                results.close();
+            } catch (SQLException error) {
+                Table table1 = Table.getInstance(column1.getTable().getName().toLowerCase());
+                Table table2 = Table.getInstance(column2.getTable().getName().toLowerCase());
+
+                // I/O's for fetching rows of both tables
+                cost = (double)table1.getSize() + (double)table2.getSize();
+                // I/O's for join, assume no index?
+                cost += (double)table1.getSize() * (double)table2.getSize();
+                System.out.println(table1.getName() + "X" + table2.getName() + " Cost: " + cost);
+            }
+			totalCost += cost;
+        }
+        System.out.println();
+        return totalCost;
+        /*String error = e.getMessage();
+        ArrayList<String> tables = extractBetweenDelimiters(error, "(.*?)", " 'APP\\.", "(\\[|')");
+        if (tables.size() == 2) {
+            // distributed join
+            Table table1 = Table.getInstance(tables.get(0).toLowerCase());
+            Table table2 = Table.getInstance(tables.get(1).toLowerCase());
+
+            // I/O's for fetching rows of both tables
+            long cost = (long)table1.getSize() + (long)table2.getSize();
+            // I/O's for join, assume no index?
+            cost += (long)table1.getSize() * (long)table2.getSize();
+            System.out.println(table1.getName() + "X" + table2.getName() + " Cost: " + cost);
+            return cost;
+        }*/
+    }
+    
     private String constructJoinQuery(Column column1, Column column2) {
         String query = "select * from " + column1.getTable() + " , " + column2.getTable() 
                 + " where " + column1.getTable() + "." + column1.getName() + " = "
                 + column2.getTable() + "." + column2.getName() + ";";
+        return query;
+    }
+    
+    private String constructSelectQuery(Table table, HashSet<Column> columns) {
+        String query = "select ";
+        int columnNum = 1;
+        for (Column column : columns) {
+            query += column.getName();
+            if (columnNum++ != columns.size()) {
+                query += ", ";
+            }
+        }
+        query += " from " + table.getName() + ";"; 
         return query;
     }
     

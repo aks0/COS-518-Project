@@ -1,5 +1,7 @@
 package materializedViews;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -20,17 +22,9 @@ public class Query {
                                             // query
     private Set<Column> whereColumns; // list of columns involved in where by
                                         // this query
+    private HashMap<Table, HashSet<Column>> tableToColumns;
     private ArrayList<Pair<Column, Column>> equijoinedColumns; // list of columns equi-joined by
                                             // this query
-
-    /**
-     * Default constructor
-     */
-    Query() {
-        referencedColumns = Util518.newHashSet();
-        whereColumns = Util518.newHashSet();
-        equijoinedColumns = Util518.newArrayList();
-    }
 
     /**
      * Construct an instance of Query based on a supplied SQL query String
@@ -42,6 +36,7 @@ public class Query {
         referencedColumns = Util518.newHashSet();
         whereColumns = Util518.newHashSet();
         equijoinedColumns = Util518.newArrayList();
+        tableToColumns = Util518.newHashMap();
         computeReferencedColumns(query);
     }
 
@@ -89,12 +84,21 @@ public class Query {
                 break;
             default:
                 Pair<String, String> namePair = splitNameString(line);
+                Table table = Table.getInstance(namePair.getFirst());
+                Column column = Column.getInstance(table.getName(), namePair.getSecond());
                 if (namePair.getSecond().equals("*")) {
-                    referencedColumns.addAll(Table.getInstance(namePair.getFirst()).getColumns());
+                    referencedColumns.addAll(table.getColumns());
                 } else {
-                    referencedColumns.add(Column.getInstance(namePair.getFirst(),
-                        namePair.getSecond()));
+                    referencedColumns.add(column);
                 }
+                HashSet<Column> columns;
+                if (tableToColumns.containsKey(table)) {
+                    columns = tableToColumns.get(table);
+                } else {
+                    columns = Util518.newHashSet();
+                    tableToColumns.put(table, columns);
+                }
+                columns.add(column);
                 break;
             }
         }
@@ -103,6 +107,10 @@ public class Query {
 
     public String getStatement() {
         return statement;
+    }
+    
+    public HashMap<Table, HashSet<Column>> getTableToColumns() {
+        return tableToColumns;
     }
     
     /**

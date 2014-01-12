@@ -25,9 +25,10 @@ public class DatabaseClient extends Thread {
             double distributedCost = 0;
             for (Query query : queries) {
                 try {
-                    dbManager.sendQuery(query);
+                    ResultSet results = dbManager.sendQuery(query);
+                    results.close();
                 } catch (SQLException e) {
-                    distributedCost += dbManager.handleError(query, e);
+                    distributedCost += dbManager.handleErrorWithCost(query);
                 }
             }
             System.out.println("Total Distributed Cost: " + distributedCost);
