@@ -63,7 +63,7 @@ public class DatabaseManager {
        // open connection
        connection = DriverManager.getConnection(URL, properties);
        // keep around a statement for interacting with the database with
-       statement = connection.createStatement();
+       statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 
     }
     
