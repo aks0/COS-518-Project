@@ -22,7 +22,7 @@ public class DatabaseClient extends Thread {
         DatabaseManager dbManager = null;
         try {
             dbManager = new DatabaseManager();
-            long distributedCost = 0;
+            double distributedCost = 0;
             for (Query query : queries) {
                 try {
                     dbManager.sendQuery(query);

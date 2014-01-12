@@ -11,6 +11,8 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import materializedViews.Column;
+import materializedViews.Pair;
 import materializedViews.Query;
 import materializedViews.Table;
 import materializedViews.Util518;
@@ -85,9 +87,36 @@ public class DatabaseManager {
         statement.executeQuery(query.getStatement()); 
     }
     
-    public long handleError(Query query, SQLException e) {
-        String error = e.getMessage();
-        ArrayList<String> tables = extractBetweenDelimiters(error, "(.*?)", "APP\\.", "\\[server groups");
+    /**
+     * @throws SQLException
+     */
+    public void sendQuery(String query) throws SQLException {
+        statement.executeQuery(query); 
+    }
+    
+    public double handleError(Query query, SQLException e) {
+        double cost = 0.0;
+        for (Pair<Column, Column> join : query.getEquijoinedColumns()) {
+            Column column1 = join.getFirst();
+            Column column2 = join.getSecond();
+            String joinQuery = constructJoinQuery(column1, column2);
+            try {
+                sendQuery(joinQuery);
+            } catch (SQLException error) {
+                Table table1 = Table.getInstance(column1.getTable().getName().toLowerCase());
+                Table table2 = Table.getInstance(column2.getTable().getName().toLowerCase());
+
+                // I/O's for fetching rows of both tables
+                cost = (double)table1.getSize() + (double)table2.getSize();
+                // I/O's for join, assume no index?
+                cost += (double)table1.getSize() * (double)table2.getSize();
+                System.out.println(table1.getName() + "X" + table2.getName() + " Cost: " + cost);
+            }
+        }
+        System.out.println();
+        return cost;
+        /*String error = e.getMessage();
+        ArrayList<String> tables = extractBetweenDelimiters(error, "(.*?)", " 'APP\\.", "(\\[|')");
         if (tables.size() == 2) {
             // distributed join
             Table table1 = Table.getInstance(tables.get(0).toLowerCase());
@@ -99,8 +128,14 @@ public class DatabaseManager {
             cost += (long)table1.getSize() * (long)table2.getSize();
             System.out.println(table1.getName() + "X" + table2.getName() + " Cost: " + cost);
             return cost;
-        }
-        return 0;
+        }*/
+    }
+    
+    private String constructJoinQuery(Column column1, Column column2) {
+        String query = "select * from " + column1.getTable() + " , " + column2.getTable() 
+                + " where " + column1.getTable() + "." + column1.getName() + " = "
+                + column2.getTable() + "." + column2.getName() + ";";
+        return query;
     }
     
     /**
@@ -121,7 +156,7 @@ public class DatabaseManager {
         // the group number of the extract is 1 plus the number of groups in start
         int groupNumOfExtract = matcher.groupCount() + 1;
         
-        pattern = Pattern.compile(start + "\\s*" + formatOfExtract  + "\\s*" + end);
+        pattern = Pattern.compile(start + formatOfExtract  + "\\s*" + end);
         matcher = pattern.matcher(content);
         while (matcher.find()) {
             // return what matches between the parentheses of pattern
