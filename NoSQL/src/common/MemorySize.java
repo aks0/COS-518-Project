@@ -37,7 +37,7 @@ public class MemorySize {
 	}
 	
 	public long getBytes() {
-		return (long)coefficient * size.getNumBytes();
+		return (long)(coefficient * size.getNumBytes());
 	}
 	
 	public String toString() {
