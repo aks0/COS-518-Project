@@ -1,9 +1,19 @@
-node0:/proj/astream561/tpcr/appendix/dbgen> ls -l *.tbl
--rw-r--r-- 1 aks0 astream561  23635 2014-01-09 23:11 customer.tbl
--rw-r--r-- 1 aks0 astream561 707286 2014-01-09 23:11 lineitem.tbl
--rw-r--r-- 1 aks0 astream561   2103 2014-01-09 23:11 nation.tbl
--rw-r--r-- 1 aks0 astream561 162716 2014-01-09 23:11 orders.tbl
--rw-r--r-- 1 aks0 astream561 113206 2014-01-09 23:11 partsupp.tbl
--rw-r--r-- 1 aks0 astream561  23477 2014-01-09 23:11 part.tbl
--rw-r--r-- 1 aks0 astream561    396 2014-01-09 23:11 region.tbl
--rw-r--r-- 1 aks0 astream561   1368 2014-01-09 23:11 supplier.tbl
+node4:/proj/astream561/tpcr/appendix/dbgen> ls -lh *.tbl
+-rw-r--r-- 1 aks0 astream561  24M 2014-01-11 17:40 customer.tbl
+-rw-r--r-- 1 aks0 astream561 725M 2014-01-11 17:40 lineitem.tbl
+-rw-r--r-- 1 aks0 astream561 2.1K 2014-01-11 17:40 nation.tbl
+-rw-r--r-- 1 aks0 astream561 164M 2014-01-11 17:40 orders.tbl
+-rw-r--r-- 1 aks0 astream561 114M 2014-01-11 17:40 partsupp.tbl
+-rw-r--r-- 1 aks0 astream561  24M 2014-01-11 17:40 part.tbl
+-rw-r--r-- 1 aks0 astream561  396 2014-01-11 17:40 region.tbl
+-rw-r--r-- 1 aks0 astream561 1.4M 2014-01-11 17:40 supplier.tbl
+
+node4:/proj/astream561/tpcr/appendix/dbgen> ls -l *.tbl
+-rw-r--r-- 1 aks0 astream561  24357279 2014-01-11 17:40 customer.tbl
+-rw-r--r-- 1 aks0 astream561 759861366 2014-01-11 17:40 lineitem.tbl
+-rw-r--r-- 1 aks0 astream561      2103 2014-01-11 17:40 nation.tbl
+-rw-r--r-- 1 aks0 astream561 171915496 2014-01-11 17:40 orders.tbl
+-rw-r--r-- 1 aks0 astream561 118812986 2014-01-11 17:40 partsupp.tbl
+-rw-r--r-- 1 aks0 astream561  24207151 2014-01-11 17:40 part.tbl
+-rw-r--r-- 1 aks0 astream561       396 2014-01-11 17:40 region.tbl
+-rw-r--r-- 1 aks0 astream561   1408798 2014-01-11 17:40 supplier.tbl
