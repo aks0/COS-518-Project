@@ -1,3 +1,4 @@
+
 -- @(#)5.sql	2.1.8.1
 -- TPC-H/TPC-R Local Supplier Volume Query (Q5)
 -- Functional Query Definition
@@ -6,7 +7,8 @@
 :o
 select
 	n.name,
-	sum(l.extendedprice * (1 - l.discount)) as revenue
+	l.extendedprice,
+	l.discount
 from
 	customer c,
 	orders o,
@@ -20,11 +22,5 @@ where
 	and l.suppkey = s.suppkey
 	and c.nationkey = s.nationkey
 	and s.nationkey = n.nationkey
-	and n.regionkey = r.regionkey
-	and r.name = ':1'
-	and o.orderdate >= ':2'
-group by
-	n.name
-order by
-	revenue desc;
+	and n.regionkey = r.regionkey;
 :n -1

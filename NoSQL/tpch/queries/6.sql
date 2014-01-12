@@ -5,11 +5,8 @@
 :x
 :o
 select
-	sum(l.extendedprice * l.discount) as revenue
+	l.extendedprice,
+	l.discount
 from
-	lineitem l
-where
-	l.shipdate >= ':1'
-	and l.discount between :2 - 0.01 and :2 + 0.01
-	and l.quantity < :3;
+	lineitem l;
 :n -1

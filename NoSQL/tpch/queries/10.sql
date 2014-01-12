@@ -22,7 +22,5 @@ from
 where
 	c.custkey = o.custkey
 	and l.orderkey = o.orderkey
-	and o.orderdate >= ':1'
-	and l.returnflag = 'R'
 	and c.nationkey = n.nationkey;
 :n 20

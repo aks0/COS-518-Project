@@ -24,6 +24,5 @@ where
     and ps.partkey = l.partkey
     and p.partkey = l.partkey
     and o.orderkey = l.orderkey
-    and s.nationkey = n.nationkey
-    and p.name like '%:1%';
+    and s.nationkey = n.nationkey;
 :n -1

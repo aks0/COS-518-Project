@@ -24,8 +24,5 @@ where
     and l.orderkey = o.orderkey
     and o.custkey = c.custkey
     and c.nationkey = n1.nationkey
-    and n1.regionkey = r.regionkey
-    and r.name = ':2'
-    and s.nationkey = n2.nationkey
-    and p.type = ':3';
+    and n1.regionkey = r.regionkey;
 :n -1

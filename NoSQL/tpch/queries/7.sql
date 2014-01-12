@@ -22,9 +22,5 @@ where
     and o.orderkey = l.orderkey
     and c.custkey = o.custkey
     and s.nationkey = n1.nationkey
-    and c.nationkey = n2.nationkey
-    and (
-        (n1.name = ':1' and n2.name = ':2')
-        or (n1.name = ':2' and n2.name = ':1')
-    );
+    and c.nationkey = n2.nationkey;
 :n -1

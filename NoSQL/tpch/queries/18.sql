@@ -10,21 +10,12 @@ select
 	o.orderkey,
 	o.orderdate,
 	o.totalprice,
-	sum(l.quantity)
+	l.quantity
 from
 	customer c,
 	orders o,
 	lineitem l
 where
-    c.custkey = o.custkey
-	and o.orderkey = l.orderkey
-group by
-	c.name,
-	c.custkey,
-	o.orderkey,
-	o.orderdate,
-	o.totalprice
-order by
-	o.totalprice desc,
-	o.orderdate;
+	c.custkey = o.custkey
+	and o.orderkey = l.orderkey;
 :n 100

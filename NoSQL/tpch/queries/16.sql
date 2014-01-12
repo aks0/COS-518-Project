@@ -8,22 +8,10 @@ select
 	p.brand,
 	p.type,
 	p.size,
-	count(distinct ps.suppkey) as supplier_cnt
+	ps.suppkey
 from
 	partsupp ps,
 	part p
 where
-	p.partkey = ps.partkey
-	and p.brand <> ':1'
-	and p.type not like ':2%'
-	and p.size in (:3, :4, :5, :6, :7, :8, :9, :10)
-group by
-	p.brand,
-	p.type,
-	p.size
-order by
-	supplier_cnt desc,
-	p.brand,
-	p.type,
-	p.size;
+	p.partkey = ps.partkey;
 :n -1

@@ -5,16 +5,12 @@
 :x
 :o
 select
-	sum(case
-		when p.type like 'PROMO%'
-			then l.extendedprice * (1 - l.discount)
-		else 0
-	end) as promo_revenue,
-	sum(l.extendedprice * (1 - l.discount))
+	p.type,
+	l.extendedprice,
+	l.discount
 from
 	lineitem l,
 	part p
 where
-	l.partkey = p.partkey
-	and l.shipdate >= ':1'
+	l.partkey = p.partkey;
 :n -1

@@ -11,8 +11,5 @@ from
 	supplier s,
 	nation n
 where
-    s.nationkey = n.nationkey
-	and n.name = ':3'
-order by
-	s.name;
+    s.nationkey = n.nationkey;
 :n -1

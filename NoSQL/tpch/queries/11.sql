@@ -14,6 +14,5 @@ from
 	nation n
 where
 	ps.suppkey = s.suppkey
-	and s.nationkey = n.nationkey
-	and n.name = ':1';
+	and s.nationkey = n.nationkey;
 :n -1

@@ -5,8 +5,7 @@
 :x
 :o
 select
-	s.name,
-    count(*)
+	s.name
 from
 	supplier s,
 	lineitem l1,
@@ -14,13 +13,5 @@ from
 	nation n
 where
 	s.suppkey = l1.suppkey
-	and o.orderkey = l1.orderkey
-	and o.orderstatus = 'F'
-	and l1.receiptdate > l1.commitdate
-	and s.nationkey = n.nationkey
-	and n.name = ':1'
-group by
-	s.name
-order by
-	s.name;
+	and o.orderkey = l1.orderkey;
 :n 100

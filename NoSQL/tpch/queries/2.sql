@@ -21,15 +21,5 @@ from
 	region r
 where
 	p.partkey = ps.partkey
-	and s.suppkey = ps.suppkey
-	and p.size = :1
-	and p.type like '%:2'
-	and s.nationkey = n.nationkey
-	and n.regionkey = r.regionkey
-	and r.name = ':3'
-order by
-	s.acctbal desc,
-	n.name,
-	s.name,
-	p.partkey;
+	and s.suppkey = ps.suppkey;
 :n 100
