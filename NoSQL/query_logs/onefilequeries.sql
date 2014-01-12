@@ -43,7 +43,7 @@ from
 	lineitem l
 where
 	c.custkey = o.custkey
-	l.orderkey = o.orderkey;
+	and l.orderkey = o.orderkey;
 
 
 select
