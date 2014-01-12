@@ -30,7 +30,7 @@ public class TableColocator {
         
         // decide colocation via partitioning
         TableGraph2 graph = GraphBuilder.build(tables, queries);
-        HashMap<Table, EntityGroup> entityMap = graph.produceEntityGroups(2);
+        HashMap<Table, EntityGroup> entityMap = graph.produceEntityGroups(3);
         
         // Get replication candidates
         ArrayList<Table> replicationCandidates = Util518.newArrayList();
@@ -56,7 +56,7 @@ public class TableColocator {
         System.out.println("\n----------------------\n");
         
         // Get Best candidates for replication
-        ArrayList<Pair<Table, ServerGroup>> pairs = graph.getHighestReplicationScorePairs(3, replicationCandidates, serverGroups);
+        ArrayList<Pair<Table, ServerGroup>> pairs = graph.getHighestReplicationScorePairs(6, replicationCandidates, serverGroups);
     
         // For each pair, decide how many servers to add in light of adding the replicated table
         for (Pair<Table, ServerGroup> pair : pairs) {

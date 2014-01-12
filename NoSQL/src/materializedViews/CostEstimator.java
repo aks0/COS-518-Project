@@ -197,7 +197,7 @@ public class CostEstimator {
 		        cost += NOT_IN_SUBSET_PENALTY
 		                * childTable.getSize()
 		                * tablesToQueryColumnsNotInSubset.get(distributedTable).size();
-		        cost += IN_SUBSET_PENALTY
+		        cost += NOT_IN_SUBSET_PENALTY
 		                * childTable.getSize()
 		                * tablesToQueryColumnsInSubset.get(localTable).size();
 		    }

@@ -178,7 +178,7 @@ public class DatabaseManager {
                     ResultSet result1 = sendQuery(selectQuery1);
                     // execute join
                     System.out.println(table1.getName() + "X" + table2.getName() + " joined");
-                    Statement additionalStatement = connection.createStatement();
+                    Statement additionalStatement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet result2 = sendQuery(selectQuery2, additionalStatement);
                     while (result1.next()) {
                         int key1 = result1.getInt(primaryKey);
@@ -189,7 +189,7 @@ public class DatabaseManager {
                                 ;
                             }
                         }
-                        result2.first();
+                        result2.beforeFirst();
                     }
                     result1.close();
                     result2.close();
@@ -200,46 +200,6 @@ public class DatabaseManager {
             }
         }
         System.out.println();
-    }
-    
-    public double handleErrorWithCost(Query query, SQLException e) {
-        double totalCost = 0.0;
-        for (Pair<Column, Column> join : query.getEquijoinedColumns()) {
-            Column column1 = join.getFirst();
-            Column column2 = join.getSecond();
-            String joinQuery = constructJoinQuery(column1, column2);
-			double cost = 0.0;
-            try {
-                ResultSet results = sendQuery(joinQuery);
-                results.close();
-            } catch (SQLException error) {
-                Table table1 = Table.getInstance(column1.getTable().getName().toLowerCase());
-                Table table2 = Table.getInstance(column2.getTable().getName().toLowerCase());
-
-                // I/O's for fetching rows of both tables
-                cost = (double)table1.getSize() + (double)table2.getSize();
-                // I/O's for join, assume no index?
-                cost += (double)table1.getSize() * (double)table2.getSize();
-                System.out.println(table1.getName() + "X" + table2.getName() + " Cost: " + cost);
-            }
-			totalCost += cost;
-        }
-        System.out.println();
-        return totalCost;
-        /*String error = e.getMessage();
-        ArrayList<String> tables = extractBetweenDelimiters(error, "(.*?)", " 'APP\\.", "(\\[|')");
-        if (tables.size() == 2) {
-            // distributed join
-            Table table1 = Table.getInstance(tables.get(0).toLowerCase());
-            Table table2 = Table.getInstance(tables.get(1).toLowerCase());
-
-            // I/O's for fetching rows of both tables
-            long cost = (long)table1.getSize() + (long)table2.getSize();
-            // I/O's for join, assume no index?
-            cost += (long)table1.getSize() * (long)table2.getSize();
-            System.out.println(table1.getName() + "X" + table2.getName() + " Cost: " + cost);
-            return cost;
-        }*/
     }
     
     private String constructJoinQuery(Column column1, Column column2) {
@@ -291,6 +251,10 @@ public class DatabaseManager {
 
     
     public static void main(String[] args) {
-        new DatabaseClient().run();
+        if (args.length == 0) {
+            System.out.println("Must supply 1 or 2");
+        } else {
+            new DatabaseClient().run(Integer.parseInt(args[0]));
+        }
     }
 }
