@@ -80,7 +80,7 @@ class TableNode {
     		benefit += totalNormalizedCost - edge.getCost(totalNormalizedCost);
     	}
     	
-    	//benefit += table.getSize();
+    	benefit += table.getSize();
     	return benefit;
     }
     
