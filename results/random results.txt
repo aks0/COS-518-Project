@@ -1,0 +1,54 @@
+random 1:
+Our tool
+Total Distributed Cost: 6.6006611E11
+Degree
+Total Distributed Cost: 1.0849562640175E13
+Size
+Total Distributed Cost: 1.6384968832E14
+
+random 2:
+Out tool
+Total Distributed Cost: 3.84000904E13
+Degree
+Total Distributed Cost: 3.84590995103E13
+Size
+Total Distributed Cost: 2.0045923139E14
+
+random 3:
+Our tool
+Total Distributed Cost: 1.98000873E13
+Degree
+Total Distributed Cost: 3.00495911403E13
+Size
+Total Distributed Cost: 1.5604969302E14
+
+random 4:
+Our tool
+Total Distributed Cost: 3.96000966E13
+Degree
+Total Distributed Cost: 3.9633602860275E13
+Size
+Total Distributed Cost: 2.1963375E14
+
+random 5:
+Our tool
+Total Distributed Cost: 1.98000873E13
+Degree
+Total Distributed Cost: 3.24491035303E13
+Size
+Total Distributed Cost: 1.9444923541E14
+
+Our total
+1.1826043e+14
+Our average
+2.3652086e+13
+
+Degree total
+1.5144096e+14
+Degree average
+3.0288192e+13
+
+Size total
+9.344416e+14
+Size average
+1.8688832e+14

@@ -162,10 +162,8 @@ public class DatabaseManager {
                 System.out.println(table1.getName() + "X" + table2.getName() + " joined");
                 
                 // fetch both tables
-                String selectQuery1 = constructSelectQuery(table1, column1, query.getTableToColumns().get(table1));
-                System.out.println(selectQuery1);
-                String selectQuery2 = constructSelectQuery(table2, column2, query.getTableToColumns().get(table2));
-                System.out.println(selectQuery2);
+                String selectQuery1 = constructSelectQuery(table1, query.getTableToColumns().get(table1));
+                String selectQuery2 = constructSelectQuery(table2, query.getTableToColumns().get(table2));
                 
                 try{
                     CachedRowSet tableResult1 = new CachedRowSetImpl();
@@ -231,14 +229,14 @@ public class DatabaseManager {
         return query;
     }
     
-    private String constructSelectQuery(Table table, Column requiredColumn, HashSet<Column> columns) {
-        String query = "select " + requiredColumn.getName();
+    private String constructSelectQuery(Table table, HashSet<Column> columns) {
+        String query = "select ";
         int columnNum = 1;
         for (Column column : columns) {
+            query += column.getName();
             if (columnNum++ != columns.size()) {
                 query += ", ";
             }
-            query += column.getName();
         }
         query += " from " + table.getName() + ";"; 
         return query;
