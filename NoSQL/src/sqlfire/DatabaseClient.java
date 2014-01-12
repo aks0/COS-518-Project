@@ -42,7 +42,7 @@ public class DatabaseClient extends Thread {
                 System.out.println("Total Distributed Cost: " + distributedCost);
             } else if (mode == TIME_MODE) {
                 long endTime = System.nanoTime();
-                System.out.println("Total execution time: " + (endTime - startTime) * 1000000L );
+                System.out.println("Total execution time: " + (endTime - startTime) / 1000000000L );
             }
         } catch(SQLException e) {
             e.printStackTrace();

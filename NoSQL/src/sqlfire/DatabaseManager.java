@@ -152,38 +152,20 @@ public class DatabaseManager {
             } catch (SQLException error) {
                 Table table1 = Table.getInstance(column1.getTable().getName().toLowerCase());
                 Table table2 = Table.getInstance(column2.getTable().getName().toLowerCase());
+				System.out.println(table1.getName() + "X" + table2.getName() + " joined");
                 
-                //find parent child relationship
-                Table parent = Table.findParentTable(table1, table2);
-                Table child;
-                if (parent.equals(table1)) {
-                    child = table2;
-                } else {
-                    child = table1;
-                }
-                
-                //find primary key
-                String primaryKey = null;
-    		    for (Column column : parent.getColumns()) {
-    		        if (column.isPrimary()) {
-    		            primaryKey = column.getName();
-    		            break;
-    		        }
-    		    }
-
                 // fetch both tables
-                String selectQuery1 = constructSelectQuery(child, query.getTableToColumns().get(child));
-                String selectQuery2 = constructSelectQuery(parent, query.getTableToColumns().get(parent));
+                String selectQuery1 = constructSelectQuery(table1, query.getTableToColumns().get(table1));
+                String selectQuery2 = constructSelectQuery(table2, query.getTableToColumns().get(table2));
                 try {
                     ResultSet result1 = sendQuery(selectQuery1);
                     // execute join
-                    System.out.println(table1.getName() + "X" + table2.getName() + " joined");
-                    Statement additionalStatement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    Statement additionalStatement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
                     ResultSet result2 = sendQuery(selectQuery2, additionalStatement);
                     while (result1.next()) {
-                        int key1 = result1.getInt(primaryKey);
+                        int key1 = result1.getInt(column1.getName());
                         while (result2.next()) {
-                            int key2 = result2.getInt(primaryKey);
+                            int key2 = result2.getInt(column2.getName());
                             if (key1 == key2) {
                                 //match
                                 ;
