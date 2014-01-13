@@ -7,7 +7,7 @@ Size
 Total Distributed Cost: 1.6384968832E14
 
 random 2:
-Out tool
+Our tool
 Total Distributed Cost: 9.6000496E12
 Degree
 Total Distributed Cost: 3.84590995103E13
