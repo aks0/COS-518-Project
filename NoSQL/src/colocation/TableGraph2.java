@@ -271,12 +271,14 @@ public class TableGraph2 {
 				
 		while (count < k) {
 			TableNode node = getHighestPartitionScore();
+			
+			// Don't add as center if benefit is all based on size
+			if (!entityMap.containsKey(node.getTable()) && node.getPartitionBenefit(totalNormalizedCost) > node.getTable().getSize())
+				entityMap.put(node.getTable(), new EntityGroup(node.getTable()));
+		
 			for (Edge edge : node.getOutEdges()) {
 				edge.getTable().setClaimed(true);
 			}
-			
-			if (!entityMap.containsKey(node.getTable()) && node.getPartitionBenefit(totalNormalizedCost) > node.getTable().getSize())
-				entityMap.put(node.getTable(), new EntityGroup(node.getTable()));
 			
 			count++;
 		}
