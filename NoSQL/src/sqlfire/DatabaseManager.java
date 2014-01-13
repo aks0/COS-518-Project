@@ -12,15 +12,12 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.JoinRowSet;
 import javax.sql.rowset.Joinable;
 
 import com.sun.rowset.CachedRowSetImpl;
-import com.sun.rowset.JdbcRowSetImpl;
 import com.sun.rowset.JoinRowSetImpl;
-import com.sun.rowset.RowSetFactoryImpl;
 
 import materializedViews.Column;
 import materializedViews.Pair;
@@ -169,34 +166,29 @@ public class DatabaseManager {
                 String selectQuery2 = constructSelectQuery(table2, query.getTableToColumns().get(table2));
                 
                 try{
-                    /*
-                    RowSet tableResult1 = new JdbcRowSetImpl();
+                    CachedRowSet tableResult1 = new CachedRowSetImpl();
                     tableResult1.setUrl(URL); 
                     tableResult1.setCommand(selectQuery1);
                     tableResult1.execute();
     
-                    RowSet tableResult2 = new JdbcRowSetImpl();
+                    CachedRowSet tableResult2 = new CachedRowSetImpl();
                     tableResult2.setUrl(URL); 
                     tableResult2.setCommand(selectQuery2);
-                    tableResult2.execute();*/
-                    Statement additionalStatement1 = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                    ResultSet result1 = sendQuery(selectQuery2, additionalStatement1);
+                    tableResult2.execute();
                     
-                    Statement additionalStatement2 = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                    ResultSet result2 = sendQuery(selectQuery2, additionalStatement2);
                     JoinRowSet joinResults = new JoinRowSetImpl();
-                    ((Joinable)result1).setMatchColumn(column1.getName());
-                    ((Joinable)result2).setMatchColumn(column2.getName());
-                    joinResults.addRowSet((Joinable) result1);            
-                    joinResults.addRowSet((Joinable) result2);
+                    ((Joinable)tableResult1).setMatchColumn(column1.getName());
+                    ((Joinable)tableResult2).setMatchColumn(column2.getName());
+                    joinResults.addRowSet(tableResult1);            
+                    joinResults.addRowSet(tableResult2);
                     
                     // display records in JoinRowSet object
                     while (joinResults.next()) {
                         // match
                         ;
                     }
-                    result1.close();
-                    result2.close();
+                    tableResult1.close();
+                    tableResult2.close();
                     joinResults.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
