@@ -275,7 +275,7 @@ public class TableGraph2 {
 				edge.getTable().setClaimed(true);
 			}
 			
-			if (!entityMap.containsKey(node.getTable()))
+			if (!entityMap.containsKey(node.getTable()) && node.getPartitionBenefit(totalNormalizedCost) > node.getTable().getSize())
 				entityMap.put(node.getTable(), new EntityGroup(node.getTable()));
 			
 			count++;
