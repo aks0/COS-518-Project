@@ -19,7 +19,7 @@ public class DatabaseClient extends Thread {
     public void run(int mode) {
         List<Table> tables = Table
                 .getTablesFromModel("data_models/tpc-h.model");
-        ArrayList<Query> queries = QueryLib.getQueryList("query_logs/onefilequeries.sql");
+        ArrayList<Query> queries = QueryLib.getQueryList("query_logs/queries-degree-non-modified.sql");
         DatabaseManager dbManager = null;
         try {
             dbManager = new DatabaseManager();

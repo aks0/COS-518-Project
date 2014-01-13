@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 public class CostEstimator {
-	public static double IN_SUBSET_PENALTY = 0.00000000000000001;
+	public static double IN_SUBSET_PENALTY = 0.0;
 	public static double NOT_IN_SUBSET_PENALTY = 1.0;
 	public static double FINAL_JOIN_PENALTY = 1.0;
 
@@ -180,9 +180,9 @@ public class CostEstimator {
                     && tablesNotInSubset.contains(childTable)) {
 		        // join is completely distributed
 	            cost += NOT_IN_SUBSET_PENALTY
-	                      * childTable.getSize() 
-	                      * (tablesToQueryColumnsNotInSubset.get(childTable).size()
-	                              * tablesToQueryColumnsNotInSubset.get(parentTable).size());
+	                      * (childTable.getSize() + parentTable.getSize() + childTable.getSize() * parentTable.getSize()); 
+	                      //* (tablesToQueryColumnsNotInSubset.get(childTable).size()
+	                        //      + tablesToQueryColumnsNotInSubset.get(parentTable).size());
 		    } else {
 		        // fetch is partly distributed
 		        Table distributedTable;
@@ -195,11 +195,11 @@ public class CostEstimator {
 		            distributedTable = childTable;
 		        }
 		        cost += NOT_IN_SUBSET_PENALTY
-		                * childTable.getSize()
-		                * tablesToQueryColumnsNotInSubset.get(distributedTable).size();
+		                * (childTable.getSize() + parentTable.getSize() + childTable.getSize() * parentTable.getSize()); 
+		        /*        * tablesToQueryColumnsNotInSubset.get(distributedTable).size();
 		        cost += NOT_IN_SUBSET_PENALTY
 		                * childTable.getSize()
-		                * tablesToQueryColumnsInSubset.get(localTable).size();
+		                * tablesToQueryColumnsInSubset.get(localTable).size();*/
 		    }
 		}
 		
