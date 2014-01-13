@@ -12,12 +12,15 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.JoinRowSet;
 import javax.sql.rowset.Joinable;
 
 import com.sun.rowset.CachedRowSetImpl;
+import com.sun.rowset.JdbcRowSetImpl;
 import com.sun.rowset.JoinRowSetImpl;
+import com.sun.rowset.RowSetFactoryImpl;
 
 import materializedViews.Column;
 import materializedViews.Pair;
@@ -166,12 +169,12 @@ public class DatabaseManager {
                 String selectQuery2 = constructSelectQuery(table2, query.getTableToColumns().get(table2));
                 
                 try{
-                    CachedRowSet tableResult1 = new CachedRowSetImpl();
+                    RowSet tableResult1 = new JdbcRowSetImpl();
                     tableResult1.setUrl(URL); 
                     tableResult1.setCommand(selectQuery1);
                     tableResult1.execute();
     
-                    CachedRowSet tableResult2 = new CachedRowSetImpl();
+                    RowSet tableResult2 = new JdbcRowSetImpl();
                     tableResult2.setUrl(URL); 
                     tableResult2.setCommand(selectQuery2);
                     tableResult2.execute();
@@ -179,8 +182,8 @@ public class DatabaseManager {
                     JoinRowSet joinResults = new JoinRowSetImpl();
                     ((Joinable)tableResult1).setMatchColumn(column1.getName());
                     ((Joinable)tableResult2).setMatchColumn(column2.getName());
-                    joinResults.addRowSet(tableResult1);            
-                    joinResults.addRowSet(tableResult2);
+                    joinResults.addRowSet((Joinable) tableResult1);            
+                    joinResults.addRowSet((Joinable) tableResult2);
                     
                     // display records in JoinRowSet object
                     while (joinResults.next()) {
