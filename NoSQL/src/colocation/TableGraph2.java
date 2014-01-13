@@ -359,6 +359,10 @@ public class TableGraph2 {
 	 */
 	public ArrayList<Pair<Table, ServerGroup>> getHighestReplicationScorePairs(int k, 
 	        ArrayList<Table> tables, ArrayList<ServerGroup> groups) {
+	    
+	    if (tables.size() == 0)
+	        return new ArrayList<Pair<Table, ServerGroup>>();
+	    
 		// Sort nodes by adding to treeMap
         Comparator<Pair<Table, ServerGroup>> comparator = new ReplicationValueComparator(tableToNode, totalNormalizedCost);
 		PriorityQueue<Pair<Table, ServerGroup>> pqueue = 

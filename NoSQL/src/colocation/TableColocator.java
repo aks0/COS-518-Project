@@ -56,7 +56,7 @@ public class TableColocator {
         System.out.println("\n----------------------\n");
         
         // Get Best candidates for replication
-        ArrayList<Pair<Table, ServerGroup>> pairs = graph.getHighestReplicationScorePairs(6, replicationCandidates, serverGroups);
+        ArrayList<Pair<Table, ServerGroup>> pairs = graph.getHighestReplicationScorePairs(3, replicationCandidates, serverGroups);
     
         // For each pair, decide how many servers to add in light of adding the replicated table
         for (Pair<Table, ServerGroup> pair : pairs) {
@@ -113,7 +113,7 @@ public class TableColocator {
     
     public static void main(String[] args) {
     	ArrayList<Table> tables = Table.getTablesFromModel("./data_models/tpc-h.model");
-		ArrayList<Query> queryList = QueryLib.getQueryList("./query_logs/queries_random5.sql");
+		ArrayList<Query> queryList = QueryLib.getQueryList("./query_logs/queries-degree.sql");
 		
 		colocate(tables, queryList, new MemorySize(0.5, Size.GB), 3);
     }

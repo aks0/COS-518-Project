@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 public class CostEstimator {
-	public static double IN_SUBSET_PENALTY = 0.0000001;
+	public static double IN_SUBSET_PENALTY = 0.00000000000000001;
 	public static double NOT_IN_SUBSET_PENALTY = 1.0;
 	public static double FINAL_JOIN_PENALTY = 1.0;
 
@@ -182,7 +182,7 @@ public class CostEstimator {
 	            cost += NOT_IN_SUBSET_PENALTY
 	                      * childTable.getSize() 
 	                      * (tablesToQueryColumnsNotInSubset.get(childTable).size()
-	                              + tablesToQueryColumnsNotInSubset.get(parentTable).size());
+	                              * tablesToQueryColumnsNotInSubset.get(parentTable).size());
 		    } else {
 		        // fetch is partly distributed
 		        Table distributedTable;
