@@ -30,9 +30,21 @@ public class TableColocator {
         
         // decide colocation via partitioning
         TableGraph2 graph = GraphBuilder.build(tables, queries);
-        HashMap<Table, EntityGroup> entityMap = graph.produceEntityGroups(2);
+        HashMap<Table, EntityGroup> entityMap = graph.produceEntityGroups(3);
         
-        // Get replication candidates
+        // Get upgrade to replication candidates
+        ArrayList<Table> upgradeCandidates = Util518.newArrayList();
+        for (Table entityCenter : entityMap.keySet()) {
+            if (!entityMap.get(entityCenter).onlyContainsCenter()) {
+                for (Table entity : entityMap.get(entityCenter)) {
+                    if (!entity.equals(entityCenter)) {
+                        upgradeCandidates.add(entity);
+                    }
+                }
+            }
+        }
+        
+        
         ArrayList<Table> replicationCandidates = Util518.newArrayList();
         for (Table entityCenter : entityMap.keySet()) {
             if (entityMap.get(entityCenter).onlyContainsCenter()) {
@@ -55,18 +67,45 @@ public class TableColocator {
         
         System.out.println("\n----------------------\n");
         
-        // Get Best candidates for replication
-        ArrayList<Pair<Table, ServerGroup>> pairs = graph.getHighestReplicationScorePairs(6, replicationCandidates, serverGroups);
+        // Get Best candidates for upgrading to replication
+        ArrayList<Pair<Table, ServerGroup>> pairs = graph.getHighestReplicationScorePairs(3, upgradeCandidates, serverGroups);
     
         // For each pair, decide how many servers to add in light of adding the replicated table
         for (Pair<Table, ServerGroup> pair : pairs) {
         	Table replicatedTable = pair.getFirst();
         	ServerGroup group = pair.getSecond();
         	
-        	System.out.println("Replicated table: " + replicatedTable.getName());
-        	group.addReplicatedTable(replicatedTable, 0, maxServers);
-        	System.out.println("Replicate to: " + group.toString());
+        	boolean upgraded = group.addReplicatedTable(replicatedTable, 0, maxServers);
+        	if (upgraded) {
+            	System.out.println("Upgraded replicated table: " + replicatedTable.getName());
+            	for (ServerGroup serverGroup : serverGroups) {
+            	    for (EntityGroup entityGroup : serverGroup.getEntityGroups()) {
+                        if (entityGroup.containsEntity(replicatedTable)) {
+                            entityGroup.removeEntity(replicatedTable);
+                            if (!serverGroup.equals(group)) {
+                                serverGroup.addReplicatedTable(replicatedTable, 0, maxServers);
+                            }
+                        }
+            	    }
+            	}
+            	System.out.println("Replicate to: " + group.toString());
+        	}
         }
+        
+        System.out.println("\n----------------------\n");
+        // Get Best candidates for replication
+        pairs = graph.getHighestReplicationScorePairs(7, replicationCandidates, serverGroups);
+    
+        // For each pair, decide how many servers to add in light of adding the replicated table
+        for (Pair<Table, ServerGroup> pair : pairs) {
+            Table replicatedTable = pair.getFirst();
+            ServerGroup group = pair.getSecond();
+            
+            System.out.println("Replicated table: " + replicatedTable.getName());
+            group.addReplicatedTable(replicatedTable, 0, maxServers);
+            System.out.println("Replicate to: " + group.toString());
+        }
+        
         
         System.out.println("-----------------");
         System.out.println("Printing final server groups");
@@ -113,7 +152,7 @@ public class TableColocator {
     
     public static void main(String[] args) {
     	ArrayList<Table> tables = Table.getTablesFromModel("./data_models/tpc-h.model");
-		ArrayList<Query> queryList = QueryLib.getQueryList("./query_logs/queries-degree-non-modified.sql");
+		ArrayList<Query> queryList = QueryLib.getQueryList("./query_logs/queries_random1.sql");
 		
 		colocate(tables, queryList, new MemorySize(0.5, Size.GB), 3);
     }

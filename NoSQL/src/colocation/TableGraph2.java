@@ -30,6 +30,10 @@ class Edge {
         return table;
     }
     
+    public double getCost() {
+    		return cost;
+    }
+    
     public double getCost(double normCost) {
     	if (!table.getClaimed())
     		return cost;
@@ -98,28 +102,28 @@ class TableNode {
     public double getReplicationBenefit(ServerGroup serverGroup, HashMap<Table, TableNode> tableToNode, double totalNormalizedCost) {
         double benefit = 0;
         
-        
-        EntityGroup group = serverGroup.getEntityGroup(0);
-        
-        // If group already contains table, no benefit in replicating it
-        if (group.contains(this.getTable()))
-        	return 0;
-        
-        // See if any joins exist from entity group to replicated table candidate
-        for (Edge edge : outEdges) {
-        	//System.out.println("Edge: " + edge.getTable().getName());
-            if (group.contains(edge.getTable())) {
-                benefit += totalNormalizedCost - edge.getCost(totalNormalizedCost);
-            }
-        }
-        
-        // See if any joins exist from replicated table candidate to table in entity group
-        for (Table entityTable : group.getEntities()) {
-        	TableNode node = tableToNode.get(entityTable);
-        	for (Edge edge : node.outEdges) {
+        for (EntityGroup group : serverGroup.getEntityGroups()) {
+            
+            // See if any joins exist from table to entity group
+            for (Edge edge : outEdges) {
             	//System.out.println("Edge: " + edge.getTable().getName());
-                if (edge.getTable().equals(this.table)) {
-                    benefit += totalNormalizedCost - edge.getCost(totalNormalizedCost);
+                if (group.contains(edge.getTable())) {
+                    benefit += totalNormalizedCost - edge.getCost();
+                }
+            }
+            
+            // See if any joins exist from entity group to table
+            for (Table entityTable : group.getEntities()) {
+                // If group already contains table, no additional benefit from parent to replicated table 
+                if (group.contains(this.getTable()) && entityTable.equals(group.getCenter())) {
+                    continue;
+                }
+            	TableNode node = tableToNode.get(entityTable);
+            	for (Edge edge : node.outEdges) {
+                	//System.out.println("Edge: " + edge.getTable().getName());
+                    if (edge.getTable().equals(this.table)) {
+                        benefit += totalNormalizedCost - edge.getCost();
+                    }
                 }
             }
         }
@@ -360,7 +364,7 @@ public class TableGraph2 {
 	public ArrayList<Pair<Table, ServerGroup>> getHighestReplicationScorePairs(int k, 
 	        ArrayList<Table> tables, ArrayList<ServerGroup> groups) {
 	    
-	    if (tables.size() == 0)
+	    if (tables.size() == 0 || k == 0)
 	        return new ArrayList<Pair<Table, ServerGroup>>();
 	    
 		// Sort nodes by adding to treeMap

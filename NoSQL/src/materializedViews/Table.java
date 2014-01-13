@@ -56,7 +56,7 @@ public class Table {
 	public static int getTotalNumRows() {
 	    return totalNumRows;
 	}
-
+	
 	/**
 	 * Use the factory method {@link Table#getInstance} to get a Table instance.
 	 * Ensures uniqueness of Table instances.

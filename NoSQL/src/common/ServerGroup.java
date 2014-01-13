@@ -74,11 +74,11 @@ public class ServerGroup {
 	 * 
 	 * @param table
 	 */
-	public void addReplicatedTable(Table table, int index, int maxServers) {
+	public boolean addReplicatedTable(Table table, int index, int maxServers) {
 		EntityGroup partitionedEntityGroup = partitionedEntityGroups.get(index);
 		boolean success = partitionedEntityGroup.addReplicatedTable(table);
 		if (!success)
-			return;
+			return false;
 		
 		// Keep adding servers till replicated table will fit in memory at each node
 		System.out.println("Avg: " + partitionedEntityGroup.getPartitionedSize(servers.size()));
@@ -91,9 +91,9 @@ public class ServerGroup {
 			// Sometimes not possible to add replicated table because not enough size
 			// Try adding servers and if you go past max, then that means replicated table cannot be added
 			if (servers.size() > maxServers) {
-				servers = servers.subList(0, originalSize - 1);
+				servers = servers.subList(0, originalSize);
 				partitionedEntityGroup.removeReplicatedTable(table);
-				return;
+				return false;
 			}
 		}
 		
@@ -101,7 +101,7 @@ public class ServerGroup {
 		// TODO: is this really useful?
 		while (true) {
 			if (servers.size() == maxServers)
-				return;
+				return true;
 			
 			double benefit = partitionedEntityGroup.getPartitionedSize(servers.size()) - 
 					partitionedEntityGroup.getPartitionedSize(servers.size()+1);
@@ -115,6 +115,7 @@ public class ServerGroup {
 			
 			addServer();
 		}
+		return true;
 	}
 	
 	/**

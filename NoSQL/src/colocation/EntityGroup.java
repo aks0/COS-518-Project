@@ -37,12 +37,11 @@ public class EntityGroup implements Iterable<Table> {
     }
     
     public boolean addReplicatedTable(Table table) {
-    	if (!contains(table)) {
-    		replicatedTables.add(table);
-    		return true;
+    	if (replicatedTables.contains(table)) {
+    	    return false;
     	}
-    	
-    	return false;
+    	replicatedTables.add(table);
+    	return true;
     }
     
     public void removeReplicatedTable(Table table) {
@@ -50,8 +49,16 @@ public class EntityGroup implements Iterable<Table> {
     		replicatedTables.remove(table);
     }
     
+    public void removeEntity(Table entity) {
+        entities.remove(entity);
+    }
+    
     public boolean contains(Table entity) {
         return (entities.contains(entity) || replicatedTables.contains(entity));
+    }
+    
+    public boolean containsEntity(Table entity) {
+        return entities.contains(entity);
     }
     
     public boolean onlyContainsCenter() {
