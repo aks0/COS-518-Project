@@ -1,81 +1,80 @@
 
 
 select
-    o.orderdate,
-    l.extendedprice,
-    l.discount,
-    n2.name
+	s.name,
+	s.address
 from
-    part p,
-    supplier s,
-    lineitem l,
-    orders o,
-    customer c,
-    nation n1,
-    nation n2,
-    region r
+	supplier s,
+	nation n
 where
-    p.partkey = l.partkey
-    and s.suppkey = l.suppkey
-    and l.orderkey = o.orderkey
-    and o.custkey = c.custkey
-    and c.nationkey = n1.nationkey
-    and n1.regionkey = r.regionkey;
+    s.nationkey = n.nationkey;
 
 
 select
-	l.extendedprice
+	p.type,
+	l.extendedprice,
+	l.discount
 from
 	lineitem l,
 	part p
 where
-	p.partkey = l.partkey;
+	l.partkey = p.partkey;
 
 
 select
-    o.orderdate,
-    l.extendedprice,
-    l.discount,
-    n2.name
+	p.type,
+	l.extendedprice,
+	l.discount
 from
-    part p,
-    supplier s,
-    lineitem l,
-    orders o,
-    customer c,
-    nation n1,
-    nation n2,
-    region r
+	lineitem l,
+	part p
 where
-    p.partkey = l.partkey
-    and s.suppkey = l.suppkey
-    and l.orderkey = o.orderkey
-    and o.custkey = c.custkey
-    and c.nationkey = n1.nationkey
-    and n1.regionkey = r.regionkey;
+	l.partkey = p.partkey;
 
 
 select
-    o.orderdate,
-    l.extendedprice,
-    l.discount,
-    n2.name
+	p.type,
+	l.extendedprice,
+	l.discount
 from
-    part p,
-    supplier s,
-    lineitem l,
-    orders o,
-    customer c,
-    nation n1,
-    nation n2,
-    region r
+	lineitem l,
+	part p
 where
-    p.partkey = l.partkey
-    and s.suppkey = l.suppkey
-    and l.orderkey = o.orderkey
-    and o.custkey = c.custkey
-    and c.nationkey = n1.nationkey
-    and n1.regionkey = r.regionkey;
+	l.partkey = p.partkey;
+
+
+select
+	p.type,
+	l.extendedprice,
+	l.discount
+from
+	lineitem l,
+	part p
+where
+	l.partkey = p.partkey;
+
+
+select
+	p.type,
+	l.extendedprice,
+	l.discount
+from
+	lineitem l,
+	part p
+where
+	l.partkey = p.partkey;
+
+
+select
+	p.brand,
+	p.type,
+	p.size,
+	ps.suppkey
+from
+	partsupp ps,
+	part p
+where
+	p.partkey = ps.partkey;
 
 
 
@@ -99,27 +98,64 @@ where
 	and n.regionkey = r.regionkey;
 
 
+
 select
-    o.orderdate,
-    l.extendedprice,
-    l.discount,
-    n2.name
+	l.shipmode,
+	o.orderpriority
 from
-    part p,
-    supplier s,
-    lineitem l,
-    orders o,
-    customer c,
-    nation n1,
-    nation n2,
-    region r
+	orders o,
+	lineitem l
 where
-    p.partkey = l.partkey
-    and s.suppkey = l.suppkey
-    and l.orderkey = o.orderkey
-    and o.custkey = c.custkey
-    and c.nationkey = n1.nationkey
-    and n1.regionkey = r.regionkey;
+	o.orderkey = l.orderkey;
+
+
+select
+	l.extendedprice,
+	l.discount
+from
+	lineitem l,
+	part p
+where
+	p.partkey = l.partkey;
+
+
+select
+	p.type,
+	l.extendedprice,
+	l.discount
+from
+	lineitem l,
+	part p
+where
+	l.partkey = p.partkey;
+
+
+select
+	l.extendedprice
+from
+	lineitem l,
+	part p
+where
+	p.partkey = l.partkey;
+
+
+select
+	l.extendedprice,
+	l.discount
+from
+	lineitem l,
+	part p
+where
+	p.partkey = l.partkey;
+
+
+select
+	l.extendedprice
+from
+	lineitem l,
+	part p
+where
+	p.partkey = l.partkey;
 
 
 select
@@ -152,20 +188,12 @@ where
 
 
 select
-	l.extendedprice,
-	l.discount
+	l.extendedprice
 from
 	lineitem l,
 	part p
 where
 	p.partkey = l.partkey;
-
-
-select
-	l.extendedprice,
-	l.discount
-from
-	lineitem l;
 
 
 select
@@ -180,46 +208,25 @@ where
 
 
 select
+	p.type,
 	l.extendedprice,
 	l.discount
 from
 	lineitem l,
 	part p
 where
-	p.partkey = l.partkey;
+	l.partkey = p.partkey;
 
 
 select
-    o.orderdate,
-    l.extendedprice,
-    l.discount,
-    n2.name
-from
-    part p,
-    supplier s,
-    lineitem l,
-    orders o,
-    customer c,
-    nation n1,
-    nation n2,
-    region r
-where
-    p.partkey = l.partkey
-    and s.suppkey = l.suppkey
-    and l.orderkey = o.orderkey
-    and o.custkey = c.custkey
-    and c.nationkey = n1.nationkey
-    and n1.regionkey = r.regionkey;
-
-
-select
+	p.type,
 	l.extendedprice,
 	l.discount
 from
 	lineitem l,
 	part p
 where
-	p.partkey = l.partkey;
+	l.partkey = p.partkey;
 
 
 select
@@ -242,73 +249,94 @@ where
 
 
 select
-    c.custkey,
-    c.name,
-    l.extendedprice,
-    l.discount,
-    c.acctbal,
-    n.name,
-    c.address,
-    c.phone,
-    c.comment
+    ps.partkey,
+    ps.supplycost,
+    ps.availqty
+from
+	partsupp ps,
+	supplier s,
+	nation n
+where
+	ps.suppkey = s.suppkey
+	and s.nationkey = n.nationkey;
+
+
+select
+	p.type,
+	l.extendedprice,
+	l.discount
+from
+	lineitem l,
+	part p
+where
+	l.partkey = p.partkey;
+
+
+select
+	l.extendedprice
+from
+	lineitem l,
+	part p
+where
+	p.partkey = l.partkey;
+
+
+select
+	p.type,
+	l.extendedprice,
+	l.discount
+from
+	lineitem l,
+	part p
+where
+	l.partkey = p.partkey;
+
+
+select
+	p.type,
+	l.extendedprice,
+	l.discount
+from
+	lineitem l,
+	part p
+where
+	l.partkey = p.partkey;
+
+
+select
+	l.extendedprice
+from
+	lineitem l,
+	part p
+where
+	p.partkey = l.partkey;
+
+
+select
+	c.name,
+	c.custkey,
+	o.orderkey,
+	o.orderdate,
+	o.totalprice,
+	l.quantity
 from
 	customer c,
 	orders o,
-	lineitem l,
-	nation n
+	lineitem l
 where
 	c.custkey = o.custkey
-	and l.orderkey = o.orderkey
-	and c.nationkey = n.nationkey;
+	and o.orderkey = l.orderkey;
 
 
 select
-	s.acctbal,
-	s.name,
-	n.name,
-	p.partkey,
-	p.mfgr,
-	s.address,
-	s.phone,
-	s.comment
-from
-	part p,
-	supplier s,
-	partsupp ps,
-	nation n,
-	region r
-where
-	p.partkey = ps.partkey
-	and s.suppkey = ps.suppkey;
-
-
-select
-	l.extendedprice
-from
-	lineitem l,
-	part p
-where
-	p.partkey = l.partkey;
-
-
-select
+	p.type,
 	l.extendedprice,
 	l.discount
 from
 	lineitem l,
 	part p
 where
-	p.partkey = l.partkey;
-
-
-select
-	l.extendedprice,
-	l.discount
-from
-	lineitem l,
-	part p
-where
-	p.partkey = l.partkey;
+	l.partkey = p.partkey;
 
 
 select
@@ -333,59 +361,6 @@ where
 
 
 select
-	s.acctbal,
-	s.name,
-	n.name,
-	p.partkey,
-	p.mfgr,
-	s.address,
-	s.phone,
-	s.comment
-from
-	part p,
-	supplier s,
-	partsupp ps,
-	nation n,
-	region r
-where
-	p.partkey = ps.partkey
-	and s.suppkey = ps.suppkey;
-
-
-select
-    o.orderdate,
-    l.extendedprice,
-    l.discount,
-    n2.name
-from
-    part p,
-    supplier s,
-    lineitem l,
-    orders o,
-    customer c,
-    nation n1,
-    nation n2,
-    region r
-where
-    p.partkey = l.partkey
-    and s.suppkey = l.suppkey
-    and l.orderkey = o.orderkey
-    and o.custkey = c.custkey
-    and c.nationkey = n1.nationkey
-    and n1.regionkey = r.regionkey;
-
-
-select
-	l.extendedprice,
-	l.discount
-from
-	lineitem l,
-	part p
-where
-	p.partkey = l.partkey;
-
-
-select
 	p.type,
 	l.extendedprice,
 	l.discount
@@ -397,26 +372,14 @@ where
 
 
 select
-    o.orderdate,
-    l.extendedprice,
-    l.discount,
-    n2.name
+	l.returnflag,
+	l.linestatus,
+	l.quantity,
+	l.extendedprice,
+	l.tax,
+	l.discount
 from
-    part p,
-    supplier s,
-    lineitem l,
-    orders o,
-    customer c,
-    nation n1,
-    nation n2,
-    region r
-where
-    p.partkey = l.partkey
-    and s.suppkey = l.suppkey
-    and l.orderkey = o.orderkey
-    and o.custkey = c.custkey
-    and c.nationkey = n1.nationkey
-    and n1.regionkey = r.regionkey;
+	lineitem l;
 
 
 select
@@ -436,14 +399,16 @@ from
 
 
 select
-	p.type,
-	l.extendedprice,
-	l.discount
+    ps.partkey,
+    ps.supplycost,
+    ps.availqty
 from
-	lineitem l,
-	part p
+	partsupp ps,
+	supplier s,
+	nation n
 where
-	l.partkey = p.partkey;
+	ps.suppkey = s.suppkey
+	and s.nationkey = n.nationkey;
 
 
 select
@@ -457,20 +422,75 @@ where
 
 
 select
-	s.name
+	l.extendedprice
 from
-	supplier s,
-	lineitem l1,
-	orders o,
-	nation n
+	lineitem l,
+	part p
 where
-	s.suppkey = l1.suppkey
-	and o.orderkey = l1.orderkey;
+	p.partkey = l.partkey;
+
+
+select
+	p.type,
+	l.extendedprice,
+	l.discount
+from
+	lineitem l,
+	part p
+where
+	l.partkey = p.partkey;
+
+
+select
+	o.orderpriority
+from
+	orders o;
 
 
 select
 	l.extendedprice,
 	l.discount
+from
+	lineitem l,
+	part p
+where
+	p.partkey = l.partkey;
+
+
+select
+	l.extendedprice,
+	l.discount
+from
+	lineitem l,
+	part p
+where
+	p.partkey = l.partkey;
+
+
+select
+	p.type,
+	l.extendedprice,
+	l.discount
+from
+	lineitem l,
+	part p
+where
+	l.partkey = p.partkey;
+
+
+select
+	p.type,
+	l.extendedprice,
+	l.discount
+from
+	lineitem l,
+	part p
+where
+	l.partkey = p.partkey;
+
+
+select
+	l.extendedprice
 from
 	lineitem l,
 	part p
@@ -495,187 +515,6 @@ from
 	part p
 where
 	p.partkey = l.partkey;
-
-
-select
-    n1.name,
-    n2.name,
-    l.shipdate,
-    l.extendedprice,
-    l.discount
-from
-    supplier s,
-    lineitem l ,
-    orders o,
-    customer c,
-    nation n1,
-    nation n2
-where
-    s.suppkey = l.suppkey
-    and o.orderkey = l.orderkey
-    and c.custkey = o.custkey
-    and s.nationkey = n1.nationkey
-    and c.nationkey = n2.nationkey;
-
-
-select
-	s.name,
-	s.address
-from
-	supplier s,
-	nation n
-where
-    s.nationkey = n.nationkey;
-
-
-select
-    o.orderdate,
-    l.extendedprice,
-    l.discount,
-    n2.name
-from
-    part p,
-    supplier s,
-    lineitem l,
-    orders o,
-    customer c,
-    nation n1,
-    nation n2,
-    region r
-where
-    p.partkey = l.partkey
-    and s.suppkey = l.suppkey
-    and l.orderkey = o.orderkey
-    and o.custkey = c.custkey
-    and c.nationkey = n1.nationkey
-    and n1.regionkey = r.regionkey;
-
-
-select
-	l.extendedprice,
-	l.discount
-from
-	lineitem l,
-	part p
-where
-	p.partkey = l.partkey;
-
-
-select
-	l.extendedprice,
-	l.discount
-from
-	lineitem l,
-	part p
-where
-	p.partkey = l.partkey;
-
-
-select
-	l.extendedprice,
-	l.discount
-from
-	lineitem l,
-	part p
-where
-	p.partkey = l.partkey;
-
-
-select
-	p.type,
-	l.extendedprice,
-	l.discount
-from
-	lineitem l,
-	part p
-where
-	l.partkey = p.partkey;
-
-
-select
-	l.extendedprice,
-	l.discount
-from
-	lineitem l,
-	part p
-where
-	p.partkey = l.partkey;
-
-
-select
-    o.orderdate,
-    l.extendedprice,
-    l.discount,
-    n2.name
-from
-    part p,
-    supplier s,
-    lineitem l,
-    orders o,
-    customer c,
-    nation n1,
-    nation n2,
-    region r
-where
-    p.partkey = l.partkey
-    and s.suppkey = l.suppkey
-    and l.orderkey = o.orderkey
-    and o.custkey = c.custkey
-    and c.nationkey = n1.nationkey
-    and n1.regionkey = r.regionkey;
-
-
-select
-	s.name
-from
-	supplier s,
-	lineitem l1,
-	orders o,
-	nation n
-where
-	s.suppkey = l1.suppkey
-	and o.orderkey = l1.orderkey;
-
-
-select
-    n1.name,
-    n2.name,
-    l.shipdate,
-    l.extendedprice,
-    l.discount
-from
-    supplier s,
-    lineitem l ,
-    orders o,
-    customer c,
-    nation n1,
-    nation n2
-where
-    s.suppkey = l.suppkey
-    and o.orderkey = l.orderkey
-    and c.custkey = o.custkey
-    and s.nationkey = n1.nationkey
-    and c.nationkey = n2.nationkey;
-
-
-select
-	s.acctbal,
-	s.name,
-	n.name,
-	p.partkey,
-	p.mfgr,
-	s.address,
-	s.phone,
-	s.comment
-from
-	part p,
-	supplier s,
-	partsupp ps,
-	nation n,
-	region r
-where
-	p.partkey = ps.partkey
-	and s.suppkey = ps.suppkey;
 
 
 select

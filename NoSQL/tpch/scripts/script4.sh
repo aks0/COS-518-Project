@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare -a arr75=(3 5 7 8 18 9);
+declare -a arr75=(3 5 7 8 18);
 declare -a arr25=();
 len1=${#arr75[@]};
 
