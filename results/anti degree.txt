@@ -1,5 +1,5 @@
 our tool
-Total Distributed Cost: 2.70000225E13
+Total Distributed Cost: 0.0 
 degree
 Total Distributed Cost: 4.80177508201E13
 size
