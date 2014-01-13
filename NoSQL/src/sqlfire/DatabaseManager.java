@@ -169,6 +169,7 @@ public class DatabaseManager {
                 String selectQuery2 = constructSelectQuery(table2, query.getTableToColumns().get(table2));
                 
                 try{
+                    /*
                     RowSet tableResult1 = new JdbcRowSetImpl();
                     tableResult1.setUrl(URL); 
                     tableResult1.setCommand(selectQuery1);
@@ -177,21 +178,25 @@ public class DatabaseManager {
                     RowSet tableResult2 = new JdbcRowSetImpl();
                     tableResult2.setUrl(URL); 
                     tableResult2.setCommand(selectQuery2);
-                    tableResult2.execute();
+                    tableResult2.execute();*/
+                    Statement additionalStatement1 = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                    ResultSet result1 = sendQuery(selectQuery2, additionalStatement1);
                     
+                    Statement additionalStatement2 = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                    ResultSet result2 = sendQuery(selectQuery2, additionalStatement2);
                     JoinRowSet joinResults = new JoinRowSetImpl();
-                    ((Joinable)tableResult1).setMatchColumn(column1.getName());
-                    ((Joinable)tableResult2).setMatchColumn(column2.getName());
-                    joinResults.addRowSet((Joinable) tableResult1);            
-                    joinResults.addRowSet((Joinable) tableResult2);
+                    ((Joinable)result1).setMatchColumn(column1.getName());
+                    ((Joinable)result2).setMatchColumn(column2.getName());
+                    joinResults.addRowSet((Joinable) result1);            
+                    joinResults.addRowSet((Joinable) result2);
                     
                     // display records in JoinRowSet object
                     while (joinResults.next()) {
                         // match
                         ;
                     }
-                    tableResult1.close();
-                    tableResult2.close();
+                    result1.close();
+                    result2.close();
                     joinResults.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
