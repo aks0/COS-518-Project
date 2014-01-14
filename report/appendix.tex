@@ -1,0 +1,7 @@
+\appendix
+\section{Appendix}
+\label{sec:appendix}
+For the TPC-H benchmark query generator \texttt{qgen} to generate the queries, we had to fix a minor bug in \texttt{appendix/dbgen/config.h}. Line \texttt{65} in that file specifies an incorrect format specifier (for C) in the generation of \texttt{long long} numbers i.e.,\\
+\centerline{\texttt{$\#$define HUGE\_FORMAT ``\%LLd''}}\\
+\noindent should change to\\
+\centerline{\texttt{$\#$define HUGE\_FORMAT ``\%lld''}}

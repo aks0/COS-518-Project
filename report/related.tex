@@ -1,0 +1,10 @@
+\section{Related Work}
+\label{sec:related}
+We borrow many of our ideas from database literature on automatically enumerating materialized views for SQL databases (\cite{Yang:1997}, \cite{Agrawal:2000}, \cite{Phan:2008}).
+
+In \cite{Yang:1997}, the idea of an Multiple View Processing Plan (MVPP) is used to generate optimal views. An MVPP is a directed graph that encodes the query access plan for a set of queries. For each intermediate result, a cost is calculated for storing the result as a view that involves both the cost to materialize the view and the cost to maintain the view. The authors provide a heuristic to reduce the search space of this graph. Lastly, they formulate the above problem as 0-1 integer programming.
+
+The authors in \cite{Agrawal:2000} also provide another heuristic to decrease the exponential search space discussed above. To prune the set of candidate views further, the authors use a query optimizer to ensure that a view is part of the optimal evaluation plan for at least one query in the workload. Additionally, they use a method of view merging to get new views that do not exist in specific query but could be used to help multiple queries in the workload.
+
+% Need one more reference in related work?
+In \cite{Phan:2008}, the authors consider a setting where one is using a database cluster to evaluate OLAP-type query workloads. If we assume we are using materialized views to speed up evaluation of queries, we need an optimal query-to-server and materialied -view-to-server mapping so that the query workload execution time is minimized. To find these two mappings, the authors propose a genetic algorithm to avoid doing exhaustive search on the exponential search space. The authors show that this heuristic is only 9\% worse than exhaustive search on the TPC-H benchmark.

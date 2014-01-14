@@ -1,0 +1,9 @@
+\section{Background}
+\label{sec:background}
+We focus on NewSQL systems that allow one to manually determine the placement of data on servers in the system.  Specifically, we use VMWare's vFabric SQLFire 1.0~\cite{web:sqlfire} as the distributed database for holding the tables and serving the queries in our research. It is an in-memory distributed NewSQL database that provides scalability and high performance for large workloads. Its memory-optimized architecture minimizes the disk I/O time which is the main performance bottleneck in traditional databases.
+
+In NewSQL systems like SQLFire, one can assign servers to one or more server groups.  Server groups are in charge of storing the data for a given set of tables.  Tables must either be partitioned~\cite{web:paritioning} or replicated~\cite{web:replication} across the servers of the group, but not both.
+
+Partitioning a table distributes the rows of the table across the server group based on values of a specified partitioning column through hash-partitioning.  Furthermore, if two tables $s$ and $t$ are partitioned on the same column, one can specify that the partitions of $t$ be colocated with the partitions of $s$.  Doing so will distribute $s$ onto servers and then additionally colocate rows of $t$ with matching values for the partitioning column onto the same servers.  A server storing partitions can only execute a join between partitions if one is specified to be colocated with the other.
+
+Replicating a table in a server group creates a synchronous replica of the entire table in each server of the group.  There is no limitation on the joins a server can do between replicated tables and other replicated tables or partitions.  Queries from a client to the system are broken and distributed so that each server handles the portion of the query that it can answer using its own data.  The results to the query are then combined and returned to the client.
