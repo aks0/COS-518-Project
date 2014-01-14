@@ -152,7 +152,7 @@ public class TableColocator {
     
     public static void main(String[] args) {
     	ArrayList<Table> tables = Table.getTablesFromModel("./data_models/tpc-h.model");
-		ArrayList<Query> queryList = QueryLib.getQueryList("./query_logs/queries_random1.sql");
+		ArrayList<Query> queryList = QueryLib.getQueryList("./query_logs/random-queries5.sql");
 		
 		colocate(tables, queryList, new MemorySize(0.5, Size.GB), 3);
     }

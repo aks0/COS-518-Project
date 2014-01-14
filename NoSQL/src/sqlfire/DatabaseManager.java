@@ -130,7 +130,6 @@ public class DatabaseManager {
             }
 			totalCost += cost;
         }
-        System.out.println();
         return totalCost;
         /*String error = e.getMessage();
         ArrayList<String> tables = extractBetweenDelimiters(error, "(.*?)", " 'APP\\.", "(\\[|')");
@@ -164,7 +163,7 @@ public class DatabaseManager {
                 // fetch both tables
                 String selectQuery1 = constructSelectQuery(table1, query.getTableToColumns().get(table1));
                 String selectQuery2 = constructSelectQuery(table2, query.getTableToColumns().get(table2));
-                
+                /*
                 try{
                     CachedRowSet tableResult1 = new CachedRowSetImpl();
                     tableResult1.setUrl(URL); 
@@ -182,19 +181,13 @@ public class DatabaseManager {
                     joinResults.addRowSet(tableResult1);            
                     joinResults.addRowSet(tableResult2);
                     
-                    // display records in JoinRowSet object
-                    while (joinResults.next()) {
-                        // match
-                        ;
-                    }
                     tableResult1.close();
                     tableResult2.close();
                     joinResults.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                
-                /*
+                */
                 try {
                     ResultSet result1 = sendQuery(selectQuery1);
                     // execute join
@@ -216,7 +209,7 @@ public class DatabaseManager {
                     additionalStatement.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
-                }*/
+                }
             }
         }
         System.out.println();
