@@ -103,7 +103,14 @@ public class ServerGroup {
 			
 			double benefit = partitionedEntityGroup.getPartitionedSize(servers.size()) - 
 					partitionedEntityGroup.getPartitionedSize(servers.size()+1);
-			double cost = partitionedEntityGroup.getReplicatedSize();
+			
+			double avg = 0;
+			for (Table replicated : partitionedEntityGroup.getReplicatedTables()) {
+				avg += replicated.getUpdateRate();
+			}
+			avg /= partitionedEntityGroup.getReplicatedTables().size();
+			
+			double cost = partitionedEntityGroup.getReplicatedSize() - avg * partitionedEntityGroup.getReplicatedSize();
 			
 			System.out.println("Benefit of adding server: " + benefit);
 			System.out.println("Cost of adding server: " + cost);
