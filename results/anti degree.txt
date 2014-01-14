@@ -1,6 +1,15 @@
+cost:
 our tool
 Total Distributed Cost: 0.0 
 degree
-Total Distributed Cost: 4.80177508201E13
+Total Distributed Cost: 4.56257392301E13
 size
-Total Distributed Cost: 7.501777228E13
+Total Distributed Cost: 1.8062585069E14
+
+timing:
+our tool
+Total execution time: 13
+degree
+Total execution time: 622 
+size
+
