@@ -1,0 +1,39 @@
+random 1:
+Our tool
+Total execution time: 38
+Degree
+Total execution time: 38
+Size
+Total execution time: 631
+
+random 2:
+Our tool
+Total execution time: 20 
+Degree
+Total execution time: 22
+Size
+Total execution time: 1152
+
+random 3:
+Our tool
+Total execution time: 54
+Degree
+Total execution time: 54
+Size
+Total execution time: 1606
+
+random 4:
+Our tool
+Total execution time: 51
+Degree
+Total execution time: 52
+Size
+Total execution time: 723
+
+random 5:
+Our tool
+Total execution time: 20
+Degree
+Total execution time: 23
+Size
+Total execution time: 1152
