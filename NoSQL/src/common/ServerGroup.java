@@ -97,8 +97,6 @@ public class ServerGroup {
 			}
 		}
 		
-		// See if adding servers past minimum necessary is useful
-		// TODO: is this really useful?
 		while (true) {
 			if (servers.size() == maxServers)
 				return true;

@@ -71,12 +71,6 @@ public class GraphBuilder {
 				.getTablesFromModel("data_models/data2.model");
 		ArrayList<Query> queryList = QueryLib
 				.getQueryList("query_logs/queries_sqlfire.sql");
-		/*for (Query query : queryList) {
-			for (Column column : query.getReferencedColumns()) {
-				System.out.println(column);
-			}
-			System.out.println("--------");
-		}*/
 		TableGraph2 graph = build(tables, queryList);
 	    System.out.println("Printing graph: ***********************");
 	    System.out.println(graph);

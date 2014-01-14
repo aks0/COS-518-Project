@@ -131,20 +131,6 @@ public class DatabaseManager {
 			totalCost += cost;
         }
         return totalCost;
-        /*String error = e.getMessage();
-        ArrayList<String> tables = extractBetweenDelimiters(error, "(.*?)", " 'APP\\.", "(\\[|')");
-        if (tables.size() == 2) {
-            // distributed join
-            Table table1 = Table.getInstance(tables.get(0).toLowerCase());
-            Table table2 = Table.getInstance(tables.get(1).toLowerCase());
-
-            // I/O's for fetching rows of both tables
-            long cost = (long)table1.getSize() + (long)table2.getSize();
-            // I/O's for join, assume no index?
-            cost += (long)table1.getSize() * (long)table2.getSize();
-            System.out.println(table1.getName() + "X" + table2.getName() + " Cost: " + cost);
-            return cost;
-        }*/
     }
     
     public void handleErrorWithTime(Query query) {
@@ -163,31 +149,6 @@ public class DatabaseManager {
                 // fetch both tables
                 String selectQuery1 = constructSelectQuery(table1, query.getTableToColumns().get(table1));
                 String selectQuery2 = constructSelectQuery(table2, query.getTableToColumns().get(table2));
-                /*
-                try{
-                    CachedRowSet tableResult1 = new CachedRowSetImpl();
-                    tableResult1.setUrl(URL); 
-                    tableResult1.setCommand(selectQuery1);
-                    tableResult1.execute();
-    
-                    CachedRowSet tableResult2 = new CachedRowSetImpl();
-                    tableResult2.setUrl(URL); 
-                    tableResult2.setCommand(selectQuery2);
-                    tableResult2.execute();
-                    
-                    JoinRowSet joinResults = new JoinRowSetImpl();
-                    ((Joinable)tableResult1).setMatchColumn(column1.getName());
-                    ((Joinable)tableResult2).setMatchColumn(column2.getName());
-                    joinResults.addRowSet(tableResult1);            
-                    joinResults.addRowSet(tableResult2);
-                    
-                    tableResult1.close();
-                    tableResult2.close();
-                    joinResults.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                */
                 try {
                     ResultSet result1 = sendQuery(selectQuery1);
                     // execute join
@@ -234,34 +195,6 @@ public class DatabaseManager {
         query += " from " + table.getName() + ";"; 
         return query;
     }
-    
-    /**
-     * Extracts a substring of a specified format that is between a specified
-     * start substring delimiter and end substring delimiter.
-     * @param content - String to extract substring from
-     * @param formatOfExtract - String describing regex format of the substring to extract
-     * @param start - start substring delimiter in regex format
-     * @param end - end substring delimiter in regex format
-     * @return String for extracted substring
-     */
-    public static ArrayList<String> extractBetweenDelimiters(String content, String formatOfExtract,
-            String start, String end) {
-        ArrayList<String> matches = Util518.newArrayList();
-        // Find the number of groups in start
-        Pattern pattern = Pattern.compile(start);
-        Matcher matcher = pattern.matcher("");
-        // the group number of the extract is 1 plus the number of groups in start
-        int groupNumOfExtract = matcher.groupCount() + 1;
-        
-        pattern = Pattern.compile(start + formatOfExtract  + "\\s*" + end);
-        matcher = pattern.matcher(content);
-        while (matcher.find()) {
-            // return what matches between the parentheses of pattern
-            matches.add(matcher.group(groupNumOfExtract));
-        }
-        return matches;
-    }
-
     
     public static void main(String[] args) {
         if (args.length == 0) {

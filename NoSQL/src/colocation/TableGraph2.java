@@ -114,10 +114,6 @@ class TableNode {
             
             // See if any joins exist from entity group to table
             for (Table entityTable : group.getEntities()) {
-                // If group already contains table, no additional benefit from parent to replicated table 
-                if (group.contains(this.getTable()) && entityTable.equals(group.getCenter())) {
-                    continue;
-                }
             	TableNode node = tableToNode.get(entityTable);
             	for (Edge edge : node.outEdges) {
                 	//System.out.println("Edge: " + edge.getTable().getName());
