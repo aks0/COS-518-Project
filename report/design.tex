@@ -20,7 +20,7 @@ This is essentially the cost of $Q$ when joins between $s$ and $t$ can be done l
 Benefit(Q,s,t) = C(Q) - C(Q,s,t)
 \vspace*{-8pt}
 \end{equation}
-We calculate $C(q,s,t)$, for any query $q$, based on our own heuristic cost model that estimates the number of row accesses required to perform the distributed joins of $q$. Only joins between tables from $\{s,t\}$ comes at no cost.  For each distributed join, we count the number of row accesses done to fetch both tables involved and perform the join.  For the purposes of our model, we assume that a server must even fetch $s$ or $t$ in a join with a table that is not from $\{s,t\}$.  We also assume the join is performed by scanning one table for each row of the other table.  For a query with distributed joins between any tables $A$, with $|A|_r$ rows, and $B$, with $|B|_r$ rows, and $s$ and $t$ colocated, we thus assign a cost of:
+We calculate $C(q,s,t)$, for any query $q$, based on our own heuristic cost model that estimates the number of row accesses required to perform the distributed joins of $q$. Only joins between tables from $\{s,t\}$ comes at no cost.  For each distributed join, we count the number of row accesses done to fetch both tables involved and perform the join.  For the purposes of our model, we assume that a server must even fetch $s$ or $t$ if they are in a join with a table that is not from $\{s,t\}$.  We also assume the join is performed by scanning one table for each row of the other table.  For a query with distributed joins between any tables $A$, with $|A|_r$ rows, and $B$, with $|B|_r$ rows, and $s$ and $t$ colocated, we thus assign a cost of:
 \vspace*{-4pt}
 \begin{equation}
 \label{eq:cost}
