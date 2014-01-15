@@ -1,6 +1,9 @@
 COS-518-Project
 ===============
 
+Adaptive Data Placement in NewSQL Systems
+-----------------------------------------
+
 In this project, we present a method for configuring the placement of data onto
 servers in NewSQL systems to minimize the cost of executing a known query
 workload.  Mainly, we apply ideas from database literature on optimal view
